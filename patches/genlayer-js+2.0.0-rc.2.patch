@@ -1,0 +1,13 @@
+diff --git a/node_modules/genlayer-js/dist/index.js b/node_modules/genlayer-js/dist/index.js
+index a7b64c6..edbd772 100644
+--- a/node_modules/genlayer-js/dist/index.js
++++ b/node_modules/genlayer-js/dist/index.js
+@@ -2457,7 +2457,7 @@ var readCurrentFeePolicy = async (client, publicClient) => {
+       functionName: "estimateProposeReceiptGas",
+       args: [receiptWrapperBytes + MIN_TERMINAL_OUTPUT_BYTES]
+     });
+-    const result = await publicClient.call({ to: address, data, gasPrice: receiptGasPrice, batch: false });
++    const result = await publicClient.call({ to: address, data, account: client.account, gasPrice: receiptGasPrice, batch: false });
+     if (!result.data) {
+       throw new Error("FeeManager.estimateProposeReceiptGas returned no data.");
+     }
