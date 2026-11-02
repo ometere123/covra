@@ -1,0 +1,36 @@
+# COVRA verification report
+
+Run date: 2026-10-31. These are actual local executions against the current workspace. No live Base/Bradbury deployment is claimed.
+
+| Command | Result |
+| --- | --- |
+| `npm ci` | PASS; 688 packages installed. npm reported 42 advisories (15 moderate, 25 high, 2 critical); no automatic force-fix was applied. |
+| `npm run typecheck` | PASS. |
+| `npm test` | PASS: 11 Vitest files, 60 tests; Node TAP suites, 7 tests passed. Includes the full CovraPools lifecycle-event ABI guard, Bradbury endpoint-boundary tests and SSRF address-boundary regression tests. |
+| `npm run test:genlayer-logic` | PASS: 8 Python host-logic tests, including observation identity/source binding, strict GenVM `Response.status` handling, and deterministic transaction-datetime checks; an obsolete `status_code`-only mock fails closed. These use an isolated shim and are not GenVM consensus tests. |
+| `npm run test:genlayer-direct` | PASS: 2 Direct Mode tests against the actual v0.3 `CovraAdjudicator.py` using the installed `gltest` runner, including positive and insufficient-evidence adjudication. The test bridge encodes v0.3 calldata and adapts only deterministic external web/LLM inputs; it does not claim Bradbury consensus. This caught and fixed the unsupported `TreeMap[str, int]`, missing-map handling, obsolete `run_nondet_unsafe`, and current `.status` response field. |
+| `npm run test:solidity` | PASS: CovraPools compiled; 59 ABI functions, 15,195-byte deployable bytecode; 19 Foundry behavioral tests compiled. The test harness warning is about the test contract, not the deployable contract. |
+| `forge test --root contracts/base -vv` | PASS: 19 tests passed, 0 failed. Includes duplicate claim IDs, five-member roster replacement snapshots, quorum, replay, denial, expiry, pause, liquidity, invalid-state paths and construction-time separation of deployer, quote, evidence-issuer and attestor identities. |
+| `npm run build` | PASS: Next.js 16.4.3 Webpack production build; 23 static pages/routes generated. Existing `ox` dynamic-dependency warning remains. |
+| `npm audit --omit=dev --json` | REVIEW REQUIRED: 37 production dependency advisories (14 moderate, 23 high, 0 critical at verification time). No force-fix was applied; `undici` and `zod` upgrades need a compatibility review, while the `minimatch` advisory has no available fix in the installed graph. |
+| `npm run test:e2e` | PASS: 8 Playwright tests passed across Chromium desktop and Pixel 7 mobile projects. They cover the public landing page, truthful unconfigured/testnet states, and all major workspace journeys. They do not claim funded cross-chain settlement. A browser-side hydration warning about injected input caret styling remains under the test runner. |
+| `py -m genvm_linter.cli lint contracts/genlayer/CovraAdjudicator.py --json` | PASS: 3 lint checks, no determinism warnings after all contract time reads were changed to the deterministic GenVM message datetime. The separate semantic `check/schema/typecheck` path is blocked by the installed linter artifact cache not containing the declared `1zr...` rc7 runner bundle. |
+| `py -m genvm_linter.cli typecheck contracts/genlayer/CovraAdjudicator.py --json` | BLOCKED by the linter's runner artifact extraction (`E101`, declared `1zr...` bundle unavailable to the semantic loader); AST lint and Direct Mode both pass. |
+| `npm run genlayer:smoke` | PASS for Bradbury EVM identity: chain 4221, expected Phase 2 genesis and AddressManager. The node endpoint `https://rpc-bradbury.genlayer.com` returned the documented exact receipt and trace responses. |
+| Bradbury `gen_getContractSchema` preflight | FAIL honestly for the existing COVRA source, a minimal `1jb...` contract, a `# v0.3.0`/`1zr...` contract, the official current `9b8...` v0.3 candidate, and three public Bradbury project sources using the older `1jb...` family: each returned `-32000 VMError: invalid_contract runner malformed` from `https://rpc-bradbury.genlayer.com`. |
+| Real Bradbury deployment probes | FAIL honestly: three representative transactions are now `Finalized` at the protocol layer but each has `FinishedWithError` and `invalid contract runner malformed`, including a minimal contract. No adjudicator address was created. See `docs/BRADBURY_DEPLOYMENT.md`. |
+
+## Adversarial coverage executed
+
+- Solidity rejects duplicate/unknown/non-roster signers, fewer than three signatures, wrong chain, wrong evidence, wrong risk digest, wrong amounts, repeat settlement, and paused new exposure. Claim IDs cannot be locked under two policies. An existing claim keeps its original roster version across delayed replacement, while the legacy arbitrary roster-change surface fails closed.
+- Exact Bradbury receipt unit tests accept only a matching ID, `FINALIZED` status, successful return execution, adjudicator recipient, `call` type, exact method, and exact argument array. Wrong transaction, recipient, status, method, and claim argument all reject.
+- Issuer tests cover approved signatures, altered facts, forged issuer wallet, expired observations, mismatching host/source, and frozen-risk substitution. Python tests cover unavailable/invalid source statuses and issuer observation source binding.
+- Production evidence envelopes now accept only `OBSERVED_PUBLIC` / `https_get`; simulated and fixture-shaped payloads are isolated to negative tests and are rejected before settlement verification.
+- Browser tests execute real page navigation and visible assertions. No browser test claims a wallet transaction because no deployed contracts were available in this run.
+
+## Not executed / blocked
+
+- Live Bradbury deployment and lifecycle: the disposable Praest account is confirmed at `0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7` on chain `4221` with sufficient test GEN. The deployment transactions are finalized with `FinishedWithError` before contract creation because the public GenVM runtime could not load a runner. The isolated positive-control source is present at `contracts/genlayer/BradburyPositiveControl.py`, but its node-side schema preflight is also blocked; it has not been broadcast. No address is recorded.
+- Live Base deployment: correctly gated until a real Bradbury adjudicator address is available; no placeholder address was used.
+- Supabase migrations, Vault inspection, indexer invocation and Cron history: the operator's `DATABASE_URL` is malformed for the PostgreSQL client because its password contains unescaped URL-reserved characters. `.env.local` was not edited. After manual correction, run migrations 001–008 and verify Vault/Cron as documented.
+- Vercel deployment: PASS for code/runtime deployment. The latest production deployment is `dpl_44JLSjnJ1Z44VQYU9FPT2VY1pHPv`, READY at `https://covra-lyart.vercel.app`; homepage and health route were probed over HTTPS, and unauthenticated indexer access returned 401. Vercel environment variables are not configured yet, so the issuer/database/indexer are intentionally not claimed operational. See `docs/VERCEL_DEPLOYMENT.md`.

@@ -1,0 +1,282 @@
+"""Direct Mode tests using the installed gltest runner.
+
+These tests load the actual Intelligent Contract and do not replace GenVM with
+the host-side shim used by test_adjudicator_logic.py.
+"""
+
+import pytest
+import os
+import hashlib
+import json
+import tempfile
+from datetime import datetime, timezone
+from gltest.direct import loader
+
+
+def _canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _digest(value):
+    return "0x" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _now_iso():
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _case_inputs(
+    direct_owner,
+    complete_facts=True,
+    nonce="00000000-0000-0000-0000-000000000001",
+):
+    insured = "0x" + direct_owner.hex()
+    case_id = _digest("COVRA-CLAIM:" + insured + ":" + nonce)
+    policy_id = "0x" + "22" * 32
+    terms_hash = "0x" + "33" * 32
+    reference_hash = "0x" + "44" * 32
+    risk_spec = {
+        "coverageClass": 0,
+        "subject": "task-123",
+        "referenceHash": reference_hash,
+        "statement": "A task deadline breach triggers this test coverage.",
+        "evidenceIssuerHost": "issuer.example.com",
+    }
+    risk_spec_json = _canonical(risk_spec)
+    risk_spec_hash = _digest(risk_spec_json)
+    observation_path = "1" if complete_facts else "2"
+    source = "https://issuer.example.com/observations/" + observation_path
+    facts = {
+        "task_id": "task-123",
+        "task_spec_hash": reference_hash,
+        "missed_deadline": True,
+        "contracted_penalty_micro_usdc": 100,
+    }
+    if not complete_facts:
+        facts.pop("missed_deadline")
+    now = int(datetime.now(timezone.utc).timestamp())
+    envelope = {
+        "schema": "covra-evidence",
+        "policy_id": policy_id,
+        "claim_id": case_id,
+        "terms_hash": terms_hash,
+        "risk_spec_hash": risk_spec_hash,
+        "risk_spec": risk_spec,
+        "coverage_class": 0,
+        "event_time": "2026-10-31T00:00:00.000Z",
+        "observation_id": "obs-001",
+        "observed_at": _now_iso(),
+        "observation_mode": "OBSERVED_PUBLIC",
+        "source_details": {
+            "issuer_host": "issuer.example.com",
+            "endpoint": source,
+            "retrieval_method": "https_get",
+            "source_payload_digest": _digest(_canonical(facts)),
+            "origin_url": source,
+            "origin_payload_digest": _digest(_canonical(facts)),
+        },
+        "facts": facts,
+        "issuer": {
+            "wallet": "0x" + "11" * 20,
+            "signature": "0x" + "00" * 65,
+            "signed_at": now,
+            "expires_at": now + 3600,
+        },
+    }
+    body = _canonical(envelope)
+    return {
+        "case_id": case_id,
+        "policy_id": policy_id,
+        "terms_hash": terms_hash,
+        "risk_spec_json": risk_spec_json,
+        "risk_spec_hash": risk_spec_hash,
+        "source": source,
+        "evidence_commitment": _digest(body),
+        "event_time": envelope["event_time"],
+        "body": body,
+        "insured": insured,
+        "nonce": nonce,
+    }
+
+
+def _deploy(direct_deploy, direct_vm):
+    original_inject = loader._inject_message_to_fd0
+    original_allocate = loader._allocate_contract
+
+    def v03_safe_inject(vm):
+        """Encode the stdin message with the v0.3 SDK used by this contract.
+
+        gltest's Windows helper currently imports the legacy ``genlayer.py``
+        calldata encoder. The v0.3 ``genlayer`` package decodes a different
+        wire representation, so use the target SDK for this test-only bridge.
+        """
+        from genlayer import calldata
+        from genlayer.types import Address, u256
+
+        sender = vm.sender
+        if isinstance(sender, bytes):
+            sender = Address(sender)
+        contract_address = vm._contract_address
+        if isinstance(contract_address, bytes):
+            contract_address = Address(contract_address)
+        origin = vm.origin
+        if isinstance(origin, bytes):
+            origin = Address(origin)
+        message = {
+            "contract_address": contract_address,
+            "sender_address": sender,
+            "origin_address": origin,
+            "stack": [],
+            "value": u256(vm._value),
+            "datetime": vm._datetime,
+            "is_init": False,
+            "chain_id": u256(vm._chain_id),
+            "entry_kind": 0,
+            "entry_data": b"",
+            "entry_stage_data": None,
+        }
+        encoded = calldata.encode(message)
+        fd, path = tempfile.mkstemp()
+        try:
+            os.write(fd, encoded)
+            os.lseek(fd, 0, os.SEEK_SET)
+            vm._original_stdin_fd = os.dup(0)
+            os.dup2(fd, 0)
+        finally:
+            os.close(fd)
+            os.unlink(path)
+
+    def windows_safe_inject(vm):
+        try:
+            v03_safe_inject(vm)
+        except PermissionError:
+            if os.name != "nt":
+                raise
+
+    def v03_allocate(contract_cls, vm, *args, **kwargs):
+        # The installed gltest loader first probes its legacy genlayer.py
+        # storage API. That branch bypasses the v0.3 storage allocator,
+        # leaving __type_desc__ unset. Use the v0.3 SDK's documented in-memory
+        # allocator for direct execution.
+        from genlayer import storage
+        return storage.inmem_allocate(contract_cls, *args, **kwargs)
+
+    def v03_refresh_message():
+        # gltest currently refreshes only its legacy genlayer.gl module after
+        # vm.sender changes. v0.3 contracts read the genlayer.message module.
+        import genlayer.message as message
+        from genlayer.types import Address, u256
+
+        sender = direct_vm.sender
+        if isinstance(sender, bytes):
+            sender = Address(sender)
+        origin = direct_vm.origin
+        if isinstance(origin, bytes):
+            origin = Address(origin)
+        message.sender_address = sender
+        message.origin_address = origin
+        message.value = u256(direct_vm._value)
+        message.chain_id = u256(direct_vm._chain_id)
+
+    direct_vm._refresh_gl_message = v03_refresh_message
+
+    loader._inject_message_to_fd0 = windows_safe_inject
+    loader._allocate_contract = v03_allocate
+    try:
+        contract = direct_deploy("contracts/genlayer/CovraAdjudicator.py")
+        # The installed helper patches genlayer.gl.vm, while the v0.3 SDK
+        # exposes the supported operation at genlayer.vm.run_nondet. Invoke
+        # the validator in-process so Direct Mode still exercises both sides.
+        from genlayer import vm as gl_vm
+        import genlayer as gl
+        from genlayer.nondet.web import Response
+
+        def direct_web(url):
+            mock = direct_vm._match_web_mock(url, "GET")
+            if mock is None:
+                return None
+            body = mock.get("body", b"")
+            if isinstance(body, str):
+                body = body.encode("utf-8")
+            return Response(status=int(mock.get("status", 200)), headers={}, body=body)
+
+        def direct_prompt(prompt, **_config):
+            return json.loads(direct_vm._match_llm_mock(prompt))
+
+        # gltest's WASI bridge still decodes gl_call requests with its removed
+        # genlayer.py package. Adapt only the external nondeterministic inputs;
+        # the contract, storage descriptors and v0.3 run_nondet validator still
+        # execute directly.
+        gl.nondet.web.get = direct_web
+        gl.nondet.exec_prompt = direct_prompt
+
+        def direct_run(leader, validator, /):
+            result = leader()
+            if not validator(gl_vm.Return(result)):
+                raise AssertionError("Direct Mode validator rejected leader result")
+            return result
+        gl_vm.run_nondet = direct_run
+        return contract
+    finally:
+        loader._inject_message_to_fd0 = original_inject
+        loader._allocate_contract = original_allocate
+
+
+@pytest.mark.direct
+def test_covra_adjudicator_initializes_and_restricts_host_changes(
+    direct_deploy, direct_vm, direct_owner, direct_alice
+):
+    contract = _deploy(direct_deploy, direct_vm)
+
+    assert contract.get_case_count() == 0
+
+    direct_vm.sender = direct_owner
+    contract.allow_evidence_host("issuer.example.com", True)
+    assert contract.approved_hosts["issuer.example.com"] is True
+
+    direct_vm.sender = direct_alice
+    with pytest.raises(Exception):
+        contract.allow_evidence_host("attacker.example.com", True)
+
+
+def test_covra_adjudicator_direct_positive_and_negative_adjudication(
+    direct_deploy, direct_vm, direct_owner
+):
+    contract = _deploy(direct_deploy, direct_vm)
+    direct_vm.sender = direct_owner
+    contract.allow_evidence_host("issuer.example.com", True)
+
+    positive = _case_inputs(direct_owner, complete_facts=True)
+    contract.submit_case(
+        positive["case_id"], positive["policy_id"], positive["case_id"],
+        positive["insured"], positive["nonce"], 0, positive["terms_hash"],
+        positive["risk_spec_json"], positive["risk_spec_hash"], positive["source"],
+        positive["evidence_commitment"], positive["event_time"], 10000,
+    )
+    direct_vm.mock_web("issuer\\.example\\.com/observations/1", {
+        "method": "GET", "status": 200, "body": positive["body"]
+    })
+    direct_vm.mock_llm("COVRA", json.dumps({
+        "verdict": "COVERED", "severity": 80,
+        "reason": "The signed fixture establishes the missed deadline.",
+        "citations": "issuer.example.com/observations/1",
+    }))
+    contract.adjudicate(positive["case_id"])
+    assert json.loads(contract.get_case(positive["case_id"]))["verdict"] == "COVERED"
+
+    negative = _case_inputs(
+        direct_owner,
+        complete_facts=False,
+        nonce="00000000-0000-0000-0000-000000000002",
+    )
+    contract.submit_case(
+        negative["case_id"], negative["policy_id"], negative["case_id"],
+        negative["insured"], negative["nonce"], 0,
+        negative["terms_hash"], negative["risk_spec_json"], negative["risk_spec_hash"],
+        negative["source"], negative["evidence_commitment"], negative["event_time"], 10000,
+    )
+    direct_vm.mock_web("issuer\\.example\\.com/observations/2", {
+        "method": "GET", "status": 200, "body": negative["body"]
+    })
+    contract.adjudicate(negative["case_id"])
+    assert json.loads(contract.get_case(negative["case_id"]))["verdict"] == "INSUFFICIENT_EVIDENCE"

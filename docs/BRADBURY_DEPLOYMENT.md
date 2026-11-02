@@ -1,0 +1,81 @@
+# Bradbury Phase 2 deployment record
+
+This record is intentionally incomplete because the public Bradbury validator fleet is currently finalizing deployment transactions with a GenVM runner-load error. No adjudicator address is claimed.
+
+## Fixed target
+
+- Network: GenLayer Bradbury Phase 2
+- Chain ID: `4221`
+- GenLayer execution RPC: `https://rpc-bradbury.genlayer.com` (verified with `gen_getTransactionReceipt`; deployment-specific reads still require the deployed contract address)
+- GenLayer Chain RPC: `https://rpc.testnet-chain.genlayer.com/`
+- CLI verified: `genlayer 0.40.0-rc.5` (the earlier `0.40.0-rc.3` profile used stale Phase 2 fee-manager data)
+- Current FeeManager: `0x7678587A847712f2A96082AC07883A88D0fc7245`
+- Explorer: `https://scan.testnet-chain.genlayer.com/`
+- Expected genesis: `0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4`
+- AddressManager: `0x3F71AE080BD6270A91dBcc7960d88797828538E0`
+
+Praest is the disposable GenLayer deployment wallet for this demonstration. It must be funded with Bradbury testnet GEN only and must not be used as a Base deployer, quote signer, evidence issuer, or attestor. The active CLI account `praest-deployer` reports this public address: `0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7`. The latest account read reports `49.999219676469991915 GEN` after failed deployment attempts. Use the official [Bradbury testnet faucet](https://testnet-faucet.genlayer.foundation/) to fund this address with test GEN only.
+
+## Verified failed deployment attempts
+
+These are genuine Bradbury transactions, not successful deployment records. The node now reports them as finalized; an outer protocol finality status does not imply successful GenVM execution:
+
+| Contract | Transaction ID | Final protocol result | Observed failure |
+| --- | --- | --- | --- |
+| COVRA adjudicator, official `py-genlayer` pin | `0x7a7e3921a9af2c1d5893d63b8b3b9dd4514e8d841891ab639cb65249a0e7f55c` | `Finalized`, `FinishedWithError` | `invalid contract runner malformed` |
+| COVRA adjudicator, newer runner pin probe | `0xb80843025e9f99a89296b85c9cf7675be5cec1bc080ff36ba2be34170e07083c` | `Finalized`, `FinishedWithError` | `invalid contract runner malformed` |
+| Minimal Bradbury smoke contract, official pin | `0x9f7511d78a82a443c42e1943cb2951c1584931cdc3b138d71f5cc4cb7ec1fa3b` | `Finalized`, `FinishedWithError` | `invalid contract runner malformed` |
+
+The minimal contract failed before application code executed. Its exact deployed source payload was 301 UTF-8 bytes with SHA-256 `42e779017f4985e763735020eb84e3a6c9398257a6f0867b1d71ab9c925eaa47`. The COVRA source payload in the first failed deployment was 23,441 bytes with SHA-256 `ac83430059be0030d95a95c6d0521cbe2c837cc548856ffbfd76362ba65cd40a`. The node trace reports GenVM `v0.3.0-rc10-x86_64-linux-release`, runner-load charged, `compilation_time=0`, and `compiled_modules=0`. The receipt for the minimal smoke transaction records `statusName=Finalized`, `resultName=MajorityAgree`, `txExecutionResultName=FinishedWithError`, five committed votes, and five revealed votes. This isolates the failure to runner loading on the public GenLayer execution path rather than COVRA application logic.
+
+## Root-cause investigation
+
+The failure was reproduced at both stages below, without another deployment after the blocker was isolated:
+
+1. `genlayer deploy` submitted a real Bradbury transaction. `gen_getTransactionReceipt` returned protocol finality but `FinishedWithError`; `gen_dbg_traceTransaction` returned the non-sensitive VM diagnostic `invalid_contract runner malformed`.
+2. Before broadcast, `gen_getContractSchema` was called against `https://rpc-bradbury.genlayer.com` with base64-encoded source. It returned the same `-32000` `VMError: invalid_contract runner malformed` for the existing COVRA source, a minimal contract using the existing `1jb...` pin, a `# v0.3.0`/`1jb...` variant, and the currently published official v0.3 example dependency `9b8kjyda2ycxyq4ea6g4yfpnydxhd52gqba5rb8dw7krkh5mn9p0`. The exact current `llm_erc20.py` example from GenLayer's official repository was also submitted verbatim and produced the same error.
+
+As an additional non-broadcast control, the same schema request was run against three public Bradbury project sources whose repositories document Bradbury deployments: GLENS `ai_debugger_v3.py`, ClauseFlow `clauseflow.py`, and Tribune `tribune_bradbury.py`. Their first-line runner declarations are respectively the older `py-genlayer:1jb...` pin, the same `1jb...` pin, and `# v0.2.16` plus the same `1jb...` pin. All three independently returned `-32000 VMError: invalid_contract runner malformed`. These repository claims are not used as COVRA deployment evidence; the control is useful because it removes COVRA-specific imports, storage, ABI, and contract size from the failing schema path.
+
+The repository now has a deployment gate for this exact check:
+
+```text
+npm run genlayer:preflight
+```
+
+It must return a constructor and method schema before any Bradbury deployment is allowed. At the time of this report it returns `ok: false` with the runner error above, so no positive-control transaction was submitted after the preflight failure.
+
+The current unbroadcast source fingerprints are:
+
+- `contracts/genlayer/BradburyPositiveControl.py`: 480 UTF-8 bytes, SHA-256 `26900ea08699924d293e542e376fc2a04f9d72ff94f2bedd3459e2dd8d58d759`.
+- `contracts/genlayer/CovraAdjudicator.py`: 25,271 UTF-8 bytes, SHA-256 `00cf372dda76119699a360e62de8e3007844b3c5a1b42f59f71722382a59ff88`.
+
+The evidence rules out a COVRA storage field, method ABI, HTTP evidence, consensus callback, fee, or claim-logic defect as the immediate cause: the minimal contract is rejected before compilation, and the trace has no compiled modules. The standard chain endpoint `https://rpc.testnet-chain.genlayer.com` correctly rejects `gen_getContractSchema` as unavailable, while `https://rpc-bradbury.genlayer.com` exposes the GenLayer node methods but returns `runner malformed` even for the exact official v0.3 example. This is a Bradbury GenVM runner availability/resolution failure (or a validator/node runner-store mismatch) for the published dependency family. A valid Bradbury-compatible dependency cannot be certified until the target runtime successfully returns a schema for the positive-control source.
+
+The built-in CLI package `genlayer 0.40.0-rc.5` maps its Bradbury chain object to `https://rpc-bradbury.genlayer.com`; the separate `https://rpc.testnet-chain.genlayer.com` endpoint is used for ordinary `eth_*` chain identity and contract metadata checks. The project keeps these endpoints separate. `genlayer network info` currently displays the chain-RPC alias field, so deployment and `gen_*` checks must be verified from the CLI package chain definition and direct RPC method response rather than that display field alone.
+
+## Runner/header compatibility evidence
+
+| Source variant | Preflight result |
+| --- | --- |
+| Existing JSON dependency header, `py-genlayer:1jb45...` | `-32000 VMError: invalid_contract runner malformed` |
+| `# v0.3.0` plus local rc7 dependency, `py-genlayer:1zr6...` | `-32000 VMError: invalid_contract runner malformed` |
+| Official current `llm_erc20.py` source, `py-genlayer:9b8...` | `-32000 VMError: invalid_contract runner malformed` |
+| Historical Bradbury `15qf...` candidate substituted into a public v0.2.16 source | `-32000 VMError: invalid_contract runner malformed` |
+
+The contract source is now on the v0.3 declaration and the locally available rc7 runner pin `1zr6nqk597d97kg0dyxg0shhrykx5v02zjgnyrajapy4wlqvfvwh`. The installed `gltest` Direct Mode runner can load and execute the contract after its Windows test bridge is adapted to the v0.3 SDK. The installed `genvm-linter 0.11.0` AST lint now passes with no determinism warnings after replacing validator-local wall-clock reads with the deterministic GenVM message datetime. Its semantic validator still cannot extract the `1zr...` runner from the cached artifact bundle. Neither local result overrides the target Bradbury node, whose schema preflight still rejects the same runner as malformed.
+
+## Required verified fields
+
+```text
+BRADBURY_ADJUDICATOR_ADDRESS=<not available: deployment failed before contract creation>
+NEXT_PUBLIC_BRADBURY_ADJUDICATOR_ADDRESS=<not available: deployment failed before contract creation>
+BRADBURY_NODE_RPC_URL=https://rpc-bradbury.genlayer.com
+NEXT_PUBLIC_BRADBURY_NODE_RPC_URL=https://rpc-bradbury.genlayer.com
+deployment_transaction_id=<none: recorded attempts finalized with FinishedWithError>
+finalization_status=not deployed
+```
+
+The EVM chain receipt and the GenLayer protocol receipt are different records. Deployment is not complete merely because an outer EVM transaction was accepted. The SDK must wait for finalization and inspect execution success, then `get_case`/the deployed interface must be independently readable at the finalized state.
+
+Do not deploy this contract to StudioNet, Studio Dev, or another chain. Do not submit another Bradbury deployment until the node-side schema preflight for `contracts/genlayer/BradburyPositiveControl.py` returns a schema. After that succeeds, deploy the positive control and verify its constructor, read, write, and read-back on Bradbury before retrying COVRA. When COVRA succeeds, enter only the actual public address, transaction ID, and node endpoint into the environment.

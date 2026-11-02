@@ -1,0 +1,54 @@
+{
+  "name": "covra",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agent-native risk coverage infrastructure — GenLayer Bradbury Phase 2 × USDC on Base",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "typecheck": "tsc --noEmit --incremental false",
+    "test": "vitest run && node --test scripts/claim-window.test.mjs scripts/preflight-io.test.mjs",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:solidity": "node scripts/compile-solidity.mjs",
+    "test:genlayer-logic": "python3 -B -m unittest discover -s tests/python -v",
+    "test:genlayer-direct": "python -m pytest tests/python/test_adjudicator_direct.py -q",
+    "check": "npm run typecheck && npm run test && npm run test:solidity && npm run build",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "deploy:base": "node --env-file=.env.local scripts/deploy-base.mjs",
+    "genlayer:smoke": "node scripts/check-bradbury.mjs",
+    "attestor:preflight": "node --env-file=.env.local scripts/attestor-preflight.mjs",
+    "issuer:sign": "node --env-file=.env.local scripts/issuer-sign.mjs",
+    "attestor:sign": "node --env-file=.env.local scripts/attestor-sign.mjs",
+    "attestor:aggregate": "node --env-file=.env.local scripts/aggregate-attestations.mjs",
+    "claim:extension": "node --env-file=.env.local scripts/claim-extension.mjs",
+    "genlayer:preflight": "node scripts/bradbury-contract-preflight.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "@supabase/supabase-js": "^2.58.0",
+    "genlayer-js": "2.0.0-rc.2",
+    "jose": "^6.0.0",
+    "lucide-react": "^0.468.0",
+    "next": "^16.0.0",
+    "postgres": "^3.4.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "viem": "^2.38.0",
+    "workflow": "^5.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "solc": "^0.8.30",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
