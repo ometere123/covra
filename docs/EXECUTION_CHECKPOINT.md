@@ -2,6 +2,16 @@
 
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
+## Authenticated infrastructure execution
+
+Vercel account delealufejoel-4184, project covra/prj_MEfQ5bR0bq4XEUNg0XzbNtUbfmqi verified before mutation. Production public network/app/issuer settings and available protected auth, quote, indexer and Supabase service credentials were configured through CLI stdin. Dedicated issuer private key and admin token generated, retained in Windows Credential Manager service COVRA-testnet-production (accounts evidence-issuer and issuer-admin-token), and stored as production Vercel Secrets. Public issuer wallet: 0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5. Host allowlists: covra-lyart.vercel.app; wallet map uses that address. scripts/configure-vercel.mjs is resumable and reuses keychain identities.
+
+Deployment dpl_3UyHRN8s3HKro2TcrgBB5ZzGkGgv READY at https://covra-lyart.vercel.app. Actual health reports testnet, quote signer/node/issuer configured; database and pool remain absent. Signed issuance is not verified yet.
+
+Supabase CLI 3.0.0 installed via npm launcher after transient EBUSY. Executable: C:/Users/USER/AppData/Local/npm-cache/_npx/aa8e5c70f9d8d161/node_modules/@supabase/cli-windows-x64/bin/supabase.exe. Existing covra project cxvgjycgojjcrmiyclga verified ACTIVE_HEALTHY. Authenticated `db query --remote=cxvgjycgojjcrmiyclga` works WITHOUT database password; all migrations 001–008 actually applied successfully using --file and --yes. This supersedes the prior assumption that malformed DATABASE_URL blocks migrations. Application Postgres connection still needs repair or supported access path. Vault and pg_cron installed; pg_net not yet installed in observed extension results. Vault secret names query was combined with extension query, whose output only showed final statement; rerun names-only query. No Cron installed or execution claimed. No secrets printed or .env.local changes made.
+
+Outstanding test session 79529 recovered exit 0 (typecheck and quiet Foundry). GitHub CI for 62c8457 passed (run 41480719681).
+
 | Task | Status | Evidence / next action |
 | --- | --- | --- |
 | Existing GitHub main publication | Verified complete | origin ometere123/covra; preserve history |
