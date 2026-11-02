@@ -2,6 +2,16 @@
 
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
+## Application connectivity repaired
+
+scripts/repair-production-database.mjs URL-encodes only the password component in protected process memory, verifies the existing cxvgjycgojjcrmiyclga project identity, authenticates a real Postgres query, and provisions DATABASE_URL as a Vercel Secret over stdin. Both authentication and secret provisioning succeeded. The local file was not changed. This supersedes the earlier database-connection blocker.
+
+Production deployment dpl_4DgZD3ZafZ9DoY4nvSEcYMF9m9cB is READY at https://covra-lyart.vercel.app. Postdeployment health reports database=true, issuer=true, quoteSigner=true, genlayerNode=true, poolContract=false. A real public observation lookup now returns 404 Observation not found (successful database query), replacing the previous unavailable-store 503. Unauthenticated issuance returns 401. No fabricated observations were inserted.
+
+Focused regression verification: 12 tests passed across bradbury-fees, risk-spec and evidence-source. CI for 42d7307 passed (41485993815). Vault names-only inspection confirms existing secret name covra-indexer-secret. Cron SQL currently expects covra_indexer_cron_secret; reconcile internally without displaying the secret. Do not activate a purportedly successful indexer until Base pool and actual start block exist; current route returns 503 without those prerequisites.
+
+Added supabase/.temp/ to .gitignore to protect CLI-generated connection metadata. Outstanding priorities: exact matching runner, semantic/Direct Mode/security checks; adjudicator and Base deployment; real policy-bound issuance and lifecycle; Cron activation after indexer readiness. No automatic payout or mock settlement is authorized.
+
 ## Authenticated infrastructure execution
 
 Vercel account delealufejoel-4184, project covra/prj_MEfQ5bR0bq4XEUNg0XzbNtUbfmqi verified before mutation. Production public network/app/issuer settings and available protected auth, quote, indexer and Supabase service credentials were configured through CLI stdin. Dedicated issuer private key and admin token generated, retained in Windows Credential Manager service COVRA-testnet-production (accounts evidence-issuer and issuer-admin-token), and stored as production Vercel Secrets. Public issuer wallet: 0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5. Host allowlists: covra-lyart.vercel.app; wallet map uses that address. scripts/configure-vercel.mjs is resumable and reuses keychain identities.

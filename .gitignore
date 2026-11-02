@@ -27,5 +27,6 @@ __pycache__/
 .venv/
 venv/
 .gltest_cache/
+supabase/.temp/
 
 .vercel
