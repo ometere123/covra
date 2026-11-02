@@ -1,5 +1,13 @@
 # Verification record — 2026-11-02
 
+## Subsequent verified progress
+
+The existing directory is now a Git repository on main, origin https://github.com/ometere123/covra. The empty remote was inspected before initialization. Initial commit 2a80676 preserved 131 non-secret source files; the staged credential-pattern scan reported no findings and `.env.local` is ignored.
+
+The RC2 fee failure was isolated in the installed SDK: its separate public client calls FeeManager `estimateProposeReceiptGas` with gasPrice and no account. `scripts/bradbury-fee-probe.mjs` applies a narrowly scoped read-only funded-caller correction for that FeeManager call. The actual node then returned feeValue 100000000000010352 wei with the SDK-derived distribution, execution budget 25000000000000000 and three rotations. This is a diagnostic repair; browser/server fee paths still require integration and regression testing.
+
+The positive control was submitted with that exact estimated distribution and deposit: transaction `0x5485f4ad127b5f856820315b1bbf41c6c24e17ed64221ef8e0b64056620025e2`, recipient `0x3e60d7f8467d67c53e5cc74e8a31876cbdf7b8a1`. Latest observed status: Accepted; execution: FinishedWithReturn. Finalization and read/write/read verification remain outstanding. The receipt reports executionConsumed 61886000000000 and storageFeeUsed 5750000000; refund is not yet verified. Do not describe this as a finalized deployment.
+
 Completion verdict: incomplete. No successful new contract deployment is claimed.
 
 ## Verified runtime correction
