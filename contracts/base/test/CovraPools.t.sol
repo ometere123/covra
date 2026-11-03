@@ -207,6 +207,34 @@ contract CovraPoolsTest {
             EVIDENCE_ISSUER, quoteSignerRoster, 84532);
     }
 
+    function testRoleRotationCannotCollapseSigningIndependence() public {
+        address signer = vm.addr(QUOTE_KEY);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.scheduleAttestorReplacement(attestors[0], address(this));
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.scheduleAttestorReplacement(attestors[0], EVIDENCE_ISSUER);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.scheduleAttestorReplacement(attestors[0], signer);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.setQuoteSigner(attestors[0]);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.transferOwnership(attestors[0]);
+        address replacement = vm.addr(0x8800);
+        pools.scheduleAttestorReplacement(attestors[0], replacement);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.setQuoteSigner(replacement);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.transferOwnership(replacement);
+        vm.warp(block.timestamp + 2 days);
+        pools.executeAttestorReplacement();
+        // Retired signers still authorize old claim roster snapshots.
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.setQuoteSigner(attestors[0]);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.transferOwnership(attestors[0]);
+        _assert(pools.attestorCount() == 5);
+    }
+
     function testDelegatedAgentCannotRedirectBeneficiary() public {
         address delegate = vm.addr(0x104);
         usdc.mint(delegate, 10000000);

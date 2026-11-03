@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { randomBytes, createHash } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { recoverMessageAddress, isAddress } from "viem";
+import { database } from "./db";
 
 const SESSION_COOKIE = "covra_session";
 const NONCE_COOKIE = "covra_nonce";
@@ -27,6 +28,11 @@ export function createChallenge(wallet: string, origin: string) {
 }
 
 export async function setNonceCookie(payload: ReturnType<typeof createChallenge>) {
+  const sql = database();
+  const nonceDigest = createHash("sha256").update(payload.nonce).digest("hex");
+  const messageDigest = createHash("sha256").update(payload.message).digest("hex");
+  await sql`insert into auth_challenges(nonce_digest,wallet,message_digest,origin,expires_at)
+    values(${nonceDigest},${payload.wallet},${messageDigest},${payload.origin},now()+interval '10 minutes')`;
   const jar = await cookies();
   jar.set(NONCE_COOKIE, Buffer.from(JSON.stringify(payload)).toString("base64url"), {
     httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production",
@@ -47,11 +53,22 @@ export async function verifyLogin(wallet: string, message: string, signature: `0
   }
   if (!isAddress(wallet) || challenge.wallet !== wallet.toLowerCase() ||
       challenge.message !== message || challenge.origin !== origin ||
-      Date.now() - new Date(challenge.createdAt).getTime() > 600_000) {
+      !/^[0-9a-f]{32}$/.test(challenge.nonce) ||
+      !Number.isFinite(Date.parse(challenge.createdAt)) ||
+      Date.parse(challenge.createdAt) > Date.now() + 30_000 ||
+      Date.now() - Date.parse(challenge.createdAt) > 600_000) {
     throw new Error("Login challenge does not match");
   }
   const signer = await recoverMessageAddress({ message, signature });
   if (signer.toLowerCase() !== wallet.toLowerCase()) throw new Error("Invalid wallet signature");
+  const sql = database();
+  const nonceDigest = createHash("sha256").update(challenge.nonce).digest("hex");
+  const messageDigest = createHash("sha256").update(message).digest("hex");
+  const consumed = await sql`update auth_challenges set consumed_at=now()
+    where nonce_digest=${nonceDigest} and wallet=${wallet.toLowerCase()}
+      and message_digest=${messageDigest} and origin=${origin}
+      and consumed_at is null and expires_at>now() returning nonce_digest`;
+  if (!consumed.length) throw new Error("Login challenge expired, unissued or already consumed");
   const token = await new SignJWT({ wallet: wallet.toLowerCase(), role: "user" })
     .setProtectedHeader({ alg: "HS256" }).setIssuedAt().setExpirationTime("7d").sign(secretKey());
   jar.set(SESSION_COOKIE, token, {

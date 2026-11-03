@@ -1,0 +1,100 @@
+{
+  "chainId": 84532,
+  "transactionHash": "0xfe01a9b68ac5a54df1173231c49838a0d67ba37be35e85624cd7d912461f93f2",
+  "status": "success",
+  "sourceSha256": "49b19bfa5eb7162766b5b9c8224b565aed18dfa0362e634981b2dfe5af9cc3d1",
+  "compiler": "0.8.38+commit.1835d247.Emscripten.clang",
+  "owner": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+  "quoteSigner": "0x870d04144Ef72B02B1740D7c6a893036F29fb3A4",
+  "evidenceIssuer": "0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5",
+  "adjudicator": "0xaefc8672272392310a2ea102787e28bb1f34e1d3",
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "attestors": [
+    "0xD1fcB05420B51b2dF3fa3036d491BBA656CB8a1b",
+    "0xA1afCA241Ad6a84acEcb3e7cC43c57df65cF7826",
+    "0x9a69739ebEbfE1d57D71F0a4668a9FcE181C4A99",
+    "0xe37B7fb260aB56C803ce5aCe5f0f2011eaC48720",
+    "0xe59e5423E14bdb46d2EEefd3A39049a168De4591"
+  ],
+  "contractAddress": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+  "blockNumber": "53734261",
+  "blockHash": "0xe129bf65c1c3dd341b860fdb47c48d60a34d8d2745e626def0a7f9669f637200",
+  "gasUsed": "3952135",
+  "verifiedAt": "2026-11-03T01:19:37.341Z",
+  "runtimeCodeSha256": "24ecd8c547386e108a3c614e1a7d4aa721b9a8e0096f93c3abb9499270ff54d9",
+  "pools": [
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    }
+  ],
+  "supersededPool": {
+    "address": "0xab4436b8ff15b7fa209e2018300d1741db0dfad1",
+    "pauseTransaction": "0xc823bf6bf8ceb102cd8b9dd8bc1e76c130679f8f9e659f3d34661ec35dcc8176",
+    "status": "success",
+    "blockNumber": "53734569"
+  },
+  "sourcify": {
+    "verificationId": "0bc5f539-1fca-4051-928b-2715d101d8e1",
+    "checkedAt": "2026-11-03T01:26:09.524Z",
+    "httpStatus": 200,
+    "isJobCompleted": true,
+    "jobStartTime": "2026-11-03T01:25:55Z",
+    "jobFinishTime": "2026-11-03T01:25:57Z",
+    "compilationTime": "1970",
+    "externalVerifications": {
+      "etherscan": {
+        "verificationId": "mzr2swmkk9qn7nxpht9yrqnddv5lem2swagrepf5cuyfbkpbs9",
+        "statusUrl": "https://api.etherscan.io/v2/api?chainid=84532&module=contract&action=checkverifystatus&guid=mzr2swmkk9qn7nxpht9yrqnddv5lem2swagrepf5cuyfbkpbs9",
+        "explorerUrl": "https://sepolia.basescan.org//address/0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4",
+        "contractApiUrl": "https://api.etherscan.io/v2/api?chainid=84532&module=contract&action=getabi&address=0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4"
+      },
+      "blockscout": {
+        "verificationId": "d8619d3948c08c8364fd3a7a35dc8a65b254a8e46ae93825",
+        "statusUrl": "https://base-sepolia.blockscout.com/api?module=contract&action=checkverifystatus&chainid=84532&guid=d8619d3948c08c8364fd3a7a35dc8a65b254a8e46ae93825",
+        "explorerUrl": "https://base-sepolia.blockscout.com//address/0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4",
+        "contractApiUrl": "https://base-sepolia.blockscout.com/api?module=contract&action=getabi&chainid=84532&address=0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4"
+      }
+    },
+    "contract": {
+      "match": "exact_match",
+      "creationMatch": "exact_match",
+      "runtimeMatch": "exact_match",
+      "chainId": "84532",
+      "address": "0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4",
+      "verifiedAt": "2026-11-03T01:25:57Z",
+      "matchId": "58152728"
+    }
+  }
+}

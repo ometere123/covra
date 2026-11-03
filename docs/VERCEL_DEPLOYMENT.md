@@ -1,5 +1,30 @@
 # Vercel deployment record
 
+## Current production — 2026-11-03
+
+Deployment `dpl_7CvirQmqhDGsr6GUtkJ7aVdDhUZk` is READY at https://covra-lyart.vercel.app, using the hardened Base contract and deployment-specific indexer cursor. Real hosted database reads/writes, wallet authentication, scoped agent credential creation/revocation, MCP scope enforcement and prospective quote issuance passed. Authentication replay is rejected using durable atomic nonce consumption (migration 010).
+
+Twenty-four production browser route/device combinations passed, covering all twelve routes at desktop/mobile sizes with screenshots and no horizontal overflow. The wallet verification bridge signs only the exact COVRA login domain/message in Node; no private key enters the browser and no transaction is submitted. Screenshots/results are in ignored `test-results/production/`.
+
+Issuer public identity: `0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5`. The protected existing key is reused, retained in Windows Credential Manager and Vercel Secret. Current exact configuration:
+
+```text
+EVIDENCE_ISSUER_HOST=covra-lyart.vercel.app
+ATTESTOR_EVIDENCE_HOSTS=covra-lyart.vercel.app
+COVRA_APPROVED_ISSUER_HOSTS=covra-lyart.vercel.app
+ATTESTOR_ISSUER_WALLETS={"covra-lyart.vercel.app":"0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5"}
+NEXT_PUBLIC_COVRA_POOLS_ADDRESS=0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4
+BASE_DEPLOYMENT_START_BLOCK=53734261
+BRADBURY_ADJUDICATOR_ADDRESS=0xaefc8672272392310a2ea102787e28bb1f34e1d3
+NEXT_PUBLIC_BRADBURY_ADJUDICATOR_ADDRESS=0xaefc8672272392310a2ea102787e28bb1f34e1d3
+```
+
+Host lists use comma-separated bare hostnames, not origins or paths; wallet registration is JSON hostname-to-address. These are already configured in production; the operator alone may enter public values locally. `.env.local` remains untouched. Keys, admin tokens, DB credentials, auth pepper and cron bearer stay server-side.
+
+Public observation URLs use `/api/evidence-issuer/observations/:observationId`. No positive policy-bound observation has yet been issued: no real funded policy or attributable covered event exists. Sharing COVRA's Vercel infrastructure does not make this an independent oracle. Supabase Cron job 1, rather than Vercel Cron, performs the five-minute schedule.
+
+## Historical initial deployment — superseded
+
 ## Verified deployment
 
 - Project: `covra`

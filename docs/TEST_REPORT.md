@@ -1,5 +1,31 @@
 # COVRA verification report
 
+## Current verified results — 2026-11-03
+
+These supersede historical results below. Full funded cross-chain acceptance remains **incomplete**.
+
+| Check | Actual result |
+| --- | --- |
+| `npm run typecheck` | Passed after authentication and deployment-bound cursor changes. |
+| `npm test` | 64 Vitest tests and 7 Node TAP tests passed. |
+| `forge test --root contracts/base -vv` | 20 passed; zero failures, including role rotation and historical roster separation. |
+| `npm run test:solidity` | Passed, 60 ABI functions, 16,312-byte creation bytecode; test harness size warning only. |
+| `npm run test:genlayer-direct` | 15 passed with exact Manager rc10 SDK, actual storage and cloudpickle serialization. External HTTP/LLM inputs are controlled test doubles; this does not prove live validator consensus. |
+| GenVM AST lint | Three checks passed. Legacy linter semantic command still E101: expects TAR runner, official Manager provides ZIP; exact target-SDK schema extraction/storage tests pass separately. |
+| `node --env-file=.env.local scripts/verify-live-agent.mjs` | Hosted signed login; restored-cookie replay 401; concurrent nonce 200/401; real scoped credential, policy read 200; MCP policy allowed, claims rejected; revoked key 401. Temporary credential revoked. |
+| `node --env-file=.env.local scripts/verify-production-browser.mjs` | 24 real HTTPS route/device combinations passed, screenshots and no horizontal overflow; real wallet signature login and prospective server-signed quote. No transaction or fabricated incident. |
+| Solidity source verification | Sourcify creation/runtime exact_match for current deployed contract. |
+| Hosted indexer/reconciliation | HTTP 200 against actual replacement pool; cursor 53735455; zero mismatches across zero policies/claims. This is empty-ledger consistency. |
+| GitHub CI | Last checked run 41558206596 passed for 47990a0; subsequent changes require a new run. |
+
+Adversarial Direct Mode scenarios include HTTP 400/404/500/503; empty, replaced, tampered and oversized evidence; malformed leader schema; different verdict; unacceptable severity disagreement. Both serialized leader and validator retrieve evidence independently in the in-process harness. None persists a failed decision.
+
+Migration 010 adds durable one-use authentication challenges. Live replay was reproduced as HTTP 200 before repair and rejected after deployment, including concurrent requests. Original cookies and keys were never logged.
+
+Current live deployments, evidence identity and Cron execution are recorded in BASE_DEPLOYMENT.md, BRADBURY_DEPLOYMENT.md and EXECUTION_CHECKPOINT.md. Pool funding, policy purchase, policy-bound public issuance, live adjudication/appeal and authorized payout remain unverified. These need genuine test USDC, authentic attributable observations and participation by three configured attestors.
+
+## Historical verification — retained for investigation
+
 Run date: 2026-10-31. These are actual local executions against the current workspace. No live Base/Bradbury deployment is claimed.
 
 | Command | Result |

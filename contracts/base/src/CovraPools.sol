@@ -140,6 +140,7 @@ contract CovraPools {
     address public immutable usdc;
     address public immutable bradburyAdjudicator;
     address public immutable evidenceIssuer;
+    address public immutable deploymentAuthority;
     address public owner;
     address public pendingOwner;
     address public quoteSigner;
@@ -158,6 +159,7 @@ contract CovraPools {
     mapping(address => mapping(address => AgentPermission)) public agentPermissions;
     mapping(address => mapping(address => uint64)) public claimAgents;
     mapping(address => bool) public attestor;
+    mapping(address => bool) private _hasBeenAttestor;
     uint8 public attestorCount;
     uint256 public attestorRosterVersion;
 
@@ -199,6 +201,7 @@ contract CovraPools {
             block.chainid != expectedChainId ||
             usdc_ == address(0) ||
             quoteSigner_ == address(0) ||
+            quoteSigner_ == msg.sender ||
             adjudicator_ == address(0) ||
             evidenceIssuer_ == address(0) ||
             evidenceIssuer_ == msg.sender ||
@@ -208,6 +211,7 @@ contract CovraPools {
         quoteSigner = quoteSigner_;
         bradburyAdjudicator = adjudicator_;
         evidenceIssuer = evidenceIssuer_;
+        deploymentAuthority = msg.sender;
         owner = msg.sender;
         attestorRosterVersion = 1;
         for (uint8 i; i < ATTESTOR_ROSTER_SIZE; ++i) {
@@ -217,6 +221,7 @@ contract CovraPools {
                 signer == evidenceIssuer_ || attestor[signer]
             ) revert InvalidInput();
             attestor[signer] = true;
+            _hasBeenAttestor[signer] = true;
             _attestorRoster[i] = signer;
             _attestorInRosterVersion[attestorRosterVersion][signer] = true;
         }
@@ -503,6 +508,9 @@ contract CovraPools {
         if (
             previousSigner == address(0) || replacementSigner == address(0) ||
             previousSigner == replacementSigner || !attestor[previousSigner] || attestor[replacementSigner] ||
+            replacementSigner == owner || replacementSigner == pendingOwner ||
+            replacementSigner == deploymentAuthority || replacementSigner == quoteSigner ||
+            replacementSigner == evidenceIssuer ||
             pendingAttestorReplacementAt != 0
         ) revert InvalidInput();
         pendingAttestorRemoval = previousSigner;
@@ -517,7 +525,10 @@ contract CovraPools {
         address replacementSigner = pendingAttestorReplacement;
         if (
             effectiveAt == 0 || block.timestamp < effectiveAt ||
-            !attestor[previousSigner] || attestor[replacementSigner]
+            !attestor[previousSigner] || attestor[replacementSigner] ||
+            replacementSigner == owner || replacementSigner == pendingOwner ||
+            replacementSigner == deploymentAuthority || replacementSigner == quoteSigner ||
+            replacementSigner == evidenceIssuer
         ) revert InvalidInput();
 
         uint256 nextVersion = attestorRosterVersion + 1;
@@ -529,6 +540,7 @@ contract CovraPools {
         }
         attestor[previousSigner] = false;
         attestor[replacementSigner] = true;
+        _hasBeenAttestor[replacementSigner] = true;
         attestorRosterVersion = nextVersion;
         attestorCount = ATTESTOR_ROSTER_SIZE;
         delete pendingAttestorRemoval;
@@ -551,7 +563,9 @@ contract CovraPools {
     }
 
     function setQuoteSigner(address newSigner) external onlyOwner {
-        if (newSigner == address(0)) revert InvalidInput();
+        if (newSigner == address(0) || newSigner == owner || newSigner == pendingOwner ||
+            newSigner == deploymentAuthority || newSigner == evidenceIssuer ||
+            newSigner == pendingAttestorReplacement || _hasBeenAttestor[newSigner]) revert InvalidInput();
         emit QuoteSignerChanged(quoteSigner, newSigner);
         quoteSigner = newSigner;
     }
@@ -562,12 +576,15 @@ contract CovraPools {
     }
 
     function transferOwnership(address newOwner) external onlyOwner {
-        if (newOwner == address(0)) revert InvalidInput();
+        if (newOwner == address(0) || newOwner == quoteSigner || newOwner == evidenceIssuer ||
+            newOwner == pendingAttestorReplacement || _hasBeenAttestor[newOwner]) revert InvalidInput();
         pendingOwner = newOwner;
         emit OwnershipTransferStarted(owner, newOwner);
     }
     function acceptOwnership() external {
         if (msg.sender != pendingOwner) revert Unauthorized();
+        if (msg.sender == quoteSigner || msg.sender == evidenceIssuer ||
+            msg.sender == pendingAttestorReplacement || _hasBeenAttestor[msg.sender]) revert InvalidInput();
         address previous = owner;
         owner = pendingOwner;
         pendingOwner = address(0);

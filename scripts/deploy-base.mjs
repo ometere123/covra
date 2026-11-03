@@ -1,4 +1,5 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 import solc from "solc";
 import { createPublicClient, createWalletClient, http, isAddress } from "viem";
@@ -36,10 +37,12 @@ const compiled = output.contracts["CovraPools.sol"].CovraPools;
 const rpc = process.env.BASE_RPC_URL || "https://sepolia.base.org";
 const client = createPublicClient({ chain: baseSepolia, transport: http(rpc) });
 if (await client.getChainId() !== 84532) throw new Error("RPC is not Base Sepolia 84532");
+if (usdc.toLowerCase() !== "0x036cbd53842c5426634e7929541ec2318f3dcf7e".toLowerCase()) throw new Error("Only official Circle Base Sepolia USDC is authorized");
 if (!(await client.getBytecode({ address: usdc }))) throw new Error("USDC address has no deployed code");
 const owner = privateKeyToAccount(privateKey);
 const signer = privateKeyToAccount(quoteKey);
-if (owner.address.toLowerCase() === evidenceIssuer.toLowerCase() ||
+if (owner.address.toLowerCase() === signer.address.toLowerCase() ||
+    owner.address.toLowerCase() === evidenceIssuer.toLowerCase() ||
     signer.address.toLowerCase() === evidenceIssuer.toLowerCase() ||
     attestors.some((address) => address.toLowerCase() === owner.address.toLowerCase() ||
       address.toLowerCase() === signer.address.toLowerCase() ||
@@ -52,6 +55,17 @@ const hash = await wallet.deployContract({
   abi: compiled.abi, bytecode: `0x${compiled.evm.bytecode.object}`,
   args: [usdc, signer.address, adjudicator, evidenceIssuer, attestors, 84532n],
 });
+// Persist the submitted hash before waiting, so interruptions never require a duplicate deployment.
+mkdirSync(join(process.cwd(), "docs/deployments"), { recursive: true });
+const recordPath = join(process.cwd(), "docs/deployments", `base-84532-${hash}.json`);
+const record = { chainId: 84532, transactionHash: hash, status: "submitted",
+  sourceSha256: createHash("sha256").update(source).digest("hex"), compiler: solc.version(),
+  owner: owner.address, quoteSigner: signer.address, evidenceIssuer, adjudicator, usdc, attestors };
+writeFileSync(recordPath, JSON.stringify(record, null, 2) + "\n");
+process.stdout.write(`SUBMITTED ${hash}; durable record ${recordPath}\n`);
 const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 2 });
+writeFileSync(recordPath, JSON.stringify({ ...record, status: receipt.status,
+  contractAddress: receipt.contractAddress, blockNumber: String(receipt.blockNumber),
+  blockHash: receipt.blockHash, gasUsed: String(receipt.gasUsed) }, null, 2) + "\n");
 if (receipt.status !== "success" || !receipt.contractAddress) throw new Error(`Deployment reverted: ${hash}`);
 process.stdout.write(`CONFIRMED TESTNET DEPLOYMENT\ncontract=${receipt.contractAddress}\ntransaction=${hash}\nblock=${receipt.blockNumber}\nSet NEXT_PUBLIC_COVRA_POOLS_ADDRESS and BASE_DEPLOYMENT_START_BLOCK in .env.local.\n`);

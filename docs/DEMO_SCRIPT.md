@@ -2,7 +2,7 @@
 
 This is a testnet demonstration. COVRA provides no real insurance coverage, collects no commercial premium, and makes no licensed underwriting representation.
 
-1. Open the hosted HTTPS COVRA app at `https://covra-lyart.vercel.app` and show the testnet banner, Base Sepolia `84532`, Bradbury `4221`, and Circle test USDC address. The current deployment is code/runtime verified but remains unconfigured until Vercel environment variables are entered.
+1. Open the hosted HTTPS COVRA app at `https://covra-lyart.vercel.app` and show the testnet banner, Base Sepolia `84532`, Bradbury `4221`, and Circle test USDC address. Production database/authentication/issuer configuration is complete; contracts are deployed, Cron runs, and balances are honestly zero. Clearly disclose that funded claims and cross-chain payout have not yet been demonstrated.
 2. Connect a demonstration wallet and show one of the five coverage classes, its frozen terms hash, risk subject, evidence host, and non-binding quote.
 3. Show the quote's signer and deadline. Explain that an agent credential is scoped and cannot spend funds by itself.
 4. Approve only the test USDC allowance needed for the wallet's explicit purchase, then purchase on Base Sepolia. Show the confirmed receipt and indexed policy state.

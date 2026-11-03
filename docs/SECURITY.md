@@ -47,6 +47,10 @@ The Solidity contract compiles; that does **not** demonstrate that its cryptogra
 
 ## Owner / agent permissions
 
+Login challenges are persisted by SHA-256 nonce/message digests, bound to wallet and origin, expire in ten minutes and are consumed by an atomic conditional database update before session issuance. Restoring an old unsigned nonce cookie cannot replay a signature; a concurrent duplicate loses the consumption race. Migration 010 enables RLS with no client policies. Hosted replay and concurrency tests pass. Nonce retention/abuse controls still need ongoing operational monitoring.
+
+Current Base deployment also preserves permanent deployment-authority separation and historical attestor separation during role rotations. An attestor removed from the current roster cannot become administrator or quote signer because claims locked under earlier rosters retain that signer's authority. This does not establish independent key custody or operator independence.
+
 There are **three separate grants**: scoped REST/MCP API credentials, a Base onchain delegated purchase grant funded by the agent wallet (cumulative limit and expiry), and time-bounded independent claim-agent grants on Base/Bradbury for owner-authorized submission and evidence revision. None allows an agent to withdraw third-party LP capital. Revocation must be checked on both chains.
 
 ## Financial limitation

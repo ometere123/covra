@@ -4,7 +4,9 @@
 
 COVRA is a unified source repository for an agentic insurance experience: a branded website, owner and underwriter workspaces, agent credential management, wallet authentication, five coverage classes, signed policy quotes, USDC purchases, evidence-based claims intake, private storage, segregated underwriting pools, and GenLayer Intelligent Contract adjudication logic.
 
-> **TESTNET / RESEARCH ONLY.** Not licensed insurance, an audited or deployed protocol, a guaranteed indemnity product, an actuarially valid price, or a promise of payout. The independent Bradbury-to-Base settlement path has **not** been deployed or verified end to end. Do not take customer premiums or advertise production coverage. Testnet USDC is for development.
+> **TESTNET / RESEARCH ONLY.** Provides no real insurance coverage. Not audited, licensed, actuarially validated or a promise of payout. Contracts are deployed on both specified testnets, but the funded Bradbury-to-Base lifecycle remains unverified. Do not collect customer premiums or advertise commercial coverage.
+
+Current hosted product: [covra-lyart.vercel.app](https://covra-lyart.vercel.app). Full Bradbury adjudicator: `0xaefc8672272392310a2ea102787e28bb1f34e1d3`, independently Finalized / FinishedWithReturn. Current Base Sepolia five-class pool: `0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4`, source exact-matched on Sourcify. Actual balances are zero; no paid lifecycle is claimed. Supabase Cron job 1 runs every five minutes and has verified HTTP 200 scheduled executions. See [current checkpoint](docs/EXECUTION_CHECKPOINT.md) and [test report](docs/TEST_REPORT.md).
 
 ## All five coverages in one build
 

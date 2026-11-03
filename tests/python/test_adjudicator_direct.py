@@ -229,6 +229,7 @@ def _deploy(direct_deploy, direct_vm):
         from genlayer.nondet.web import Response
 
         def direct_web(url):
+            direct_vm._covra_web_reads = getattr(direct_vm, "_covra_web_reads", 0) + 1
             mock = direct_vm._match_web_mock(url, "GET")
             if mock is None:
                 return None
@@ -252,7 +253,8 @@ def _deploy(direct_deploy, direct_vm):
             leader = cloudpickle.loads(cloudpickle.dumps(leader))
             validator = cloudpickle.loads(cloudpickle.dumps(validator))
             result = leader()
-            if not validator(gl_vm.Return(result)):
+            transform = getattr(direct_vm, "_covra_candidate_transform", lambda value: value)
+            if not validator(gl_vm.Return(transform(result))):
                 raise AssertionError("Direct Mode validator rejected leader result")
             return result
         gl_vm.run_nondet = direct_run
@@ -355,3 +357,53 @@ def test_pinned_sdk_semantics_and_schema(direct_deploy, direct_vm, direct_owner)
     assert schema["methods"]["get_case"]["readonly"] is True
     contract.authorize_case_agent("0x" + "22" * 20, 0)
     assert contract.get_case_count() == 0
+
+
+def _submitted(direct_deploy, direct_vm, direct_owner):
+    contract = _deploy(direct_deploy, direct_vm)
+    direct_vm.sender = direct_owner
+    contract.allow_evidence_host("issuer.example.com", True)
+    case = _case_inputs(direct_owner)
+    contract.submit_case(case["case_id"], case["policy_id"], case["case_id"],
+        case["insured"], case["nonce"], 0, case["terms_hash"], case["risk_spec_json"],
+        case["risk_spec_hash"], case["source"], case["evidence_commitment"], case["event_time"], 10000)
+    return contract, case
+
+
+@pytest.mark.parametrize("status", [400, 404, 500, 503])
+def test_http_failures_do_not_persist_a_decision(direct_deploy, direct_vm, direct_owner, status):
+    contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
+    direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": status, "body": case["body"]})
+    with pytest.raises(Exception):
+        contract.adjudicate(case["case_id"])
+    assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"
+    assert contract.get_decision_digest(case["case_id"]) == ""
+
+
+@pytest.mark.parametrize("body", ["", "{}", "tampered", "x" * 131073], ids=["empty", "replaced-json", "tampered", "oversized"])
+def test_changed_empty_and_oversized_evidence_fail_closed(direct_deploy, direct_vm, direct_owner, body):
+    contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
+    direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": 200, "body": body})
+    with pytest.raises(Exception):
+        contract.adjudicate(case["case_id"])
+    assert json.loads(contract.get_case(case["case_id"]))["verdict"] == "PENDING"
+
+
+@pytest.mark.parametrize("change", ["wrong_verdict", "severity", "missing_reason", "extra_field"])
+def test_malicious_leader_and_disagreement_rejected(direct_deploy, direct_vm, direct_owner, change):
+    contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
+    direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": 200, "body": case["body"]})
+    direct_vm.mock_llm("COVRA", json.dumps({"verdict": "COVERED", "severity": 80,
+        "reason": "Objective deadline evidence", "citations": case["source"]}))
+    def manipulate(value):
+        value = dict(value)
+        if change == "wrong_verdict": value["verdict"] = "NOT_COVERED"
+        if change == "severity": value["severity"] = 1
+        if change == "missing_reason": value["reason"] = ""
+        if change == "extra_field": value["transfer"] = "attacker"
+        return value
+    direct_vm._covra_candidate_transform = manipulate
+    with pytest.raises(AssertionError, match="validator rejected"):
+        contract.adjudicate(case["case_id"])
+    assert direct_vm._covra_web_reads == 2  # Both callbacks actually retrieve the evidence.
+    assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"

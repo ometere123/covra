@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { database } from "@/lib/db";
+import { indexerStream } from "@/lib/indexer-stream";
 
 function authorized(request: NextRequest): boolean {
   const expected = process.env.INDEXER_CRON_SECRET;
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
   if (!authorized(request)) return NextResponse.json({ error: "Not authorized" }, { status: 401 });
   const pool = configuredPoolAddress();
   if (!pool || !process.env.DATABASE_URL) return NextResponse.json({ error: "Reconciliation requires database and deployed pool" }, { status: 503 });
+  const stream = indexerStream(pool);
   try {
     const sql = database();
     const head = await baseClient.getBlockNumber();
@@ -50,9 +52,9 @@ export async function GET(request: NextRequest) {
       if (local.status === "PAID" && !used) mismatches.push({ type: "PAID_NOT_USED", claimId: local.id });
       if (local.status === "DENIED" && !used) mismatches.push({ type: "DENIED_NOT_USED", claimId: local.id });
     }
-    const cursor = await sql`select stream,last_block,last_block_hash,updated_at from indexer_cursors where stream='base-lifecycle' limit 1`;
+    const cursor = await sql`select stream,last_block,last_block_hash,updated_at from indexer_cursors where stream=${stream} limit 1`;
     const runs = await sql`select id,started_at,finished_at,success,from_block,through_block,indexed_events,error
-      from indexer_runs where stream='base-lifecycle' order by started_at desc limit 10`;
+      from indexer_runs where stream=${stream} order by started_at desc limit 10`;
     return NextResponse.json({
       network: "Base Sepolia", chainId: 84532, pool, head: head.toString(), confirmedBlock: confirmedBlock.toString(),
       policyChecks, claimChecks, mismatchCount: mismatches.length, mismatches, cursor: cursor[0] || null, recentRuns: runs,

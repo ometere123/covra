@@ -4,8 +4,8 @@ import { decodeEventLog } from "viem";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { database } from "@/lib/db";
 import { logRanges } from "@/lib/indexer-ranges";
+import { indexerStream } from "@/lib/indexer-stream";
 
-const STREAM = "base-lifecycle";
 const CONFIRMATIONS = 12n;
 const MAX_RANGE = 2000n;
 
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
   if (!contract || !process.env.DATABASE_URL || !process.env.BASE_DEPLOYMENT_START_BLOCK) {
     return NextResponse.json({ error: "Indexer requires database, deployed contract, and deployment block" }, { status: 503 });
   }
+  const STREAM = indexerStream(contract);
 
   let body: { fromBlock?: string; maxBlocks?: number } = {};
   try {

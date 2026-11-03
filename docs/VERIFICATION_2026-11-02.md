@@ -1,5 +1,16 @@
 # Verification record — 2026-11-02
 
+## Verified continuation — 2026-11-03 (supersedes older status statements)
+
+- Full adjudicator `0xaefc8672272392310a2ea102787e28bb1f34e1d3`, deployment `0xd19bcbd6d2c6d3d2718312bb7114eec69d95facbf26a67cd00c2f7ee26432b28`, independently Finalized / FinishedWithReturn; exact source and ten-method schema checked.
+- Account-aware RC2 SDK patch replaces the diagnostic global-fetch hook in production. Manager v0.6.0-rc10 official universal bundle contains the exact babwp runner. Checksum verified; 15 SDK-backed Direct Mode tests now pass, including storage, cloudpickle serialization and independent callback disagreement. Legacy linter semantic CLI remains incompatible with ZIP runner packaging; AST lint passes 3 checks. These tests are not live consensus proof.
+- Hardened five-class Base pool `0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4`, successful transaction `0xfe01a9b68ac5a54df1173231c49838a0d67ba37be35e85624cd7d912461f93f2`, block 53734261. Sourcify exact creation/runtime match. Original empty pool preserved and paused after role-rotation hardening.
+- Vercel READY `dpl_7CvirQmqhDGsr6GUtkJ7aVdDhUZk`; real hosted authentication, replay rejection, agent credential lifecycle, MCP scope boundaries, database persistence and prospective signed quotation passed. Twenty-four desktop/mobile production page checks passed.
+- Supabase migrations 001–010 applied. Vault name mismatch reconciled internally without displaying values. Actual Cron job 1 active every five minutes; scheduled HTTP 200 responses verified. Current deployment-bound indexer and empty-ledger reconciliation both return 200.
+- Still incomplete: pool funding/premium/payout, real policy-bound issuance, live adjudication/appeal, and 3-of-5 settlement. Configured deployer last held zero Circle test USDC; three configured attestor operators' participation/custody is unavailable. No incident, observation or settlement has been fabricated.
+
+## Historical investigation — preserved evidence
+
 ## Subsequent verified progress
 
 The existing directory is now a Git repository on main, origin https://github.com/ometere123/covra. The empty remote was inspected before initialization. Initial commit 2a80676 preserved 131 non-secret source files; the staged credential-pattern scan reported no findings and `.env.local` is ignored.
