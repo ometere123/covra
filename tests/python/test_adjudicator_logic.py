@@ -54,6 +54,30 @@ class AdjudicatorLogicTests(unittest.TestCase):
             with self.assertRaises(UserError):
                 module.parse_result({**valid, **mutation})
 
+    def test_validator_rejects_malicious_results_and_does_not_capture_storage(self):
+        record = self.record()
+        record["state"] = "SUBMITTED"
+        self.contract.cases[record["id"]] = self.module.canonical_json(record)
+        valid = {"verdict": "COVERED", "severity": 50, "reason": "Verified facts", "citations": record["source"]}
+        class Returned:
+            def __init__(self, data):
+                self.calldata = data
+        self.gl.vm.Return = Returned
+        self.module.CovraAdjudicator._assess_independently = staticmethod(lambda _record: dict(valid))
+        def consensus(leader, validator):
+            self.assertNotIn("self", leader.__code__.co_freevars)
+            self.assertNotIn("self", validator.__code__.co_freevars)
+            self.assertTrue(validator(Returned(valid)))
+            self.assertFalse(validator(Returned({**valid, "verdict": "NOT_COVERED"})))
+            self.assertFalse(validator(Returned({**valid, "severity": 90})))
+            self.assertFalse(validator(Returned({**valid, "reason": {"payload": "bad"}})))
+            self.assertFalse(validator(Returned({**valid, "citations": ""})))
+            self.assertFalse(validator(object()))
+            return leader()
+        self.gl.vm.run_nondet = consensus
+        self.contract.adjudicate(record["id"])
+        self.assertEqual(json.loads(self.contract.get_case(record["id"]))["state"], "DECIDED")
+
     def setUp(self):
         self.module, self.gl = load_contract()
         self.insured = "0x" + "1" * 40

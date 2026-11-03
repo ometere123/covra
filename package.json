@@ -14,7 +14,7 @@
     "test:e2e": "playwright test",
     "test:solidity": "node scripts/compile-solidity.mjs",
     "test:genlayer-logic": "python3 -B -m unittest discover -s tests/python -p test_adjudicator_logic.py -v",
-    "test:genlayer-direct": "python -m pytest tests/python/test_adjudicator_direct.py -q",
+    "test:genlayer-direct": "node scripts/run-genlayer-direct.mjs",
     "check": "npm run typecheck && npm run test && npm run test:solidity && npm run build",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "deploy:base": "node --env-file=.env.local scripts/deploy-base.mjs",

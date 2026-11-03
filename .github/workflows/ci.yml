@@ -22,6 +22,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm run test:genlayer-logic
+      - run: python -m pip install genlayer-test==0.29.2
+      - name: Verify pinned Bradbury runtime SDK
+        run: |
+          mkdir -p .runtime
+          curl --fail --location --retry 3 https://github.com/genlayerlabs/genvm-manager/releases/download/v0.6.0-rc10/genvm-universal.tar.xz -o .runtime/genvm-universal.tar.xz
+          python scripts/prepare-genvm-runtime.py
+          npm run test:genlayer-direct
       - uses: foundry-rs/foundry-toolchain@v1
         with:
           version: stable

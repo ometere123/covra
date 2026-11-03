@@ -9,8 +9,36 @@ import os
 import hashlib
 import json
 import tempfile
+import sys
+from pathlib import Path
 from datetime import datetime, timezone
 from gltest.direct import loader
+from gltest.direct import sdk_loader
+
+
+def _verified_manager_sdk(contract_path=None, version=None):
+    root = Path(__file__).resolve().parents[2] / ".runtime"
+    archive = root / "genvm-universal.tar.xz"
+    if not archive.exists() or hashlib.file_digest(archive.open("rb"), "sha256").hexdigest() != "d3c6ba368dbd5cad01e484e19573906b4ffed41f46a48191bdc579c81cf801af":
+        raise RuntimeError("Run scripts/prepare-genvm-runtime.py with the official Manager rc10 bundle")
+    dependencies = sdk_loader.parse_contract_header(Path(contract_path))
+    paths = []
+    visited = set()
+    def include(family, digest):
+        if (family, digest) in visited:
+            return
+        visited.add((family, digest))
+        folder = root / "manager-rc10" / family / digest
+        if not folder.is_dir():
+            raise RuntimeError("Missing exact runtime dependency: " + family + ":" + digest)
+        paths.append(folder)
+        for dep_family, dep_digest in sdk_loader.parse_runner_manifest(folder).items():
+            include(dep_family, dep_digest)
+    for family, digest in dependencies.items():
+        include(family, digest)
+    for folder in paths:
+        sys.path.insert(0, str(folder / "src" if (folder / "src").exists() else folder))
+    return paths
 
 
 def _canonical(value):
@@ -100,8 +128,15 @@ def _case_inputs(
 
 
 def _deploy(direct_deploy, direct_vm):
+    # Each direct deployment represents a fresh GenVM process. The old gltest
+    # loader does not reset v0.3's per-process main-contract registration.
+    contract_module = sys.modules.get("genlayer.contract")
+    if contract_module is not None:
+        contract_module.__known_contract__ = None
     original_inject = loader._inject_message_to_fd0
     original_allocate = loader._allocate_contract
+    original_sdk_setup = sdk_loader.setup_sdk_paths
+    sdk_loader.setup_sdk_paths = _verified_manager_sdk
 
     def v03_safe_inject(vm):
         """Encode the stdin message with the v0.3 SDK used by this contract.
@@ -159,6 +194,7 @@ def _deploy(direct_deploy, direct_vm):
         # leaving __type_desc__ unset. Use the v0.3 SDK's documented in-memory
         # allocator for direct execution.
         from genlayer import storage
+        v03_refresh_message()
         return storage.inmem_allocate(contract_cls, *args, **kwargs)
 
     def v03_refresh_message():
@@ -177,6 +213,7 @@ def _deploy(direct_deploy, direct_vm):
         message.origin_address = origin
         message.value = u256(direct_vm._value)
         message.chain_id = u256(direct_vm._chain_id)
+        message.raw["datetime"] = direct_vm._datetime
 
     direct_vm._refresh_gl_message = v03_refresh_message
 
@@ -211,6 +248,9 @@ def _deploy(direct_deploy, direct_vm):
         gl.nondet.exec_prompt = direct_prompt
 
         def direct_run(leader, validator, /):
+            import cloudpickle
+            leader = cloudpickle.loads(cloudpickle.dumps(leader))
+            validator = cloudpickle.loads(cloudpickle.dumps(validator))
             result = leader()
             if not validator(gl_vm.Return(result)):
                 raise AssertionError("Direct Mode validator rejected leader result")
@@ -220,6 +260,7 @@ def _deploy(direct_deploy, direct_vm):
     finally:
         loader._inject_message_to_fd0 = original_inject
         loader._allocate_contract = original_allocate
+        sdk_loader.setup_sdk_paths = original_sdk_setup
 
 
 @pytest.mark.direct
@@ -280,3 +321,37 @@ def test_covra_adjudicator_direct_positive_and_negative_adjudication(
     })
     contract.adjudicate(negative["case_id"])
     assert json.loads(contract.get_case(negative["case_id"]))["verdict"] == "INSUFFICIENT_EVIDENCE"
+
+    assert contract.get_case_count() == 2
+    assert contract.get_case_id_at(0) == positive["case_id"]
+    assert contract.get_case("unknown") == ""
+    assert contract.get_decision_digest(positive["case_id"]) == ""
+    with pytest.raises(Exception):
+        contract.finalize_case(positive["case_id"])
+    contract.appeal(positive["case_id"], negative["source"], negative["evidence_commitment"])
+    appealed = json.loads(contract.get_case(positive["case_id"]))
+    assert appealed["revision"] == 1 and appealed["state"] == "SUBMITTED"
+    with pytest.raises(Exception):
+        contract.appeal(positive["case_id"], positive["source"], positive["evidence_commitment"])
+    # The new bytes identify the other case: adjudication must fail closed.
+    contract.adjudicate(positive["case_id"])
+    direct_vm.warp("2027-01-01T12:00:00Z")
+    contract.finalize_case(positive["case_id"])
+    finalized = json.loads(contract.get_case(positive["case_id"]))
+    fields = {"case_id": finalized["id"], "policy_id": finalized["policy_id"],
+              "claim_id": finalized["claim_id"], "terms_hash": finalized["terms_hash"],
+              "risk_spec_hash": finalized["risk_spec_hash"], "verdict": finalized["verdict"],
+              "revision": finalized["revision"], "evidence_hash": finalized["evidence_hash"],
+              "coverage_class": finalized["risk"], "finalized_at": finalized["finalized_at"]}
+    assert contract.get_decision_digest(positive["case_id"]) == _digest(_canonical(fields))
+
+
+def test_pinned_sdk_semantics_and_schema(direct_deploy, direct_vm, direct_owner):
+    contract = _deploy(direct_deploy, direct_vm)
+    cls = sys.modules["_contract_CovraAdjudicator"].CovraAdjudicator
+    schema = json.loads(cls.__get_schema__())
+    assert len(schema["methods"]) == 10
+    assert schema["methods"]["submit_case"]["readonly"] is False
+    assert schema["methods"]["get_case"]["readonly"] is True
+    contract.authorize_case_agent("0x" + "22" * 20, 0)
+    assert contract.get_case_count() == 0

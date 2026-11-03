@@ -2,6 +2,16 @@
 
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
+## Active full adjudicator deployment
+
+Base deployed successfully: pool 0xab4436b8ff15b7fa209e2018300d1741db0dfad1, tx 0x5945c5e6637ac9b4811ea4b7ed88c30de077676790c8c2de8d34e318c9fcdabc, block 53729517. Live reads verify attestorCount=5, correct evidenceIssuer and bound adjudicator. All five pools currently have zero assets/reserves/premiums/paid/shares; no funded lifecycle is claimed. Correct actual addresses/start block configured in production Vercel. Deployment session 72745 pending: dpl_96LpVjYXkDCQhj9sxxgDiViSGBuH. Wait for READY then authenticated /api/indexer/sync before activating Cron. Vault covra_indexer_cron_secret securely compared to configured INDEXER_CRON_SECRET: true. Next install URL entry + reviewed cron SQL only after hosted route verifies.
+
+Submitted once after exact-runner Direct Mode/schema checks: 0xd19bcbd6d2c6d3d2718312bb7114eec69d95facbf26a67cd00c2f7ee26432b28. Independently verified Finalized / FinishedWithReturn. Actual FULL COVRA adjudicator: 0xaefc8672272392310a2ea102787e28bb1f34e1d3. Deployed source SHA256 matches 4f424277b2aa1c23d599f8936452c7d16989ab7bd4e4265fbb28aab57092d0f2; initial case count zero and all ten schema methods independently retrieved. No repeat deployment needed. Live adjudication/appeal still pending.
+
+Official artifact breakthrough: genlayerlabs/genvm-manager v0.6.0-rc10 universal bundle, SHA256 d3c6ba368dbd5cad01e484e19573906b4ffed41f46a48191bdc579c81cf801af, contains exact babwp runner and declared std z7fv8... dependency. scripts/prepare-genvm-runtime.py verifies checksum and extracts SDKs; .runtime excluded from Git and Vercel. Python 3.12 required for bundled cloudpickle (3.14 recursion failure). Three Direct Mode tests pass using actual extracted storage and cloudpickle round-trips, including schema, authorization, adjudication, appeal/replay, finalization, persistence and digest parity. This is in-process SDK execution with controlled external web/model inputs, not real network consensus. Ten host tests and three AST lint checks pass. Old linter semantic loader still assumes legacy genlayer.py; actual pinned SDK __get_schema__ test passes instead.
+
+Latest JS tests: 62 Vitest + 7 TAP pass. SSRF fixes reject hexadecimal mapped local IPv4 and reserved/transition ranges (4 evidence-source tests). Assessment callbacks no longer capture self. Base deployer 0xa5840e65a15021d8b1648dB10176c04811f07873 has 0.14 Base Sepolia ETH and zero official Circle USDC. Five configured attestor public addresses verified present, signing custody/independence not verified.
+
 ## 2026-11-03 adjudicator security update
 
 Strict model-result validation now rejects unknown/missing fields, noncanonical verdicts, boolean/string/fractional severity, empty or non-string rationale/citations and oversized text. Validator callbacks parse leader results through the same checks before comparing substance. Nine host tests passed, AST lint passed three checks, and actual Bradbury schema extraction passed all ten methods for SHA256 7dd10a936d361f2575e1316dddcfd51240c80999eb7c144edafd7c666c221246 (25,667 bytes). These are not substitutes for Direct Mode or live adjudication.

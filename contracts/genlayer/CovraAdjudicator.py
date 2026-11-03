@@ -327,7 +327,8 @@ class CovraAdjudicator(gl.contract.Contract):
         self.case_order.append(case_id)
         self.case_count = cast(u256, self.case_count + 1)
 
-    def _assess_independently(self, record: dict) -> dict:
+    @staticmethod
+    def _assess_independently(record: dict) -> dict:
         """Leader AND validators each perform a fresh external read and analysis."""
         source = record["source"]
         response = gl.nondet.web.get(source)
@@ -407,13 +408,13 @@ class CovraAdjudicator(gl.contract.Contract):
             raise gl.vm.UserError(ERROR_EXPECTED + " case not adjudicable")
 
         def leader():
-            return self._assess_independently(record)
+            return CovraAdjudicator._assess_independently(record)
 
         def validator(leader_result: gl.vm.Result) -> bool:
             if not isinstance(leader_result, gl.vm.Return):
                 # Retry/rotate on errors; do not agree on a leader's LLM failure.
                 return False
-            own = self._assess_independently(record)
+            own = CovraAdjudicator._assess_independently(record)
             candidate = leader_result.calldata
             try:
                 candidate = parse_result(candidate)

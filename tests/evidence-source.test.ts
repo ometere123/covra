@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { isPrivateNetworkAddress } from "../src/lib/evidence-source";
 
 describe("evidence source network boundary", () => {
+  it("blocks hexadecimal mapped IPv4, shared-address and transition bypasses", () => {
+    for (const address of ["::ffff:c0a8:101", "::ffff:7f00:1", "100.64.0.1", "224.0.0.1", "2002:7f00:1::", "2001:db8::1"]) {
+      expect(isPrivateNetworkAddress(address)).toBe(true);
+    }
+    expect(isPrivateNetworkAddress("2606:4700:4700::1111")).toBe(false);
+  });
   it("does not classify ordinary DNS hostnames as private targets", () => {
     expect(isPrivateNetworkAddress("status.example.org")).toBe(false);
     expect(isPrivateNetworkAddress("8.8.8.8")).toBe(false);

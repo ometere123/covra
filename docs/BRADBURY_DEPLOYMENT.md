@@ -1,5 +1,19 @@
 # Bradbury Phase 2 deployment record
 
+## Verified COVRA deployment — 2026-11-03
+
+Full adjudicator address: `0xaefc8672272392310a2ea102787e28bb1f34e1d3`.
+Transaction: `0xd19bcbd6d2c6d3d2718312bb7114eec69d95facbf26a67cd00c2f7ee26432b28`.
+Independent GenLayer receipt: `Finalized` / `FinishedWithReturn`.
+Deployed source SHA-256: `4f424277b2aa1c23d599f8936452c7d16989ab7bd4e4265fbb28aab57092d0f2`, identical to local source.
+Initial `get_case_count` returned zero; all ten public methods returned in deployed schema.
+
+Runner: `py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0`.
+Official matching bundle is GenVM Manager v0.6.0-rc10 from `genlayerlabs/genvm-manager`, not the older `genlayerlabs/genvm` rc7 release. Bundle SHA-256: `d3c6ba368dbd5cad01e484e19573906b4ffed41f46a48191bdc579c81cf801af`.
+Three actual pinned-SDK Direct Mode tests passed on Python 3.12, including callback cloudpickle round trips and appeal/finalization/digest checks with controlled external inputs. These do not prove live evidence consensus, which remains pending.
+
+Set both public/server adjudicator address variables to the verified address above. The historical failures below are retained as investigation evidence and are superseded by this deployment.
+
 This record is intentionally incomplete because the public Bradbury validator fleet is currently finalizing deployment transactions with a GenVM runner-load error. No adjudicator address is claimed.
 
 ## Fixed target
