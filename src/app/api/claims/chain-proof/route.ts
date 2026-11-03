@@ -192,7 +192,7 @@ export async function POST(request:NextRequest) {
 
     await sql`insert into claim_chain_events(chain_id,tx_hash,log_index,claim_id,event_type,block_number,block_hash,payload)
       values(${phase.startsWith("BASE")?84532:4221},${txHash.toLowerCase()},${logIndex},${claimId},
-        ${eventType},${blockNumber},${blockHash},${JSON.stringify(details)}::jsonb) on conflict do nothing`;
+        ${eventType},${blockNumber},${blockHash},${sql.json(JSON.parse(JSON.stringify(details)))}) on conflict do nothing`;
     if (phase==="BASE_LOCKED") await sql`update claims set base_lock_tx_hash=${txHash},updated_at=now() where id=${claimId}`;
     if (phase==="BASE_REVISED") await sql`update claims set evidence_manifest_hash=${evidenceDigest!},
       evidence_revision=1,pending_appeal_digest=null,

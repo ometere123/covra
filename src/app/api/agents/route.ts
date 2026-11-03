@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const sql = database();
     const rows = await sql`
       insert into agent_credentials(owner_wallet,label,key_hash,scopes,max_daily_requests,expires_at)
-      values (${owner},${body.label},${hashKey(rawKey)},${JSON.stringify(body.scopes)}::jsonb,
+      values (${owner},${body.label},${hashKey(rawKey)},${sql.json(body.scopes)},
               ${body.maxDailyRequests}, now() + (${body.expiresInDays} * interval '1 day'))
       returning id,label,scopes,expires_at
     `;

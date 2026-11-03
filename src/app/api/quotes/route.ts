@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     const sql = database();
     await sql`insert into policy_risk_specs(policy_id,owner_wallet,risk_spec_hash,risk_spec_json)
       values(${quote.policyId},${signedFor.toLowerCase()},${quote.riskSpecHash},
-        ${canonicalRiskSpec(parsed.riskSpec)}::jsonb)`;
+        ${sql.json(JSON.parse(canonicalRiskSpec(parsed.riskSpec)))})`;
     const signature = await signer.signTypedData({
       domain: { name: "COVRA", version: "1", chainId: 84532, verifyingContract: contract },
       types: quoteTypes, primaryType: "Quote", message: quote,

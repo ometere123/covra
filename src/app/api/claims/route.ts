@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         requested_micro_usdc,idempotency_key,status,evidence_manifest_hash
       ) values (
         ${body.policyId},${owner},${body.coverageClass},${body.incidentAt},
-        ${body.description},${JSON.stringify(body.evidenceUrls)}::jsonb,
+        ${body.description},${sql.json(body.evidenceUrls)},
         ${body.requestedMicroUsdc},${idempotency},'AWAITING_EVIDENCE',${body.evidenceCommitment.toLowerCase()}
       ) on conflict do nothing
       returning id,status,policy_id,created_at

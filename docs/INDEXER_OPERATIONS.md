@@ -1,5 +1,7 @@
 # Base Sepolia lifecycle indexer
 
+Verified live on 2026-11-03: Supabase Cron job `1`, `covra-indexer-five-minute`, active `*/5 * * * *`. Scheduled execution at 01:10 UTC succeeded; pg_net response id 1 returned HTTP 200 without timeout. The durable cursor advanced from 53730951 to 53731653, with an indexer success row and no error. The authenticated reconciliation report had zero mismatches for the currently empty policy/claim ledger. RPC log retrieval is paginated into inclusive 200-block requests within each bounded backfill.
+
 The indexer is a resumable operational read model. Base Sepolia receipts and state remain the settlement source of truth; Supabase never authorizes a payout by itself.
 
 ## API

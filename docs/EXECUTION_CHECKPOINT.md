@@ -2,6 +2,16 @@
 
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
+## Live Cron and agent regression
+
+JSON repair reverified in production: dpl_EBzRjDU4Jf5CFAdCK3A6kQn63kL6 READY. scripts/verify-live-agent.mjs passed actual signed wallet authentication, real temporary read-scoped agent credential creation, HTTP 200 scoped policy read (zero policies), credential revocation and HTTP 401 revoked-key rejection. Credential always revoked in finally; no keys/cookies logged. Migration 009 complete including all six JSON shape constraints. Still no real funded policy, observation or settlement has been created. Next independent tests: hosted MCP permission boundaries, auth replay protection, all five actual issuer workflows once policy exists; inspect contract role-rotation separation and remaining economic invariants; confirm latest CI. No need to repeat the runtime download, positive control or finalized deployments.
+
+Cron job 1 installed and active */5 * * * * after successful authenticated hosted indexer execution. First scheduled execution at 2026-11-03 01:10:00 UTC succeeded; net._http_response id 1 returned 200, timed_out=false. Indexer run at 01:10:01.424385 UTC succeeded and persisted through block 53731653 (previous manual cursor 53730951). Authenticated reconciliation returned zero mismatches with zero policies/claims; this proves empty-ledger consistency, not a paid lifecycle.
+
+Live wallet authentication succeeded for configured deployer. Temporary real scoped credential creation succeeded but policy read returned 401 because jsonb scopes were double encoded as a string. Temporary credential revoked in finally. Repaired all six JSON write sites with sql.json rather than JSON.stringify::jsonb. Migration 009 normalizes existing string-encoded JSON and adds shape constraints. The initial normalization-only version applied; full constraint version being applied in current session. Redeployment session 62637 (dpl_EBzRjDU4Jf5CFAdCK3A6kQn63kL6) pending. Rerun scripts/verify-live-agent.mjs after READY to verify the original failing path and revocation.
+
+Desktop/mobile browser suite passed 8/8; known test-runner caret-style hydration warnings persist. CI d565d7f and dc6f33d passed, including newly installed checksum-verified Manager SDK Direct Mode. Real host allowlist write 0xd9ab1ba5e9fe068827dec59686e42d7cc555bace2e9d27ec367a6ab262aa7007 independently Finalized / FinishedWithReturn. No pool funding yet. User asked asynchronously to fund the configured deployer with test USDC and provide participation by three configured attestor operators; no replacement attestors created.
+
 ## Active full adjudicator deployment
 
 Indexer live check against real pool returned RPC 413 because public Base endpoint limits getLogs to 200 blocks. Implemented tested 200-block inclusive pagination within existing 2,000-block bounded backfill; pending-log fields fail closed. Range regression test and TypeScript pass. Initial deployment dpl_69tK7rfzutkxFD3QzstfYjjMavCN failed TypeScript before the pending-log null guard; fixed, new deployment launched. Do not activate Cron until patched hosted sync succeeds. Public URL Vault entry configured successfully via supabase/cron/configure-indexer-url.sql. Cron itself is not installed yet.

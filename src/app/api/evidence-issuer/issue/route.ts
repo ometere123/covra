@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
       observation_id,coverage_class,evidence_digest,issuer_wallet,envelope,issued_at,expires_at
     ) values(
       ${body.observationId},${Number(claim.coverage_class)},${digest},${account.address.toLowerCase()},
-      ${JSON.stringify(envelope)}::jsonb,${new Date(now * 1000).toISOString()},${new Date(expiresAt * 1000).toISOString()}
+      ${sql.json(JSON.parse(JSON.stringify(envelope)))},${new Date(now * 1000).toISOString()},${new Date(expiresAt * 1000).toISOString()}
     ) on conflict (observation_id) do nothing returning observation_id`;
     if (!inserted.length) {
       const existing = await sql`select evidence_digest,issuer_wallet,envelope

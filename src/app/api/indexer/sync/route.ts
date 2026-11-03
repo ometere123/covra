@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       const inserted = await sql`insert into claim_chain_events(
         chain_id,tx_hash,log_index,claim_id,event_type,block_number,block_hash,payload
       ) values(84532,${item.transactionHash.toLowerCase()},${Number(item.logIndex ?? 0)},${claimId},
-        ${eventName},${String(item.blockNumber)},${item.blockHash},${payload}::jsonb)
+        ${eventName},${String(item.blockNumber)},${item.blockHash},${sql.json(JSON.parse(payload))})
         on conflict do nothing returning tx_hash`;
       if (!inserted.length) continue;
       indexed += 1;
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
         on conflict(stream) do update set last_block=excluded.last_block,last_block_hash=excluded.last_block_hash,updated_at=now()`;
     }
     await sql`update indexer_runs set finished_at=now(),success=true,from_block=${String(start)},through_block=${String(until)},
-      indexed_events=${indexed},replay_only=${replayOnly},metadata=${serialized({logs:logs.length,latest:latest.toString()})}::jsonb where id=${runId}`;
+      indexed_events=${indexed},replay_only=${replayOnly},metadata=${sql.json({logs:logs.length,latest:latest.toString()})} where id=${runId}`;
     return NextResponse.json({ indexed, scanned: logs.length, fromBlock: start.toString(), throughBlock: until.toString(),
       caughtUp: until === latest, replayOnly, confirmations: Number(CONFIRMATIONS) });
   } catch (error) {
