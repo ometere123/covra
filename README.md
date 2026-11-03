@@ -29,7 +29,7 @@ Each class has distinct exclusions, required evidence, duration bounds and expli
 - Bradbury Phase 2 fee-aware SDK integration: explicit wallet actions for submission, adjudication, one appeal and finalization. Real GenLayer execution-node compatibility is required; submitting is not adjudicating.
 - Hosted evidence issuer for all five classes with signed canonical observations sourced from operator-authorized public HTTPS observations, stable public retrieval, expiry, revocation and supersession; read-only attestor preflight, isolated signer that rechecks live state, 3-of-5 certificate aggregation and a bounded claim-extension tool. Genuine signer independence still requires external operators.
 - Next.js APIs for executable quotes, wallet sessions, indexed policies, private claims, signed issuer provenance, exact chain-receipt reconciliation and nine scoped MCP agent tools.
-- PostgreSQL RLS schema, private Supabase object storage, durable follow-up workflow definition, resumable lifecycle indexer with reconciliation report, Supabase Cron installation SQL, self-contained testnet deployment script and test suites.
+- PostgreSQL RLS, private Supabase storage, triggered durable claim-follow-up jobs with fenced leases/retry checkpoints, resumable lifecycle indexing/reconciliation and a verified five-minute Supabase Cron schedule. Jobs monitor required actions; wallet and settlement authority remain separate.
 
 ## Chain design
 

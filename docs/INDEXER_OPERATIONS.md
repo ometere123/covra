@@ -4,6 +4,10 @@ Verified live on 2026-11-03: Supabase Cron job `1`, `covra-indexer-five-minute`,
 
 The indexer is a resumable operational read model. Base Sepolia receipts and state remain the settlement source of truth; Supabase never authorizes a payout by itself.
 
+The current deployment uses stream `base-84532:0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4`; historical cursors are preserved. Event deduplication and projections commit atomically; failed projections roll back so retries cannot skip them. Lease renewal/fencing protects both event writes and cursor advancement. Claim association requires the exact owner-bound claim digest. Scheduled01:25,01:30 and01:35 UTC executions advanced this stream successfully.
+
+Migration011 adds durable claim follow-ups. Each authenticated sync processes up to ten due jobs independently before Base RPC calls. Database-triggered enqueue avoids a crash gap after claim insertion. Successful nonterminal checks are due hourly; failures use five-minute increasing backoff, four-minute fenced leases, and a five-attempt ceiling including crashes. FAILED jobs require owner/claim:issue reset through POST /api/agents/followups. GET requires owner or claim:read; MCP lifecycle inspection exposes the same job checkpoint. Jobs do not mark payouts or sign transactions. The scheduler remains Supabase Cron, functional with the operator's PC switched off.
+
 ## API
 
 - `POST /api/indexer/sync` with `Authorization: Bearer INDEXER_CRON_SECRET`.

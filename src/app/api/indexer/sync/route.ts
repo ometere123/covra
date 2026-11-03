@@ -6,6 +6,7 @@ import { database } from "@/lib/db";
 import { logRanges } from "@/lib/indexer-ranges";
 import { indexerStream } from "@/lib/indexer-stream";
 import { claimIdFromUuid } from "@/lib/claim-protocol";
+import { processClaimFollowups } from "@/workflows/claim-followup";
 
 const CONFIRMATIONS = 12n;
 const MAX_RANGE = 2000n;
@@ -57,6 +58,8 @@ export async function POST(request: NextRequest) {
   }
 
   const sql = database();
+  // Independent read-model jobs also recover while Base RPC is unavailable.
+  const followups = await processClaimFollowups().catch(() => ({ error: "FOLLOWUP_QUEUE_UNAVAILABLE" }));
   const leaseId = randomUUID();
   let runId: string | undefined;
   let replayOnly = false;
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
     const latest = head > CONFIRMATIONS ? head - CONFIRMATIONS : 0n;
     if (start > latest) {
       await sql`update indexer_runs set finished_at=now(),success=true,from_block=${String(start)},indexed_events=0,replay_only=${replayOnly} where id=${runId}`;
-      return NextResponse.json({ indexed: 0, caughtUp: true, confirmations: Number(CONFIRMATIONS), cursor: cursorBlock?.toString() ?? null });
+      return NextResponse.json({ indexed: 0, caughtUp: true, confirmations: Number(CONFIRMATIONS), cursor: cursorBlock?.toString() ?? null, followups });
     }
     const configuredRange = BigInt(body.maxBlocks ?? Number(MAX_RANGE));
     const until = start + configuredRange - 1n > latest ? latest : start + configuredRange - 1n;
@@ -206,7 +209,7 @@ export async function POST(request: NextRequest) {
       indexed_events=${indexed},replay_only=${replayOnly},metadata=${sql.json({logs:logs.length,latest:latest.toString()})} where id=${activeRunId}`;
     });
     return NextResponse.json({ indexed, scanned: logs.length, fromBlock: start.toString(), throughBlock: until.toString(),
-      caughtUp: until === latest, replayOnly, confirmations: Number(CONFIRMATIONS) });
+      caughtUp: until === latest, replayOnly, confirmations: Number(CONFIRMATIONS), followups });
   } catch (error) {
     if (runId) await sql`update indexer_runs set finished_at=now(),success=false,error=${error instanceof Error ? error.message : "Indexer failure"},replay_only=${replayOnly} where id=${runId}`.catch(() => undefined);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Indexer query failed; cursor not intentionally advanced" }, { status: statusCode(error) });

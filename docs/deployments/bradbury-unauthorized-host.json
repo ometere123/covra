@@ -1,0 +1,39 @@
+{
+  "chainId": 4221,
+  "caller": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+  "adjudicator": "0xaefc8672272392310a2ea102787e28bb1f34e1d3",
+  "method": "allow_evidence_host",
+  "args": [
+    "unauthorized.example.org",
+    true
+  ],
+  "status": "REJECTED_BEFORE_BROADCAST",
+  "executionKind": "UserError",
+  "diagnostic": "[EXPECTED] only owner",
+  "checkedAt": "2026-11-03T02:05:16.257Z",
+  "transactionSubmitted": false,
+  "diagnostics": [
+    {
+      "code": -32000,
+      "dataType": "undefined",
+      "fields": [
+        "details",
+        "docsPath",
+        "metaMessages",
+        "shortMessage",
+        "version",
+        "name",
+        "code"
+      ]
+    },
+    {
+      "code": -32000,
+      "dataType": "string",
+      "fields": [
+        "code",
+        "message",
+        "data"
+      ]
+    }
+  ]
+}

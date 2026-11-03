@@ -40,6 +40,12 @@ if (!process.argv.includes("--reproduce-replay")) {
 }
 const credential = await call("/api/agents", { method: "POST", body: JSON.stringify({ label: "Live verification — read only", scopes: ["policy:read"], expiresInDays: 1, maxDailyRequests: 10 }) });
 try {
+  const followups = await call("/api/agents/followups");
+  if (!Array.isArray(followups.items)) throw new Error("Owner follow-up read failed");
+  console.log("Owner durable follow-up read verified", followups.items.length, "jobs");
+  const forbidden = await fetch(origin + "/api/agents/followups", { headers: { Authorization: "Bearer " + credential.secret } });
+  if (forbidden.status !== 401) throw new Error("Policy-only key accessed claim follow-ups");
+  console.log("Claim follow-up scope boundary verified", forbidden.status);
   // Deliberately omit the owner cookie to exercise agent authorization.
   const response = await fetch(origin + "/api/policies", { headers: { Authorization: "Bearer " + credential.secret } });
   if (response.status !== 200) throw new Error("Agent policy read failed HTTP " + response.status);

@@ -100,7 +100,10 @@ function makeHandler(request: NextRequest) {
       if (!claims.length) return { isError: true, content: [{ type: "text" as const, text: "Claim not found for this owner" }] };
       const events = await sql`select chain_id,tx_hash,log_index,event_type,block_number,block_hash,payload,created_at
         from claim_chain_events where claim_id=${claimId} order by created_at asc`;
-      return asText({ claim: claims[0], events, sourceOfTruth: "Base receipts and finalized Bradbury provenance must be independently verified; Supabase is a read model" });
+      const followup = await sql`select status,next_run_at,attempts,checkpoint,last_error,updated_at
+        from claim_followups where claim_id=${claimId} limit 1`;
+      return asText({ claim: claims[0], events, followup: followup[0] || null,
+        sourceOfTruth: "Base receipts and finalized Bradbury provenance must be independently verified; Supabase is a read model" });
     });
     server.registerTool("read_policy_chain_state", {
       description: "Read the confirmed Base Sepolia policy and claim-lock state for an owned policy; policy:read scope required.",
