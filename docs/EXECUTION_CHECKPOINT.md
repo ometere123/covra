@@ -2,6 +2,14 @@
 
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
+## 2026-11-03 adjudicator security update
+
+Strict model-result validation now rejects unknown/missing fields, noncanonical verdicts, boolean/string/fractional severity, empty or non-string rationale/citations and oversized text. Validator callbacks parse leader results through the same checks before comparing substance. Nine host tests passed, AST lint passed three checks, and actual Bradbury schema extraction passed all ten methods for SHA256 7dd10a936d361f2575e1316dddcfd51240c80999eb7c144edafd7c666c221246 (25,667 bytes). These are not substitutes for Direct Mode or live adjudication.
+
+Applied supabase/cron/reconcile-vault-names.sql successfully through authenticated remote SQL. It copies the existing operator Vault entry internally to covra_indexer_cron_secret only if absent, preserving covra-indexer-secret and returning no values. Cron remains inactive pending real Base deployment and start block. A preceding inline SQL attempt failed syntax parsing before any mutation; the reviewed SQL file succeeded.
+
+Latest verified GitHub CI: 41490181666 succeeded for 699844f. Full adjudicator is not deployed. Mandatory runtime, closure serialization and independent consensus checks remain open. Base deployment/funding, policy-bound issuance, active Cron and cross-chain lifecycle remain unverified. Do not represent the positive control as COVRA adjudicator.
+
 ## Application connectivity repaired
 
 scripts/repair-production-database.mjs URL-encodes only the password component in protected process memory, verifies the existing cxvgjycgojjcrmiyclga project identity, authenticates a real Postgres query, and provisions DATABASE_URL as a Vercel Secret over stdin. Both authentication and secret provisioning succeeded. The local file was not changed. This supersedes the earlier database-connection blocker.

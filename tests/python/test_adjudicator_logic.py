@@ -44,6 +44,16 @@ def load_contract():
 
 
 class AdjudicatorLogicTests(unittest.TestCase):
+    def test_model_results_reject_coercion_and_unbounded_fields(self):
+        module, _ = load_contract()
+        valid = {"verdict": "COVERED", "severity": 50, "reason": "Verified facts", "citations": "https://issuer.example.org/claim"}
+        self.assertEqual(module.parse_result(valid), valid)
+        for mutation in ({"severity": True}, {"severity": 1.5}, {"severity": "50"},
+                         {"reason": {}}, {"citations": ""}, {"reason": "x" * 1201},
+                         {"verdict": "covered"}, {"extra": "instruction"}):
+            with self.assertRaises(UserError):
+                module.parse_result({**valid, **mutation})
+
     def setUp(self):
         self.module, self.gl = load_contract()
         self.insured = "0x" + "1" * 40

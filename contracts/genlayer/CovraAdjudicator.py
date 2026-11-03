@@ -198,20 +198,26 @@ def parse_result(value) -> dict:
             raise gl.vm.UserError(ERROR_LLM + " invalid JSON")
     if not isinstance(value, dict):
         raise gl.vm.UserError(ERROR_LLM + " analysis must be an object")
-    verdict = str(value.get("verdict", "")).upper().strip()
+    if set(value) != {"verdict", "severity", "reason", "citations"}:
+        raise gl.vm.UserError(ERROR_LLM + " invalid result fields")
+    if not isinstance(value["verdict"], str):
+        raise gl.vm.UserError(ERROR_LLM + " invalid verdict type")
+    verdict = value["verdict"]
     if verdict not in ALLOWED_VERDICTS:
         raise gl.vm.UserError(ERROR_LLM + " verdict outside enum")
-    try:
-        severity = int(value.get("severity", 0))
-    except (ValueError, TypeError):
+    if type(value["severity"]) is not int:
         raise gl.vm.UserError(ERROR_LLM + " invalid severity")
+    severity = value["severity"]
     if severity < 0 or severity > 100:
         raise gl.vm.UserError(ERROR_LLM + " severity outside bounds")
+    for field, maximum in (("reason", 1200), ("citations", 1600)):
+        if not isinstance(value[field], str) or not value[field].strip() or len(value[field]) > maximum:
+            raise gl.vm.UserError(ERROR_LLM + " invalid " + field)
     return {
         "verdict": verdict,
         "severity": severity,
-        "reason": str(value.get("reason", ""))[:1200],
-        "citations": str(value.get("citations", ""))[:1600],
+        "reason": value["reason"],
+        "citations": value["citations"],
     }
 
 
@@ -409,7 +415,9 @@ class CovraAdjudicator(gl.contract.Contract):
                 return False
             own = self._assess_independently(record)
             candidate = leader_result.calldata
-            if not isinstance(candidate, dict):
+            try:
+                candidate = parse_result(candidate)
+            except gl.vm.UserError:
                 return False
             if own["verdict"] != candidate.get("verdict"):
                 return False
