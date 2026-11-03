@@ -3,6 +3,7 @@ import { randomUUID, timingSafeEqual } from "node:crypto";
 import { decodeEventLog } from "viem";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { database } from "@/lib/db";
+import { logRanges } from "@/lib/indexer-ranges";
 
 const STREAM = "base-lifecycle";
 const CONFIRMATIONS = 12n;
@@ -85,9 +86,15 @@ export async function POST(request: NextRequest) {
     }
     const configuredRange = BigInt(body.maxBlocks ?? Number(MAX_RANGE));
     const until = start + configuredRange - 1n > latest ? latest : start + configuredRange - 1n;
-    const logs = await baseClient.getLogs({ address: contract, fromBlock: start, toBlock: until });
+    const logs: Awaited<ReturnType<typeof baseClient.getLogs>> = [];
+    for (const range of logRanges(start, until)) {
+      logs.push(...await baseClient.getLogs({ address: contract, ...range }));
+    }
     let indexed = 0;
     for (const item of logs) {
+      if (item.transactionHash === null || item.blockNumber === null || item.logIndex === null) {
+        throw halted("RPC returned a pending log inside the confirmed backfill range");
+      }
       let decoded: { eventName?: string; args?: unknown };
       try {
         decoded = decodeEventLog({ abi: poolsAbi, data: item.data, topics: item.topics }) as typeof decoded;
