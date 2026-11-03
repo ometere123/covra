@@ -1,0 +1,94 @@
+{
+  "chainId": 4221,
+  "verifiedAt": "2026-11-03T01:41:46.869Z",
+  "txId": "0x5485f4ad127b5f856820315b1bbf41c6c24e17ed64221ef8e0b64056620025e2",
+  "recipient": "0x3e60d7f8467d67c53e5cc74e8a31876cbdf7b8a1",
+  "status": "Finalized",
+  "executionResult": "FinishedWithReturn",
+  "feeManager": "0x7678587A847712f2A96082AC07883A88D0fc7245",
+  "fees": {
+    "deposit": "100000000000010352",
+    "userValue": "0",
+    "distribution": {
+      "leaderTimeunitsAllocation": "100",
+      "validatorTimeunitsAllocation": "200",
+      "appealRounds": "0",
+      "executionBudgetPerRound": "25000000000000000",
+      "totalMessageFees": "0",
+      "rotations": [
+        "3"
+      ],
+      "maxPriceGenPerTimeUnit": "2",
+      "storageFeeMaxGasPrice": "300000000",
+      "receiptFeeMaxGasPrice": "300000000"
+    },
+    "locked": {
+      "genPerTimeUnit": "1",
+      "storageUnitPrice": "250000000",
+      "receiptGasPrice": "250000000"
+    },
+    "consumed": {
+      "executionConsumed": "61886000000000",
+      "storageFeeUsed": "5750000000",
+      "messageFeesConsumed": "0",
+      "messageFeesBudgetTotal": "0"
+    },
+    "hasAllocations": false,
+    "allocations": null,
+    "allocationPolicy": "open"
+  },
+  "settlements": [
+    {
+      "evmTransactionHash": "0x160c55b738406add547487e67ac253a3b8338a5e07cd22e23454ccc8b4effb4e",
+      "blockNumber": "207037",
+      "blockHash": "0x5d8117b668b2c1e9c5d725ccea449beb75bce17091ebdb68560e3c648bf7ab38",
+      "refund": {
+        "txId": "0x5485f4ad127b5f856820315b1bbf41c6c24e17ed64221ef8e0b64056620025e2",
+        "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+        "amount": "99938108250009058"
+      },
+      "events": [
+        {
+          "event": "FeesRefunded",
+          "args": {
+            "txId": "0x5485f4ad127b5f856820315b1bbf41c6c24e17ed64221ef8e0b64056620025e2",
+            "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+            "amount": "99938108250009058"
+          },
+          "logIndex": 22
+        },
+        {
+          "event": "UnifiedFeesDistributed",
+          "args": {
+            "txId": "0x5485f4ad127b5f856820315b1bbf41c6c24e17ed64221ef8e0b64056620025e2",
+            "chunkIndex": "0",
+            "recipients": [
+              "0x854967Dbe3B5eb71760d4b4C49C6936d89198427",
+              "0x6D3fc241dbB3A8f1B467F2DfdE57A7D227803A58",
+              "0xaa03BDF2BA77118d7357a3e81CE1B0958CA22bc1",
+              "0x09c066924fbB6918154a853C2e9Db316a3100939",
+              "0x2ab2522DB85Ab48ED9f17007369A567Df288a0c9",
+              "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7"
+            ],
+            "amounts": [
+              "61887150000300",
+              "1150000200",
+              "1150000200",
+              "1150000200",
+              "1150000200",
+              "99938108250009058"
+            ]
+          },
+          "logIndex": 23
+        },
+        {
+          "event": "TransactionFinalized",
+          "args": {
+            "txId": "0x5485f4ad127b5f856820315b1bbf41c6c24e17ed64221ef8e0b64056620025e2"
+          },
+          "logIndex": 25
+        }
+      ]
+    }
+  ]
+}

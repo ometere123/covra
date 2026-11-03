@@ -5,6 +5,7 @@ import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { database } from "@/lib/db";
 import { logRanges } from "@/lib/indexer-ranges";
 import { indexerStream } from "@/lib/indexer-stream";
+import { claimIdFromUuid } from "@/lib/claim-protocol";
 
 const CONFIRMATIONS = 12n;
 const MAX_RANGE = 2000n;
@@ -66,7 +67,8 @@ export async function POST(request: NextRequest) {
       where indexer_leases.lease_until < now() returning stream`;
     if (!lease.length) return NextResponse.json({ error: "Another indexer run currently holds the lifecycle lease" }, { status: 409 });
     const run = await sql`insert into indexer_runs(stream,replay_only) values(${STREAM},false) returning id`;
-    runId = String(run[0].id);
+    const activeRunId = String(run[0].id);
+    runId = activeRunId;
 
     const cursor = await sql`select last_block,last_block_hash from indexer_cursors where stream=${STREAM} limit 1`;
     const cursorBlock = cursor.length ? BigInt(String(cursor[0].last_block)) : null;
@@ -89,13 +91,17 @@ export async function POST(request: NextRequest) {
     const until = start + configuredRange - 1n > latest ? latest : start + configuredRange - 1n;
     const logs: Awaited<ReturnType<typeof baseClient.getLogs>> = [];
     for (const range of logRanges(start, until)) {
+      const renewed = await sql`update indexer_leases set lease_until=now()+interval '4 minutes',updated_at=now()
+        where stream=${STREAM} and lease_id=${leaseId} and lease_until>now() returning stream`;
+      if (!renewed.length) throw halted("Indexer lease expired or ownership changed; retry from the durable cursor");
       logs.push(...await baseClient.getLogs({ address: contract, ...range }));
     }
     let indexed = 0;
     for (const item of logs) {
-      if (item.transactionHash === null || item.blockNumber === null || item.logIndex === null) {
+      if (item.transactionHash === null || item.blockNumber === null || item.logIndex === null || item.blockHash === null) {
         throw halted("RPC returned a pending log inside the confirmed backfill range");
       }
+      const transactionHash = item.transactionHash.toLowerCase();
       let decoded: { eventName?: string; args?: unknown };
       try {
         decoded = decodeEventLog({ abi: poolsAbi, data: item.data, topics: item.topics }) as typeof decoded;
@@ -106,22 +112,32 @@ export async function POST(request: NextRequest) {
       const args = (decoded.args || {}) as Record<string, any>;
       const policyId = args.policyId ? String(args.policyId).toLowerCase() : null;
       const onchainClaimId = args.claimId ? String(args.claimId).toLowerCase() : null;
+      // The deduplication marker and every projection must commit together.
+      // Otherwise a failed projection would be permanently skipped on retry.
+      await sql.begin(async transaction => {
+      const sql = transaction;
+      const fenced = await sql`update indexer_leases set lease_until=now()+interval '4 minutes',updated_at=now()
+        where stream=${STREAM} and lease_id=${leaseId} and lease_until>now() returning stream`;
+      if (!fenced.length) throw halted("Indexer lease expired or ownership changed; refusing stale event writes");
       let claimRows: Array<{ id: string }> = [];
       if (onchainClaimId) {
         claimRows = await sql`select id from claims where lower(onchain_claim_id)=${onchainClaimId} limit 1` as Array<{ id: string }>;
       }
       if (!claimRows.length && policyId && onchainClaimId) {
-        claimRows = await sql`select id from claims where lower(policy_id)=${policyId}
-          and status not in ('CANCELLED','PAID','DENIED','EXPIRED') order by created_at asc limit 1` as Array<{ id: string }>;
+        const candidates = await sql`select id,claimant_wallet from claims where lower(policy_id)=${policyId}
+          and status not in ('CANCELLED','PAID','DENIED','EXPIRED') order by created_at asc limit 100`;
+        claimRows = candidates.filter(candidate =>
+          claimIdFromUuid(String(candidate.id), String(candidate.claimant_wallet)).toLowerCase() === onchainClaimId
+        ).map(candidate => ({ id: String(candidate.id) }));
       }
       const claimId = claimRows.length ? claimRows[0].id : null;
       const payload = serialized(args);
       const inserted = await sql`insert into claim_chain_events(
         chain_id,tx_hash,log_index,claim_id,event_type,block_number,block_hash,payload
-      ) values(84532,${item.transactionHash.toLowerCase()},${Number(item.logIndex ?? 0)},${claimId},
+      ) values(84532,${transactionHash},${Number(item.logIndex ?? 0)},${claimId},
         ${eventName},${String(item.blockNumber)},${item.blockHash},${sql.json(JSON.parse(payload))})
         on conflict do nothing returning tx_hash`;
-      if (!inserted.length) continue;
+      if (!inserted.length) return;
       indexed += 1;
 
       if (eventName === "PolicyPurchased" && policyId && args.insured && args.beneficiary) {
@@ -132,7 +148,7 @@ export async function POST(request: NextRequest) {
           ${policyId},${String(args.insured).toLowerCase()},${String(args.beneficiary).toLowerCase()},${Number(args.coverageClass)},
           ${String(args.premium)},${String(args.limit)},${String(args.termsHash).toLowerCase()},${String(args.riskSpecHash).toLowerCase()},
           ${new Date(Number(args.startsAt)*1000).toISOString()},${new Date(Number(args.endsAt)*1000).toISOString()},
-          ${new Date(Number(args.claimDeadline)*1000).toISOString()},${item.transactionHash.toLowerCase()},${String(item.blockNumber)},1
+          ${new Date(Number(args.claimDeadline)*1000).toISOString()},${transactionHash},${String(item.blockNumber)},1
         ) on conflict(policy_id) do update set
           owner_wallet=excluded.owner_wallet,beneficiary_wallet=excluded.beneficiary_wallet,
           coverage_class=excluded.coverage_class,premium_micro_usdc=excluded.premium_micro_usdc,
@@ -152,7 +168,7 @@ export async function POST(request: NextRequest) {
       }
       if (eventName === "ClaimLocked" && claimId && onchainClaimId) {
         await sql`update claims set onchain_claim_id=${onchainClaimId},
-          base_lock_tx_hash=coalesce(base_lock_tx_hash,${item.transactionHash.toLowerCase()}),
+          base_lock_tx_hash=coalesce(base_lock_tx_hash,${transactionHash}),
           status=case when status in ('INTAKE','AWAITING_EVIDENCE') then 'AWAITING_EVIDENCE' else status end,
           updated_at=now() where id=${claimId}`;
       }
@@ -164,24 +180,31 @@ export async function POST(request: NextRequest) {
         await sql`update claims set claim_resolution_extended_until=${String(args.newDeadline)},updated_at=now() where id=${claimId}`;
       }
       if (eventName === "ClaimSettled" && claimId) {
-        await sql`update claims set base_settlement_tx_hash=${item.transactionHash.toLowerCase()},
+        await sql`update claims set base_settlement_tx_hash=${transactionHash},
           status=case when status in ('CANCELLED','DENIED','EXPIRED') then status else 'PAID' end,updated_at=now() where id=${claimId}`;
         if (policyId) await sql`update policies set onchain_state=2,onchain_state_updated_at=now() where lower(policy_id)=${policyId}`;
       }
       if (eventName === "ClaimDenied" && claimId) {
-        await sql`update claims set base_denial_tx_hash=${item.transactionHash.toLowerCase()},
+        await sql`update claims set base_denial_tx_hash=${transactionHash},
           status=case when status in ('CANCELLED','PAID','EXPIRED') then status else 'DENIED' end,updated_at=now() where id=${claimId}`;
         if (policyId) await sql`update policies set onchain_state=4,onchain_state_updated_at=now() where lower(policy_id)=${policyId}`;
       }
+      });
     }
     const anchor = await baseClient.getBlock({ blockNumber: until });
     if (!anchor.hash) throw new Error("Indexed block missing canonical hash");
+    await sql.begin(async transaction => {
+    const sql = transaction;
+    const fenced = await sql`update indexer_leases set lease_until=now()+interval '4 minutes',updated_at=now()
+      where stream=${STREAM} and lease_id=${leaseId} and lease_until>now() returning stream`;
+    if (!fenced.length) throw halted("Indexer lease expired or ownership changed; refusing stale cursor writes");
     if (!replayOnly) {
       await sql`insert into indexer_cursors(stream,last_block,last_block_hash) values(${STREAM},${String(until)},${anchor.hash})
         on conflict(stream) do update set last_block=excluded.last_block,last_block_hash=excluded.last_block_hash,updated_at=now()`;
     }
     await sql`update indexer_runs set finished_at=now(),success=true,from_block=${String(start)},through_block=${String(until)},
-      indexed_events=${indexed},replay_only=${replayOnly},metadata=${sql.json({logs:logs.length,latest:latest.toString()})} where id=${runId}`;
+      indexed_events=${indexed},replay_only=${replayOnly},metadata=${sql.json({logs:logs.length,latest:latest.toString()})} where id=${activeRunId}`;
+    });
     return NextResponse.json({ indexed, scanned: logs.length, fromBlock: start.toString(), throughBlock: until.toString(),
       caughtUp: until === latest, replayOnly, confirmations: Number(CONFIRMATIONS) });
   } catch (error) {

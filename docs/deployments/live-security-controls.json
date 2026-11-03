@@ -1,0 +1,67 @@
+{
+  "verifiedAt": "2026-11-03T01:43:04.308Z",
+  "origin": "https://covra-lyart.vercel.app",
+  "results": [
+    {
+      "name": "indexer unauthenticated",
+      "status": 401
+    },
+    {
+      "name": "indexer wrong credential",
+      "status": 401
+    },
+    {
+      "name": "issuer unauthenticated",
+      "status": 401
+    },
+    {
+      "name": "issuer nonexistent public observation",
+      "status": 404
+    },
+    {
+      "name": "MCP cross-origin",
+      "status": 403
+    },
+    {
+      "name": "MCP streamed size limit",
+      "status": 413
+    },
+    {
+      "name": "issuer unsafe source example.org",
+      "status": 400
+    },
+    {
+      "name": "issuer unsafe source 127.0.0.1",
+      "status": 400
+    },
+    {
+      "name": "issuer unsafe source 192.168.1.1",
+      "status": 400
+    },
+    {
+      "name": "issuer unsafe source covra-lyart.vercel.app",
+      "status": 400
+    },
+    {
+      "name": "issuer arbitrary assertions rejected",
+      "status": 422
+    },
+    {
+      "name": "anonymous nonce table RLS",
+      "status": 401,
+      "visibleRows": 0
+    },
+    {
+      "name": "unauthorized quote signer change",
+      "outcome": "RPC eth_call reverted; no transaction submitted"
+    },
+    {
+      "name": "owner cannot reuse attestor as quote signer",
+      "outcome": "RPC eth_call reverted; no transaction submitted"
+    },
+    {
+      "name": "owner cannot appoint issuer as attestor",
+      "outcome": "RPC eth_call reverted; no transaction submitted"
+    }
+  ]
+}

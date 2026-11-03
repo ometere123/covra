@@ -10,6 +10,7 @@ import { database } from "@/lib/db";
 import { quoteRequestSchema,claimInputSchema } from "@/lib/quote";
 import { POST as issueQuote } from "@/app/api/quotes/route";
 import { POST as createClaim } from "@/app/api/claims/route";
+import { limitedBody } from "@/lib/request-body";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -155,8 +156,18 @@ async function handle(request: NextRequest) {
         return new Response("Cross-origin MCP access denied", { status: 403 });
     } catch { return new Response("Invalid origin", { status: 403 }); }
   }
-  if (Number(request.headers.get("content-length") || "0") > 100_000)
-    return new Response("MCP request is too large", { status: 413 });
+  if (request.method === "POST") {
+    try {
+      const body = await limitedBody(request, 100_000);
+      const bounded = new NextRequest(request.url, {
+        method: "POST", headers: request.headers, body, signal: request.signal,
+      });
+      return makeHandler(bounded).fetch(bounded);
+    } catch (error) {
+      return new Response(error instanceof RangeError ? "MCP request is too large" : "Invalid MCP request body",
+        { status: error instanceof RangeError ? 413 : 400 });
+    }
+  }
   return makeHandler(request).fetch(request);
 }
 export const POST = handle;

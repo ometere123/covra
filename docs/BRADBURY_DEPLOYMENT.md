@@ -10,11 +10,13 @@ Initial `get_case_count` returned zero; all ten public methods returned in deplo
 
 Runner: `py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0`.
 Official matching bundle is GenVM Manager v0.6.0-rc10 from `genlayerlabs/genvm-manager`, not the older `genlayerlabs/genvm` rc7 release. Bundle SHA-256: `d3c6ba368dbd5cad01e484e19573906b4ffed41f46a48191bdc579c81cf801af`.
-Three actual pinned-SDK Direct Mode tests passed on Python 3.12, including callback cloudpickle round trips and appeal/finalization/digest checks with controlled external inputs. These do not prove live evidence consensus, which remains pending.
+Twenty-four pinned-SDK Direct Mode tests passed on Python 3.12, including callback cloudpickle round trips, adversarial leader/model/HTTP cases, delegation/revocation and appeal/finalization/digest checks with controlled external inputs. `npm run genlayer:validate` verifies the checksum-pinned Manager SDK, AST safety and its actual v0.3 semantic/schema API for all ten methods. These do not prove live evidence consensus, which remains pending.
+
+Deployment fee deposit:100000000000010352wei, payable user value0. Actual mined refund:99937910750009058wei, verified in FeesRefunded at EVMtx`0xab44df92843d6c03bb929c6eb2fdfbc4d3afd5159d6dbc3490e0494f4ce3ed72`, block208720, together with UnifiedFeesDistributed and TransactionFinalized. Public JSON record is in docs/deployments. This is an actual refund event. Positive-control deployment/write refund evidence is separately preserved there.
 
 Set both public/server adjudicator address variables to the verified address above. The historical failures below are retained as investigation evidence and are superseded by this deployment.
 
-This record is intentionally incomplete because the public Bradbury validator fleet is currently finalizing deployment transactions with a GenVM runner-load error. No adjudicator address is claimed.
+Historical failure details below predate the successful deployment above. They do not describe the current runner or deployment state.
 
 ## Fixed target
 

@@ -4,6 +4,8 @@
 
 These supersede historical results below. Full funded cross-chain acceptance remains **incomplete**.
 
+Latest expansion: **81 Vitest +7 TAP**, **24 Direct Mode**, TypeScript passed. `npm run genlayer:validate` passes actual target-SDK semantic/schema reflection plus AST lint; legacy native semantic CLI remains incompatible, clearly distinguished. CI41560062537 passed for9984983. Current hosted deployment: dpl_287EDyXTGwavwGV5a9Rvtr4g57xp. `scripts/verify-live-security.mjs` passes actual HTTPS authorization, SSRF, streamed-body and RLS controls plus read-only deployed-contract reverts. Ten issuer matrix tests cover all five classes. Indexer failure injection verifies retry atomicity, stale-worker fencing and exact claim association using an isolated transactional test double; actual empty-chain sync/reconciliation also pass. No test double is used by production.
+
 | Check | Actual result |
 | --- | --- |
 | `npm run typecheck` | Passed after authentication and deployment-bound cursor changes. |

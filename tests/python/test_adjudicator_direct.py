@@ -407,3 +407,53 @@ def test_malicious_leader_and_disagreement_rejected(direct_deploy, direct_vm, di
         contract.adjudicate(case["case_id"])
     assert direct_vm._covra_web_reads == 2  # Both callbacks actually retrieve the evidence.
     assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"
+
+
+@pytest.mark.parametrize("payload", [
+    "not-json", "[]", "{}",
+    '{"verdict":"APPROVED","severity":80,"reason":"reason","citations":"source"}',
+    '{"verdict":"COVERED","severity":true,"reason":"reason","citations":"source"}',
+    '{"verdict":"COVERED","severity":101,"reason":"reason","citations":"source"}',
+    '{"verdict":"COVERED","severity":80,"reason":7,"citations":"source"}',
+    '{"verdict":"COVERED","severity":80,"reason":"reason","citations":[]}',
+], ids=["invalid-json", "array", "empty-object", "invalid-verdict", "boolean-severity", "excess-severity", "reason-type", "citation-type"])
+def test_malformed_model_output_cannot_create_a_decision(direct_deploy, direct_vm, direct_owner, payload):
+    contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
+    direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": 200, "body": case["body"]})
+    direct_vm.mock_llm("COVRA", payload)
+    with pytest.raises(Exception):
+        contract.adjudicate(case["case_id"])
+    assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"
+
+
+def test_exact_sdk_delegation_revocation_duplicate_and_unknown_cases(direct_deploy, direct_vm, direct_owner, direct_alice):
+    contract = _deploy(direct_deploy, direct_vm)
+    direct_vm.sender = direct_owner
+    contract.allow_evidence_host("issuer.example.com", True)
+    case = _case_inputs(direct_owner)
+    args = (case["case_id"], case["policy_id"], case["case_id"], case["insured"], case["nonce"],
+        0, case["terms_hash"], case["risk_spec_json"], case["risk_spec_hash"], case["source"],
+        case["evidence_commitment"], case["event_time"], 10000)
+    direct_vm.sender = direct_alice
+    with pytest.raises(Exception):
+        contract.submit_case(*args)
+    assert contract.get_case_count() == 0
+    direct_vm.sender = direct_owner
+    now = sys.modules["_contract_CovraAdjudicator"].transaction_timestamp()
+    agent = "0x" + direct_alice.hex()
+    contract.authorize_case_agent(agent, now + 600)
+    direct_vm.sender = direct_alice
+    contract.submit_case(*args)
+    assert contract.get_case_count() == 1
+    with pytest.raises(Exception):
+        contract.submit_case(*args)
+    direct_vm.sender = direct_owner
+    contract.authorize_case_agent(agent, 0)
+    assert contract.case_agents[case["insured"] + ":" + agent] == 0
+    for method, params in [(contract.adjudicate, ("unknown",)), (contract.finalize_case, ("unknown",)),
+            (contract.appeal, ("unknown", case["source"], case["evidence_commitment"]))]:
+        with pytest.raises(Exception):
+            method(*params)
+    for index in [-1, 1]:
+        with pytest.raises(Exception):
+            contract.get_case_id_at(index)
