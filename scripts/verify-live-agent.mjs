@@ -38,6 +38,14 @@ if (!process.argv.includes("--reproduce-replay")) {
   if (String(statuses) !== "200,401") throw new Error("Concurrent authentication replay was accepted");
   console.log("Concurrent nonce consumption verified", statuses.join("/"));
 }
+const nonexistentDraft = await fetch(origin + "/api/claims", { method: "POST", headers: {
+  "Content-Type": "application/json", Origin: origin, Cookie: [...cookies].map(([name, value]) => `${name}=${value}`).join("; "),
+  "Idempotency-Key": crypto.randomUUID(),
+}, body: JSON.stringify({ policyId: `0x${"00".repeat(32)}`, coverageClass: 0, incidentAt: new Date().toISOString(),
+  description: "Security verification only. This request has no existing policy and must never create a claim record.",
+  requestedMicroUsdc: "1000000" }) });
+if (nonexistentDraft.status !== 404) throw new Error("Evidence-pending intake did not enforce policy existence: HTTP " + nonexistentDraft.status);
+console.log("Evidence-pending intake with nonexistent policy rejected", nonexistentDraft.status);
 const credential = await call("/api/agents", { method: "POST", body: JSON.stringify({ label: "Live verification — read only", scopes: ["policy:read"], expiresInDays: 1, maxDailyRequests: 10 }) });
 try {
   const followups = await call("/api/agents/followups");

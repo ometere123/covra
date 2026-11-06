@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-11-03T01:43:04.308Z",
+  "verifiedAt": "2026-11-06T06:20:56.045Z",
   "origin": "https://covra-lyart.vercel.app",
   "results": [
     {
@@ -44,6 +44,10 @@
     },
     {
       "name": "issuer arbitrary assertions rejected",
+      "status": 422
+    },
+    {
+      "name": "issuer retrieved public HTTPS JSON and rejected unrelated schema",
       "status": 422
     },
     {

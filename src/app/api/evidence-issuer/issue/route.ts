@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { lookup } from "node:dns/promises";
 import { request as httpsRequest } from "node:https";
 import { isIP } from "node:net";
-import { timingSafeEqual } from "node:crypto";
+import { matchesBearerSecret } from "@/lib/bearer-secret";
 import { privateKeyToAccount } from "viem/accounts";
 import { z } from "zod";
 import { database } from "@/lib/db";
@@ -38,15 +38,6 @@ function issuerHost(): string {
     throw new Error("EVIDENCE_ISSUER_HOST must be a hostname without scheme, path or port");
   }
   return host;
-}
-
-function adminAuthorized(request: NextRequest): boolean {
-  const expected = process.env.EVIDENCE_ISSUER_ADMIN_TOKEN;
-  const supplied = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-  if (!expected || !supplied) return false;
-  const suppliedBytes = Buffer.from(supplied);
-  const expectedBytes = Buffer.from(expected);
-  return suppliedBytes.length === expectedBytes.length && timingSafeEqual(suppliedBytes, expectedBytes);
 }
 
 async function safeSourceUrl(value: string, ownHost: string): Promise<URL> {
@@ -144,7 +135,9 @@ function ttlSeconds(): number {
 export async function POST(request: NextRequest) {
   try {
     testnetGuard();
-    if (!adminAuthorized(request)) return NextResponse.json({ error: "Evidence issuer authorization required" }, { status: 401 });
+    if (!matchesBearerSecret(request.headers.get("authorization"), process.env.EVIDENCE_ISSUER_ADMIN_TOKEN)) {
+      return NextResponse.json({ error: "Evidence issuer authorization required" }, { status: 401 });
+    }
     const privateKey = process.env.EVIDENCE_ISSUER_PRIVATE_KEY;
     if (!privateKey || !/^0x[0-9a-fA-F]{64}$/.test(privateKey)) throw new Error("Dedicated evidence issuer key is not configured");
     const host = issuerHost();

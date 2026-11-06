@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { timingSafeEqual } from "node:crypto";
+import { matchesBearerSecret } from "@/lib/bearer-secret";
 import { z } from "zod";
 import { database } from "@/lib/db";
 import { responseError, testnetGuard } from "@/lib/http";
@@ -19,17 +19,12 @@ const schema = z.object({
   }
 });
 
-function authorized(request: NextRequest): boolean {
-  const expected = process.env.EVIDENCE_ISSUER_ADMIN_TOKEN;
-  const supplied = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-  if (!expected || !supplied || expected.length !== supplied.length) return false;
-  return timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
-}
-
 export async function POST(request: NextRequest) {
   try {
     testnetGuard();
-    if (!authorized(request)) return NextResponse.json({ error: "Evidence issuer authorization required" }, { status: 401 });
+    if (!matchesBearerSecret(request.headers.get("authorization"), process.env.EVIDENCE_ISSUER_ADMIN_TOKEN)) {
+      return NextResponse.json({ error: "Evidence issuer authorization required" }, { status: 401 });
+    }
     const body = schema.parse(await request.json());
     const sql = database();
     if (body.state === "SUPERSEDED") {

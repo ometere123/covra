@@ -35,6 +35,10 @@ await check("issuer arbitrary assertions rejected", "/api/evidence-issuer/issue"
   method: "POST", headers: { authorization: "Bearer " + admin, "content-type": "application/json" },
   body: JSON.stringify({ observationId: "security-check-no-record", claimId: "8cfa78d0-7001-4322-899b-2d53993ee5a2", sourceUrl: "https://example.org/source", facts: { invented: true } }),
 }, [422]);
+await check("issuer retrieved public HTTPS JSON and rejected unrelated schema", "/api/evidence-issuer/issue", {
+  method: "POST", headers: { authorization: "Bearer " + admin, "content-type": "application/json" },
+  body: JSON.stringify({ observationId: "security-check-no-record", claimId: "8cfa78d0-7001-4322-899b-2d53993ee5a2", sourceUrl: "https://www.githubstatus.com/api/v2/status.json" }),
+}, [422]);
 if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const response = await fetch(process.env.NEXT_PUBLIC_SUPABASE_URL + "/rest/v1/auth_challenges?select=nonce_digest", { headers: { apikey: anon, authorization: "Bearer " + anon } });

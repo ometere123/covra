@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { matchesBearerSecret } from "@/lib/bearer-secret";
 import { decodeEventLog } from "viem";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { database } from "@/lib/db";
@@ -10,13 +11,6 @@ import { processClaimFollowups } from "@/workflows/claim-followup";
 
 const CONFIRMATIONS = 12n;
 const MAX_RANGE = 2000n;
-
-function authorized(request: NextRequest): boolean {
-  const expected = process.env.INDEXER_CRON_SECRET;
-  const supplied = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-  if (!expected || !supplied || supplied.length !== expected.length) return false;
-  return timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
-}
 
 function serialized(value: unknown): string {
   return JSON.stringify(value, (_key, entry) => typeof entry === "bigint" ? entry.toString() : entry);
@@ -35,7 +29,9 @@ function halted(message: string, status = 409): Error & { statusCode: number } {
 }
 
 export async function POST(request: NextRequest) {
-  if (!authorized(request)) return NextResponse.json({ error: "Not authorized" }, { status: 401 });
+  if (!matchesBearerSecret(request.headers.get("authorization"), process.env.INDEXER_CRON_SECRET)) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 });
+  }
   const contract = configuredPoolAddress();
   if (!contract || !process.env.DATABASE_URL || !process.env.BASE_DEPLOYMENT_START_BLOCK) {
     return NextResponse.json({ error: "Indexer requires database, deployed contract, and deployment block" }, { status: 503 });
