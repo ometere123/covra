@@ -8,7 +8,9 @@ The signature coordinator now verifies Base Sepolia identity and simulates the e
 
 Commit `e60adac0e10ef14935bfe64e2e6cca7b927d5ac9` passed CI run `42176259656` and production deployment `dpl_99ifJUKFtbyLSMAL4NXwiuBekZsy` is READY. The hosted browser verifier passed 24 route/device checks, wallet login and a prospective signed quote. The settled-certificate positive regression uses isolated signing keys and a controlled RPC boundary. Live positive settlement remains pending funding, evidence and operator signatures.
 
-At 06:45 UTC job 1 dispatched successfully but HTTP response 932 timed out under the default `pg_net` deadline. The worker persisted the cursor at block `55128158` around four seconds after dispatch. The reviewed SQL updated the same production job to a 30-second timeout while retaining the five-minute cadence, active flag, Vault names and job ID. Run `supabase/cron/verify-indexer.sql` after the next scheduled interval to confirm HTTP success and cursor advancement.
+At 06:45 UTC job 1 dispatched successfully but HTTP response 932 timed out under the default `pg_net` deadline. The worker persisted the cursor at block `55128158` around four seconds after dispatch. The reviewed SQL updated the same production job to a 30-second timeout while retaining the five-minute cadence, active flag, Vault names and job ID. The 06:50 UTC scheduled run produced response 933, HTTP 200 without timeout, and persisted cursor block `55129651` at 06:50:03 UTC. CI run `42176669162` passed for the SQL and documentation commit.
+
+The package and signer subprocess explicitly enable TypeScript stripping for attestation tooling. All ten Node tests passed on the declared minimum Node `22.12.0`, including sorted typed signatures, wrong network, duplicate signers and reverted simulation. No claim or settlement transaction is pending.
 
 ## 2026-11-06 verification and receipt recovery
 

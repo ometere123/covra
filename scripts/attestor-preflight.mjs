@@ -1,6 +1,6 @@
 /**
  * COVRA independent verifier preflight. READ ONLY. NEVER SIGNS.
- * Run with: node --env-file=.env.local scripts/attestor-preflight.mjs <case-id> <finalization-tx-hash>
+ * Run with: npm run attestor:preflight -- <case-id> <finalization-tx-hash>
  *
  * Each of the five independently owned attestors must use its own authenticated
  * Phase 2 node/provider, compare with an independent Base node, and verify the

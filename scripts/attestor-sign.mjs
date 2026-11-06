@@ -38,6 +38,7 @@ async function main() {
   // Never sign merely because someone supplied JSON claiming a successful
   // preflight. Re-run independently against this operator's configured nodes.
   const preflight=parsePreflightOutput(execFileSync(process.execPath,[
+    "--experimental-strip-types",
     resolve(dirname(fileURLToPath(import.meta.url)),"attestor-preflight.mjs"),
     input.caseId,input.decision.genlayerTxId,
   ],{encoding:"utf8",timeout:60000,env:process.env,maxBuffer:1024*1024}));
