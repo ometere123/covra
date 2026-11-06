@@ -9,7 +9,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit --incremental false",
-    "test": "vitest run && node --test scripts/claim-window.test.mjs scripts/preflight-io.test.mjs",
+    "test": "vitest run && node --test scripts/claim-window.test.mjs scripts/preflight-io.test.mjs scripts/aggregate-attestations.test.mjs",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:solidity": "node scripts/compile-solidity.mjs",

@@ -1,22 +1,22 @@
 # Evidence required before a transactional public launch
 
-**Code-complete is not business-ready.** No claim that these gates passed is made by the ZIP.
+Testnet evidence and commercial-launch requirements are tracked separately. The [execution checkpoint](EXECUTION_CHECKPOINT.md) records the latest verified operations.
 
 | Gate | Acceptance evidence | Current repository state |
 | --- | --- | --- |
 | All five coverage terms | Insurer/legal-approved event definitions, exclusions, limits, evidence rulebooks, appeals | Research definitions only |
 | Regulatory authority | Jurisdiction-specific licensed underwriter/distribution structure and legal opinion | Not obtained |
 | Prices and capital | Actuarial pricing, correlation scenarios, solvency reserve and stress test | Illustrative, fixed testnet bps only |
-| Base USD token | Testnet native Circle USDC address and code verified; no mock mismatched token | Contract configured, live tests pending |
-| Bradbury Phase 2 | Verified `4221` RPC, separate GenLayer node RPC, v0.6 CLI/JS/GenVM, fee support and live contract deployment | EVM RPC known; node availability / contract execution unverified |
+| Base USD token | Testnet native Circle USDC address and code verified | Deployed pool is bound to Circle test USDC. Funding and transfers for a policy remain pending. |
+| Bradbury Phase 2 | Verified `4221` identity, execution node, fee support and live contract deployment | Full adjudicator finalized and deployed source and schema matched. Finalized views and the allowlist write were verified. |
 | Intelligent-contract adjudication | Multiple live validator runs with consistent evidence-based verdicts and correct appeals | Python source with bounded SHA-256 evidence and 3-day appeals; **still needs real network QA** |
-| Cross-chain settlement | Five actually independent attestors validate final Bradbury state and signed issuer observations; perform positive/negative malicious signer tests | Preflight, separately run EIP-712 signer and quorum aggregation code are supplied; independent operation not deployed |
-| Base liquidity coverage | All five ring-fenced pools seeded with verified testnet USDC and reserve invariant fuzzed | Contract source; no funded deployment |
+| Cross-chain settlement | Three separately controlled keys from the frozen five-member roster validate a finalized verdict and sign the exact settlement | The deployed quorum and local adversarial tests pass. Actual signer participation, custody and live settlement remain unverified. |
+| Base liquidity coverage | All five ring-fenced pools seeded with verified testnet USDC and reserve invariants tested | The five-class pool deployment and source are verified. All five classes remain unfunded. |
 | Claim lifecycle | Five real policies, frozen insured exposures, independent evidence sources, Base lock, Bradbury submit/adjudicate/appeal/finalize, signed certificate, Base payout | UI and API actions exist, no real Phase 2/Basescan lifecycle executed here |
-| Security | Independent audit, fuzz/invariant tests, key-management reviews, bug bounty | Typecheck, host-side regression tests and 18 executed Foundry cases; no independent audit, live DB test or independent signer drill |
-| Backend | Signed-in reads, role boundaries, secure bucket, DB migrations, rate and origin limits, finality reindex | Backend code, eight ordered migrations, one-active-claim constraint, exact receipt reconciliation, leased full-lifecycle indexer and reconciliation report; live DB/Cron verification pending |
-| Data protection | Retention, consent, evidence deletion, privacy impact and breach plan | Design documentation needed |
-| UI/accessibility | Browser tests, wallet-state tests, mobile usability, full WCAG audit | Three Chromium smoke tests pass; wallet-state/full lifecycle and independent accessibility audit remain pending |
+| Security | Independent audit, fuzz/invariant tests, key-management reviews, bug bounty | Twenty Foundry tests, GenVM adversarial cases and hosted authorization checks passed. Independent audit and signer drills remain pending. |
+| Backend | Signed-in reads, role boundaries, secure bucket, DB migrations, rate and origin limits, finality reindex | Production authentication, scoped agent/MCP calls, database migrations and scheduled indexer runs are verified. Reconciliation has checked the empty production ledger. |
+| Data protection | Retention, consent, evidence deletion, privacy impact and breach plan | Commercial policy and operational review remain pending. |
+| UI/accessibility | Browser tests, wallet-state tests, mobile usability, full WCAG audit | Production wallet login, signed quote and 24 desktop/mobile route checks passed. Funded lifecycle and independent accessibility audit remain pending. |
 | Reliability | Incident response, monitoring, backups, SLOs and rollback | No live SLO/incident drills |
 | Commercial | Underwriter/policyholder agreements, customer support, complaints/refunds, accounting | Not established |
 

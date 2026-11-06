@@ -101,7 +101,7 @@ export async function POST(request:NextRequest) {
           baseClient.readContract({address:pool,abi:poolsAbi,functionName:"policies",args:[claim.policy_id],blockNumber:receipt.blockNumber}),
           baseClient.readContract({address:pool,abi:poolsAbi,functionName:"usedClaims",args:[actualId],blockNumber:receipt.blockNumber}),
         ]);
-        if (![2,4].includes(Number(policy[3])) || !used)
+        if (Number(policy[3]) !== (eventType === "ClaimSettled" ? 2 : 4) || !used)
           throw new Error("Base settlement receipt does not match the terminal on-chain policy and claim state");
       }
     } else {

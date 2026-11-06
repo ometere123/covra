@@ -59,6 +59,7 @@ export default function ClaimsScreen() {
   const chosen=policies.find(p=>p.policy_id===policyId);
   const currentClaim=claims.find(c=>String(c.id)===created);
   const appealSynchronizationPending=currentClaim?.status==="APPEAL_SYNC_PENDING";
+  const verifiedFinalTx=String(currentClaim?.bradbury_finalization_tx_hash || "");
   const rememberReceipt = (phase: string, hash: string, digest?: string, evidenceSource?: string) => {
     setRecoveryPhase(phase);
     setRecoveryHash(hash);
@@ -317,22 +318,25 @@ export default function ClaimsScreen() {
   const settle=async()=>{
     setBusy(true);setError("");
     try{
-      if (!created||!chosen||!wallet.address||!window.ethereum||!finalTx)throw new Error("Resume a finalized case and connect wallet");
+      if (!created||!chosen||!wallet.address||!window.ethereum||!verifiedFinalTx||appealSynchronizationPending)
+        throw new Error("Verify the finalized case and connect your wallet before settlement");
       const pool=configuredPoolAddress();if(!pool)throw new Error("Base pool not configured");
       const bundle=JSON.parse(certificate);
-      if (!bundle?.decision||!Array.isArray(bundle.signatures)||bundle.signatures.length<3)
+      if (!bundle?.decision||!Array.isArray(bundle.signatures)||bundle.signatures.length<3||bundle.signatures.length>5)
         throw new Error("Provide a 3-of-5 independent settlement certificate bundle");
       const d=bundle.decision;
       if (String(d.policyId).toLowerCase()!==policyId.toLowerCase()||
           String(d.claimId).toLowerCase()!==onchainClaimId.toLowerCase()||
+          String(d.genlayerTxId).toLowerCase()!==verifiedFinalTx.toLowerCase()||
           String(d.riskSpecHash).toLowerCase()!==String(chosen.risk_spec_hash).toLowerCase())
-        throw new Error("Settlement certificate concerns a different insured risk or case");
-      if (wallet.chainId!==84532)await wallet.switchToBase();
-      const baseWallet=createWalletClient({account:wallet.address,chain:baseSepolia,transport:custom(window.ethereum)});
+        throw new Error("Settlement certificate concerns a different insured risk, case or finalized transaction");
       const message={...d,amount:BigInt(d.amount),finalizedAt:BigInt(d.finalizedAt),
         deadline:BigInt(d.deadline),sourceChainId:BigInt(d.sourceChainId)};
-      const hash=await baseWallet.writeContract({address:pool,abi:poolsAbi,functionName:"settle",
-        args:[message,bundle.signatures],account:wallet.address,chain:baseSepolia});
+      const {request}=await baseClient.simulateContract({address:pool,abi:poolsAbi,functionName:"settle",
+        args:[message,bundle.signatures],account:wallet.address});
+      if (wallet.chainId!==84532)await wallet.switchToBase();
+      const baseWallet=createWalletClient({account:wallet.address,chain:baseSepolia,transport:custom(window.ethereum)});
+      const hash=await baseWallet.writeContract({...request,chain:baseSepolia});
       rememberReceipt("BASE_SETTLED",hash);
       await baseClient.waitForTransactionReceipt({hash,confirmations:12});
       const result=await saveReceipt("BASE_SETTLED",hash);
@@ -384,7 +388,7 @@ export default function ClaimsScreen() {
           <button className="secondary-action" disabled={busy||!appealSource||!appealDigest} onClick={appeal}>Submit appeal and synchronize both chains</button>
           <p className="field-hint">Bradbury is updated first to protect its shorter appeal window. If Base or a receipt update fails, resume the missing leg; never submit a second appeal. The two blockchains cannot commit atomically.</p>
         </div>}
-        {finalTx&&<div className="form-block">
+        {verifiedFinalTx&&!appealSynchronizationPending&&<div className="form-block">
           <div className="form-block-title"><span>04</span> Independent USDC settlement</div>
           <p className="field-hint">Each of three independently operated attestors must verify Bradbury finality, approved signed evidence, the insured risk and the Base claim lock. Paste their verified aggregate certificate here. COVRA never generates quorum signatures on the user's behalf.</p>
           <div className="field"><label htmlFor="settlement-certificate">ATTESTED DECISION AND SIGNATURES (JSON)</label><textarea id="settlement-certificate" value={certificate} onChange={e=>setCertificate(e.target.value)} placeholder='{"decision":{...},"signatures":[...]}' /></div>
