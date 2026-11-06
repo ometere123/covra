@@ -1,5 +1,11 @@
 # Verification record — 2026-11-02
 
+## November 6 follow-up
+
+The verified `genlayer-js@2.0.0-rc.2` fee patch supplies the funded sender to FeeManager's gas-price-bearing simulation and passes the actual distribution and nonzero deposit separately from payable value. The matching GenVM Manager v0.6.0-rc10 bundle supplies the pinned v0.3 runner. CI exercises the target SDK semantic/schema checks and 24 Direct Mode cases with controlled external inputs. The older native semantic linter still cannot load this bundle format.
+
+The pinned JS SDK's simplified receipts drop decoded calldata, and its read method sends a field the live node ignores. Exact verification now requests full receipts and makes explicit `gen_call` reads with `status: "finalized"`. The production execution node and independent attestor check the Phase 2 genesis. The full deployed adjudicator returned zero finalized cases and empty unknown-case results through this path. The [execution checkpoint](EXECUTION_CHECKPOINT.md) records production release, CI, scheduled indexing and remaining funding and signer dependencies.
+
 ## Verified continuation — 2026-11-03 (supersedes older status statements)
 
 - Full adjudicator `0xaefc8672272392310a2ea102787e28bb1f34e1d3`, deployment `0xd19bcbd6d2c6d3d2718312bb7114eec69d95facbf26a67cd00c2f7ee26432b28`, independently Finalized / FinishedWithReturn; exact source and ten-method schema checked.

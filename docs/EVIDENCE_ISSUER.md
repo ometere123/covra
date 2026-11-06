@@ -39,7 +39,7 @@ The production envelope schema accepts only `observation_mode: "OBSERVED_PUBLIC"
 
 The issuer signs `COVRA-ISSUER-EVIDENCE:` plus the SHA-256 digest of the canonical unsigned envelope. Attestors and the backend independently recover the signer and compare it to the approved host-to-wallet map. A matching digest without an approved issuer signature is not accepted.
 
-The public route returns `410` after expiry, revocation or supersession. Revocation never mutates the signed observation; it prevents future retrieval and makes the failure explicit. Confidential user evidence remains in the private Supabase bucket and is never exposed through this public record.
+The public route returns `410` after expiry, revocation or supersession. Revocation prevents future retrieval without mutating the signed observation. Attestor preflight checks the issuer wallet against both the approved host map and the wallet bound on Base. The quorum signs a deadline no later than the last second before evidence expiry. Issuer revocation alone cannot invalidate an already signed Base certificate before its deadline. Confidential user evidence remains in the private Supabase bucket.
 
 ## Required configuration
 

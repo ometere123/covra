@@ -12,7 +12,7 @@ import { createClient, isSuccessful } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 import { createPublicClient, http, parseAbi, recoverMessageAddress } from "viem";
 import { baseSepolia } from "viem/chains";
-import { assertIncidentWithinPolicy } from "./claim-window.mjs";
+import { assertIncidentWithinPolicy, settlementCertificateDeadline } from "./claim-window.mjs";
 import { encodePreflightOutput } from "./preflight-io.mjs";
 import { assertExactBradburyReceipt } from "./bradbury-receipt.mjs";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "../src/lib/bradbury-final-state.ts";
@@ -187,6 +187,7 @@ async function main() {
   const wallets=JSON.parse(process.env.ATTESTOR_ISSUER_WALLETS || "{}");
   const expectedIssuer=wallets[source.hostname.toLowerCase()];
   if (!issuer||!address(issuer.wallet)||!address(expectedIssuer)||!same(issuer.wallet,expectedIssuer)||
+      !same(expectedIssuer,boundEvidenceIssuer)||
       !Number.isSafeInteger(issuer.signed_at)||!Number.isSafeInteger(issuer.expires_at)||
       issuer.signed_at>Math.floor(Date.now()/1000)+300||
       issuer.expires_at<=Math.floor(Date.now()/1000)||issuer.expires_at<=issuer.signed_at||
@@ -201,12 +202,10 @@ async function main() {
   // The preflight is deliberately rerun by attestor-sign. A moving
   // `now + 3600` deadline made the exact EIP-712 object change between those
   // two independent reads, preventing legitimate signers from ever signing.
-  // The Base resolution deadline is an immutable, common value unless the
-  // authorized quorum explicitly extends the claim, which invalidates old
-  // preflight statements and requires fresh operator review.
-  const deadline=Number(resolutionDeadline);
-  if (!Number.isSafeInteger(deadline) || deadline<=Math.floor(Date.now()/1000))
-    fail("claim settlement grace already expired or deadline unsafe");
+  // Both bounds are shared by every verifier. Neither depends on the time at
+  // which an operator runs this check. The signed expiry prevents an otherwise
+  // valid certificate from remaining usable after its evidence has expired.
+  const deadline=settlementCertificateDeadline(resolutionDeadline,issuer.expires_at,Math.floor(Date.now()/1000));
   const decision={policyId:record.policy_id,claimId:record.claim_id,
     bradburyDecisionId:caseId,genlayerTxId:finalizationTx,
     evidenceDigest:record.evidence_hash,resultDigest:expectedResultDigest,

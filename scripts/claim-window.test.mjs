@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { assertIncidentWithinPolicy, parseIncidentTime } from "./claim-window.mjs";
+import { assertIncidentWithinPolicy, parseIncidentTime, settlementCertificateDeadline } from "./claim-window.mjs";
 
 const inception = BigInt(Date.parse("2026-10-30T10:00:00.000Z") / 1000);
 const expiry = inception + 86400n;
@@ -28,4 +28,11 @@ test("rejects invalid and ambiguous timestamps, including timezone offsets", () 
 
 test("rejects a malformed Base policy coverage interval", () => {
   assert.throws(() => assertIncidentWithinPolicy("2026-10-30T10:00:00Z", expiry, inception), /outside/);
+});
+
+test("bounds the settlement signature by both the Base deadline and the evidence expiry", () => {
+  assert.equal(settlementCertificateDeadline(200n, 151, 100), 150);
+  assert.equal(settlementCertificateDeadline(140n, 151, 100), 140);
+  assert.throws(() => settlementCertificateDeadline(200n, 101, 100), /expired/);
+  assert.throws(() => settlementCertificateDeadline(2n ** 64n, 151, 100), /Unsafe/);
 });

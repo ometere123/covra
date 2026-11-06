@@ -26,3 +26,15 @@ export function assertIncidentWithinPolicy(eventTime, startsAt, endsAt) {
   }
   return incidentMs;
 }
+
+export function settlementCertificateDeadline(resolutionDeadline, evidenceExpiry, now) {
+  const resolution = Number(resolutionDeadline);
+  if (![resolution, evidenceExpiry, now].every(Number.isSafeInteger)) {
+    throw new Error("Unsafe claim or evidence expiry timestamp");
+  }
+  // Base accepts settlement at the deadline, while the evidence expires at
+  // its expiry timestamp. Keep the last eligible second strictly before it.
+  const deadline = Math.min(resolution, evidenceExpiry - 1);
+  if (deadline <= now) throw new Error("Claim or evidence authorization window has expired");
+  return deadline;
+}
