@@ -136,7 +136,7 @@ function makeHandler(request: NextRequest) {
     });
     server.registerTool("create_claim_intake", {
       description: "Register one owner-bound testnet claim; requires claim:issue. No payout, Base lock or GenLayer judgment occurs from this tool alone.",
-      inputSchema:claimInputSchema.extend({idempotencyKey:z.string().min(12).max(100)}),
+      inputSchema:claimInputSchema.safeExtend({idempotencyKey:z.string().min(12).max(100)}),
     },async ({idempotencyKey,...claim})=>{
       // The API route alone validates and counts the scoped key once.
       const forwarded=new NextRequest(request.url,{method:"POST",headers:{

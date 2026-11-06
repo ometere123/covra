@@ -109,7 +109,8 @@ export async function POST(request:NextRequest) {
       const adjudicator=process.env.BRADBURY_ADJUDICATOR_ADDRESS;
       if (!endpoint?.startsWith("https://")||!adjudicator) throw new Error("Bradbury execution node not configured");
       const client=createClient({chain:testnetBradbury,endpoint});
-      const receipt=await client.waitForFinalization({hash:txHash as `0x${string}` & {length:66}});
+      // The SDK's simplified receipt drops the decoded calldata map.
+      const receipt=await client.waitForFinalization({hash:txHash as `0x${string}` & {length:66},fullTransaction:true});
       if (!isSuccessful(receipt)) throw new Error("GenLayer transaction did not finalize successfully");
       const expectedFunction: string|undefined=({
         BRADBURY_SUBMITTED:"submit_case",BRADBURY_DECIDED:"adjudicate",

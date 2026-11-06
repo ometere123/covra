@@ -101,7 +101,7 @@ async function main() {
   if (!nodeUrl || !nodeUrl.startsWith("https://")) fail("missing full GenLayer BRADBURY_NODE_RPC_URL");
   if (!address(basePool) || !address(adjudicator) || !address(evidenceIssuer)) fail("missing Base/Bradbury/evidence-issuer addresses");
   const gen=createClient({chain:testnetBradbury,endpoint:nodeUrl});
-  const finalReceipt=await gen.waitForFinalization({hash:finalizationTx});
+  const finalReceipt=await gen.waitForFinalization({hash:finalizationTx,fullTransaction:true});
   if (!isSuccessful(finalReceipt)) fail("claimed GenLayer finalization receipt is not successful");
   try {
     assertExactBradburyReceipt({receipt:finalReceipt,transactionHash:finalizationTx,

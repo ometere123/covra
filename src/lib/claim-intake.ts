@@ -20,9 +20,10 @@ export function sameClaimIntake(existing: ExistingClaim, input: ClaimInput): boo
     Number(existing.coverage_class) === input.coverageClass &&
     new Date(existing.incident_at).getTime() === new Date(input.incidentAt).getTime() &&
     existing.description === input.description &&
-    JSON.stringify(existing.evidence_urls) === JSON.stringify(input.evidenceUrls) &&
     String(existing.requested_micro_usdc) === input.requestedMicroUsdc &&
-    String(existing.evidence_manifest_hash).toLowerCase() === input.evidenceCommitment.toLowerCase();
+    (input.evidenceCommitment === undefined ||
+      (JSON.stringify(existing.evidence_urls) === JSON.stringify(input.evidenceUrls) &&
+        existing.evidence_manifest_hash?.toLowerCase() === input.evidenceCommitment.toLowerCase()));
 }
 
 export function canCancelUnanchoredClaim(status: string, baseLockTx: string | null,

@@ -48,6 +48,8 @@ describe("non-binding deterministic testnet pricing", () => {
       requestedMicroUsdc: "10000000",
     };
     expect(claimInputSchema.safeParse(claim).success).toBe(true);
+    expect(claimInputSchema.safeParse({ ...claim, evidenceUrls: undefined, evidenceCommitment: undefined }).success).toBe(true);
+    expect(claimInputSchema.safeParse({ ...claim, evidenceCommitment: undefined }).success).toBe(false);
     expect(claimInputSchema.safeParse({ ...claim, evidenceUrls: [] }).success).toBe(false);
     expect(claimInputSchema.safeParse({ ...claim, evidenceCommitment: "0xBAD" }).success).toBe(false);
     expect(claimInputSchema.safeParse({ ...claim, description: "no detail" }).success).toBe(false);

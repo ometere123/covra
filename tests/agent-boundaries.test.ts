@@ -27,6 +27,9 @@ describe("agent purchase and claim boundaries",()=>{
 
   it("treats a truly repeated claim as idempotent",()=>{
     expect(sameClaimIntake(existing,claim)).toBe(true);
+    const draft = {...claim,evidenceUrls:[],evidenceCommitment:undefined};
+    expect(sameClaimIntake(existing,draft)).toBe(true);
+    expect(sameClaimIntake(existing,{...draft,description:"Changed incident details"})).toBe(false);
   });
 
   it("rejects reuse of an idempotency key for altered claims or cancelled intakes",()=>{

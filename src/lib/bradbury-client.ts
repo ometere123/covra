@@ -5,9 +5,13 @@
  * an explicitly configured, non-secret gen_* endpoint. Never embed an API key
  * or a privileged node URL in NEXT_PUBLIC_ variables.
  */
-import { createClient, isSuccessful } from "genlayer-js";
+import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 import type { EIP1193Provider } from "viem";
+import { assertExactBradburyReceipt } from "./bradbury-receipt";
+
+const BRADBURY_PHASE_2_GENESIS = "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4";
+type BradburySubmission = { txHash: string; feeDeposit: string };
 
 export function publicBradburyEndpoint(): string | null {
   const configured = process.env.NEXT_PUBLIC_BRADBURY_NODE_RPC_URL;
@@ -25,6 +29,7 @@ export function publicBradburyEndpoint(): string | null {
 export async function writeBradburyAction(
   provider: EIP1193Provider, wallet: `0x${string}`, adjudicator: `0x${string}`,
   functionName: string, args: (string|number|boolean)[],
+  onSubmitted?: (submission: BradburySubmission) => void,
 ) {
   const endpoint = publicBradburyEndpoint();
   if (!endpoint) throw new Error("A public Bradbury Phase 2 GenLayer node RPC is not configured.");
@@ -35,6 +40,10 @@ export async function writeBradburyAction(
   await client.connect("testnetBradbury");
   const current = await provider.request({ method: "eth_chainId" });
   if (Number(BigInt(String(current))) !== 4221) throw new Error("Wallet did not switch to Bradbury 4221.");
+  const genesis = await provider.request({ method: "eth_getBlockByNumber", params: ["0x0", false] });
+  if (genesis?.hash?.toLowerCase() !== BRADBURY_PHASE_2_GENESIS) {
+    throw new Error("The wallet RPC genesis does not match Bradbury Phase 2.");
+  }
 
   // Phase 2 fees must accompany every write. Missing price data must fail.
   const estimate = await client.estimateTransactionFeesForWrite({
@@ -49,18 +58,26 @@ export async function writeBradburyAction(
       ...(estimate.messageAllocations ? { messageAllocations: estimate.messageAllocations } : {}),
     },
   });
-  const receipt = await client.waitForFinalization({ hash: txHash });
-  if (!isSuccessful(receipt)) {
-    throw new Error("Bradbury submission did not finalize successfully; inspect transaction lifecycle.");
+  const submission = { txHash: String(txHash), feeDeposit: estimate.feeValue.toString() };
+  try {
+    onSubmitted?.(submission);
+    const receipt = await client.waitForFinalization({ hash: txHash, fullTransaction: true });
+    assertExactBradburyReceipt({
+      receipt, transactionHash: submission.txHash, recipient: adjudicator, functionName, args,
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "Receipt unavailable";
+    throw new Error(`Bradbury transaction ${submission.txHash} was submitted. Verify its receipt before trying again. ${reason}`, { cause: error });
   }
-  return { txHash: String(txHash), feeDeposit: estimate.feeValue.toString() };
+  return submission;
 }
 
 export function writeBradburyCase(
   provider: EIP1193Provider, wallet: `0x${string}`, adjudicator: `0x${string}`,
   args: (string|number|boolean)[],
+  onSubmitted?: (submission: BradburySubmission) => void,
 ) {
-  return writeBradburyAction(provider,wallet,adjudicator,"submit_case",args);
+  return writeBradburyAction(provider,wallet,adjudicator,"submit_case",args,onSubmitted);
 }
 
 export async function readBradburyCase(adjudicator: `0x${string}`, caseId: string) {

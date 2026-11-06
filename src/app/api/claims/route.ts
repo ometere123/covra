@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       ) values (
         ${body.policyId},${owner},${body.coverageClass},${body.incidentAt},
         ${body.description},${sql.json(body.evidenceUrls)},
-        ${body.requestedMicroUsdc},${idempotency},'AWAITING_EVIDENCE',${body.evidenceCommitment.toLowerCase()}
+        ${body.requestedMicroUsdc},${idempotency},'AWAITING_EVIDENCE',${body.evidenceCommitment?.toLowerCase() ?? null}
       ) on conflict do nothing
       returning id,status,policy_id,created_at
     `;
@@ -115,8 +115,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       claim: rows[0],
       onchainClaimId,
-      evidenceDigest: body.evidenceCommitment.toLowerCase(),
-      next: "Lock the timely claim on Base, then submit independently retrievable evidence to the Bradbury adjudicator.",
+      evidenceDigest: body.evidenceCommitment?.toLowerCase() ?? null,
+      next: body.evidenceCommitment
+        ? "Lock the timely claim on Base, then submit independently retrievable evidence to the Bradbury adjudicator."
+        : "Give the claim ID to the approved evidence issuer. Resume the claim after the observation has been bound.",
       settlementStatus: "NO_PAYOUT_AUTHORIZED",
     }, { status: 201 });
   } catch (error) {

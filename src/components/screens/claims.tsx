@@ -11,6 +11,10 @@ import { configuredAdjudicator, readBradburyCase, writeBradburyAction, writeBrad
 import { canonicalJson, claimIdFromUuid } from "@/lib/claim-protocol";
 import { planAppealRecovery } from "@/lib/appeal-recovery";
 
+function receiptKey(claimId: string) {
+  return `covra:claim-receipt:${configuredPoolAddress()}:${configuredAdjudicator()}:${claimId}`;
+}
+
 export default function ClaimsScreen() {
   const wallet=useWallet();
   const {authenticated}=wallet;
@@ -55,6 +59,15 @@ export default function ClaimsScreen() {
   const chosen=policies.find(p=>p.policy_id===policyId);
   const currentClaim=claims.find(c=>String(c.id)===created);
   const appealSynchronizationPending=currentClaim?.status==="APPEAL_SYNC_PENDING";
+  const rememberReceipt = (phase: string, hash: string, digest?: string, evidenceSource?: string) => {
+    setRecoveryPhase(phase);
+    setRecoveryHash(hash);
+    try {
+      localStorage.setItem(receiptKey(created), JSON.stringify({ phase, hash, digest, evidenceSource }));
+    } catch {
+      // The current recovery form still holds the hash if storage is disabled.
+    }
+  };
   const saveReceipt=async(phase:string,hash:string,digest?:string,evidenceSource?:string)=>{
     const result=await fetch("/api/claims/chain-proof",{method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -62,22 +75,42 @@ export default function ClaimsScreen() {
     });
     const info=await result.json();
     if (!result.ok) throw new Error(info.error||"Chain proof verification is still pending");
+    try {
+      const key = receiptKey(created);
+      const saved = JSON.parse(localStorage.getItem(key) ?? "null");
+      if (saved?.phase === phase && saved?.hash === hash) localStorage.removeItem(key);
+    } catch {
+      // Reconciliation succeeded independently of browser storage.
+    }
     refresh();
     return info;
   };
   const resume=(claim:any)=>{
     setPolicyId(String(claim.policy_id));setCreated(String(claim.id));
     setOnchainClaimId(claimIdFromUuid(String(claim.id),String(claim.claimant_wallet)));
-    setConfirmedDigest(String(claim.evidence_manifest_hash));
+    setConfirmedDigest(String(claim.evidence_manifest_hash ?? ""));
     setLockTx(String(claim.base_lock_tx_hash||""));
     setBradburyTx(String(claim.bradbury_tx_hash||""));
     setDecisionTx(String(claim.bradbury_decision_tx_hash||""));
     setFinalTx(String(claim.bradbury_finalization_tx_hash||""));
     setDescription(String(claim.description));
     setSource(String((claim.evidence_urls||[])[0]||""));
-    setSourceDigest(String(claim.evidence_manifest_hash));
+    setSourceDigest(String(claim.evidence_manifest_hash ?? ""));
     setAppealDigest(String(claim.pending_appeal_digest || (Number(claim.evidence_revision)===1 ? claim.evidence_manifest_hash : "")));
     setAppealSource(String(claim.appeal_evidence_url || ""));
+    setRecoveryHash("");
+    setRecoveryPhase("BASE_LOCKED");
+    try {
+      const saved = JSON.parse(localStorage.getItem(receiptKey(String(claim.id))) ?? "null");
+      if (saved && /^0x[0-9a-f]{64}$/i.test(saved.hash)) {
+        setRecoveryHash(saved.hash);
+        setRecoveryPhase(saved.phase);
+        if (typeof saved.digest === "string") setAppealDigest(saved.digest);
+        if (typeof saved.evidenceSource === "string") setAppealSource(saved.evidenceSource);
+      }
+    } catch {
+      // The recovery form also accepts a hash copied from the wallet.
+    }
     setDate(new Date(claim.incident_at).toISOString().slice(0,16));
     setRequested(Number(claim.requested_micro_usdc)/1e6);
     setError("");setCaseStatus(String(claim.status));
@@ -86,21 +119,21 @@ export default function ClaimsScreen() {
     setBusy(true);setError("");setCreated("");
     try {
       if(!chosen)throw new Error("Select a real indexed Base policy.");
-      if(!source.startsWith("https://"))throw new Error("Provide an HTTPS evidence source.");
+      if(source && !source.startsWith("https://"))throw new Error("Provide an HTTPS evidence source.");
       const response=await fetch("/api/claims",{
         method:"POST",headers:{"Content-Type":"application/json","Idempotency-Key":crypto.randomUUID()},
         body:JSON.stringify({
           policyId,coverageClass:Number(chosen.coverage_class),
           incidentAt:new Date(date).toISOString(),description,
-          evidenceUrls:[source],requestedMicroUsdc:Math.round(requested*1e6).toString(),
-          evidenceCommitment:sourceDigest,
+          evidenceUrls:source?[source]:[],requestedMicroUsdc:Math.round(requested*1e6).toString(),
+          evidenceCommitment:sourceDigest||undefined,
         }),
       });
       const body=await response.json();
       if(!response.ok)throw new Error(body.error||"Claim intake was rejected.");
       setCreated(body.claim.id);
       setOnchainClaimId(body.onchainClaimId);
-      setConfirmedDigest(body.evidenceDigest);
+      setConfirmedDigest(body.evidenceDigest ?? "");
       refresh();
     }catch(e){setError(e instanceof Error?e.message:"Claim intake failed");}
     finally{setBusy(false);}
@@ -124,7 +157,7 @@ export default function ClaimsScreen() {
   const lockOnBase=async()=>{
     setBusy(true);setError("");
     try {
-      if(!wallet.address||!onchainClaimId||!confirmedDigest||!chosen)
+      if(!wallet.address||!onchainClaimId||!/^0x[0-9a-f]{64}$/i.test(confirmedDigest)||!chosen)
         throw new Error("Create a claim and connect the insured wallet first.");
       if(!window.ethereum)throw new Error("An injected wallet is required.");
       const contract=configuredPoolAddress();
@@ -136,6 +169,7 @@ export default function ClaimsScreen() {
         args:[chosen.policy_id as `0x${string}`,onchainClaimId as `0x${string}`,confirmedDigest as `0x${string}`],
         account:wallet.address,chain:baseSepolia,
       });
+      rememberReceipt("BASE_LOCKED", hash);
       const receipt=await baseClient.waitForTransactionReceipt({hash});
       if(receipt.status!=="success")throw new Error("Base claim lock transaction reverted");
       setLockTx(hash);
@@ -160,13 +194,13 @@ export default function ClaimsScreen() {
   const submitToBradbury=async()=>{
     setBusy(true);setError("");
     try {
-      if(!lockTx||!created||!wallet.address||!onchainClaimId||!confirmedDigest||!chosen)
+      if(!lockTx||!currentClaim||!wallet.address||!onchainClaimId||!confirmedDigest||!chosen)
         throw new Error("The Base claim must be confirmed before Bradbury submission.");
       if(!window.ethereum)throw new Error("An injected wallet is required.");
       const adjudicator=configuredAdjudicator();
       if(!adjudicator)throw new Error("Bradbury adjudicator is not configured.");
       const limit=BigInt(String(chosen.cover_micro_usdc));
-      const requestedMicro=BigInt(Math.round(requested*1e6));
+      const requestedMicro=BigInt(String(currentClaim.requested_micro_usdc));
       const bps=Number((requestedMicro*10000n+limit-1n)/limit);
       if(bps<1||bps>10000)throw new Error("Requested amount exceeds policy limit.");
       if (!chosen.risk_spec_json||!chosen.risk_spec_hash) throw new Error("Specific insured-risk terms not indexed");
@@ -174,10 +208,11 @@ export default function ClaimsScreen() {
         onchainClaimId,policyId,onchainClaimId,String(chosen.owner_wallet),created,
         Number(chosen.coverage_class),String(chosen.terms_hash),
         canonicalJson(chosen.risk_spec_json),String(chosen.risk_spec_hash),
-        source,confirmedDigest,new Date(date).toISOString(),bps,
+        String(currentClaim.evidence_urls?.[0] ?? ""),confirmedDigest,new Date(currentClaim.incident_at).toISOString(),bps,
       ];
       const {txHash,feeDeposit}=await writeBradburyCase(
         window.ethereum,wallet.address,adjudicator,args,
+        ({txHash})=>rememberReceipt("BRADBURY_SUBMITTED",txHash),
       );
       setBradburyTx(txHash);setBradburyFee(feeDeposit);
       await saveReceipt("BRADBURY_SUBMITTED",txHash);
@@ -190,7 +225,8 @@ export default function ClaimsScreen() {
       if (!wallet.address||!window.ethereum||!onchainClaimId||!created) throw new Error("Choose an existing case first");
       const adjudicator=configuredAdjudicator();
       if (!adjudicator) throw new Error("Bradbury contract not configured");
-      const {txHash}=await writeBradburyAction(window.ethereum,wallet.address,adjudicator,"adjudicate",[onchainClaimId]);
+      const {txHash}=await writeBradburyAction(window.ethereum,wallet.address,adjudicator,"adjudicate",[onchainClaimId],
+        (submission)=>rememberReceipt("BRADBURY_DECIDED",submission.txHash));
       setDecisionTx(txHash);await saveReceipt("BRADBURY_DECIDED",txHash);
       const record=await readBradburyCase(adjudicator,onchainClaimId);
       setCaseStatus(record.verdict+": "+record.reason);
@@ -241,8 +277,8 @@ export default function ClaimsScreen() {
       if (plan==="APPEAL_BRADBURY_AND_REVISE_BASE"||plan==="SUBMIT_BRADBURY_ONLY") {
         // Bradbury's three-day deadline is shorter than Base's recovery window.
         const {txHash}=await writeBradburyAction(window.ethereum,wallet.address,adjudicator,"appeal",
-          [onchainClaimId,appealSource,appealDigest]);
-        setRecoveryPhase("BRADBURY_APPEALED");setRecoveryHash(txHash);
+          [onchainClaimId,appealSource,appealDigest],
+          (submission)=>rememberReceipt("BRADBURY_APPEALED",submission.txHash,appealDigest,appealSource));
         await saveReceipt("BRADBURY_APPEALED",txHash,appealDigest,appealSource);
       }
       if (plan==="APPEAL_BRADBURY_AND_REVISE_BASE"||plan==="REVISE_BASE_ONLY") {
@@ -252,7 +288,7 @@ export default function ClaimsScreen() {
         const baseWallet=createWalletClient({account:wallet.address,chain:baseSepolia,transport:custom(window.ethereum)});
         const lockHash=await baseWallet.writeContract({address:pool,abi:poolsAbi,functionName:"reviseClaimEvidence",
           args:[chosen.policy_id as `0x${string}`,appealDigest as `0x${string}`],account:wallet.address,chain:baseSepolia});
-        setRecoveryPhase("BASE_REVISED");setRecoveryHash(lockHash);
+        rememberReceipt("BASE_REVISED",lockHash,appealDigest);
         const receipt=await baseClient.waitForTransactionReceipt({hash:lockHash,confirmations:12});
         if(receipt.status!=="success")throw new Error("Base evidence revision reverted");
         await saveReceipt("BASE_REVISED",lockHash,appealDigest);
@@ -270,7 +306,8 @@ export default function ClaimsScreen() {
     try{
       if (!wallet.address||!window.ethereum||!onchainClaimId||!created) throw new Error("Resume a decided claim first");
       const adjudicator=configuredAdjudicator();if(!adjudicator)throw new Error("Adjudicator not configured");
-      const {txHash}=await writeBradburyAction(window.ethereum,wallet.address,adjudicator,"finalize_case",[onchainClaimId]);
+      const {txHash}=await writeBradburyAction(window.ethereum,wallet.address,adjudicator,"finalize_case",[onchainClaimId],
+        (submission)=>rememberReceipt("BRADBURY_FINALIZED",submission.txHash));
       setFinalTx(txHash);await saveReceipt("BRADBURY_FINALIZED",txHash);
       const record=await readBradburyCase(adjudicator,onchainClaimId);
       setCaseStatus(record.verdict+": "+record.reason);
@@ -296,6 +333,7 @@ export default function ClaimsScreen() {
         deadline:BigInt(d.deadline),sourceChainId:BigInt(d.sourceChainId)};
       const hash=await baseWallet.writeContract({address:pool,abi:poolsAbi,functionName:"settle",
         args:[message,bundle.signatures],account:wallet.address,chain:baseSepolia});
+      rememberReceipt("BASE_SETTLED",hash);
       await baseClient.waitForTransactionReceipt({hash,confirmations:12});
       const result=await saveReceipt("BASE_SETTLED",hash);
       setCaseStatus(result.status+": confirmed on Base Sepolia");
@@ -327,14 +365,14 @@ export default function ClaimsScreen() {
           {policies.map(x=><option key={x.policy_id} value={x.policy_id}>{x.policy_id.slice(0,16)}… · {coverages[Number(x.coverage_class)]?.name}</option>)}
         </select></div>
         <div className="field-grid">
-          <div className="field"><label htmlFor="claim-date">INCIDENT TIMESTAMP</label><input className="input" id="claim-date" type="datetime-local" value={date} onChange={e=>setDate(e.target.value)}/></div>
+          <div className="field"><label htmlFor="claim-date">INCIDENT TIMESTAMP (LOCAL TIME)</label><input className="input" id="claim-date" type="datetime-local" step="0.001" value={date} onChange={e=>setDate(e.target.value)}/></div>
           <div className="field"><label htmlFor="claim-amount">REQUESTED LOSS (USDC)</label><input className="input" id="claim-amount" type="number" value={requested} min={1} step="0.01" onChange={e=>setRequested(Number(e.target.value))}/></div>
         </div>
         <div className="field"><label htmlFor="claim-desc">WHAT HAPPENED? (80–4,000 CHARACTERS)</label><textarea id="claim-desc" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Describe the authorized agent task, expected outcome, actual event, loss calculation and available independent evidence." /></div>
         <div className="field"><label htmlFor="claim-source">PUBLIC HTTPS EVIDENCE SOURCE</label><input className="input" id="claim-source" value={source} onChange={e=>setSource(e.target.value)} placeholder="https://..." /><span className="field-hint">Private claim attachments are not automatically public or independently verifiable. For GenLayer adjudication, choose a source on the contract's approved domain list.</span></div>
-        <div className="field"><label htmlFor="claim-digest">PUBLIC EVIDENCE SHA-256 (0x + 64 HEX CHARACTERS)</label><input className="input" id="claim-digest" value={sourceDigest} onChange={e=>setSourceDigest(e.target.value)} placeholder="0x..." /><span className="field-hint">Hash the exact raw response bytes at the public source URL. Validators independently fetch them and must reject any changed content. The private attachment digest is not a substitute.</span></div>
+        <div className="field"><label htmlFor="claim-digest">PUBLIC EVIDENCE SHA-256 (0x + 64 HEX CHARACTERS)</label><input className="input" id="claim-digest" value={sourceDigest} onChange={e=>setSourceDigest(e.target.value)} placeholder="0x..." /><span className="field-hint">Hash the exact response bytes, or leave both public evidence fields empty to request issuer binding. Resume the intake after the approved issuer has published and bound the observation.</span></div>
         <button className="primary-action" disabled={!authenticated||!policies.length||busy} onClick={submit}><ClipboardCheck size={15}/>{busy?"Submitting…":"Submit claim intake"}<ArrowUpRight size={15}/></button>
-        {created&&<button className="secondary-action" disabled={!authenticated||busy||Boolean(lockTx)} onClick={lockOnBase}><ShieldCheck size={15}/>{lockTx?"Claim locked on Base":"Lock claim and reserve on Base Sepolia"}</button>}
+        {created&&<button className="secondary-action" disabled={!authenticated||busy||Boolean(lockTx)||!confirmedDigest} onClick={lockOnBase}><ShieldCheck size={15}/>{lockTx?"Claim locked on Base":confirmedDigest?"Lock claim and reserve on Base Sepolia":"Waiting for issuer evidence"}</button>}
         {lockTx&&<button className="secondary-action" disabled={busy||Boolean(bradburyTx)} onClick={submitToBradbury}><ShieldCheck size={15}/>{bradburyTx?"Bradbury case submitted":"Submit to GenLayer validators (Bradbury Phase 2)"}</button>}
         {bradburyTx&&!decisionTx&&!appealSynchronizationPending&&<button className="secondary-action" disabled={busy} onClick={adjudicate}><ShieldCheck size={15}/> Request independent GenLayer adjudication</button>}
         {decisionTx&&!finalTx&&!appealSynchronizationPending&&<button className="secondary-action" disabled={busy} onClick={finalize}><ShieldCheck size={15}/> Finalize after three-day appeal window</button>}

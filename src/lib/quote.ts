@@ -50,8 +50,11 @@ export const claimInputSchema = z.object({
   coverageClass: z.number().int().min(0).max(4),
   incidentAt: z.string().datetime(),
   description: z.string().min(80).max(4000),
-  evidenceUrls: z.array(z.string().url()).min(1).max(8),
+  evidenceUrls: z.array(z.string().url()).max(8).default([]),
   requestedMicroUsdc: z.string().regex(/^[1-9][0-9]*$/),
-  evidenceCommitment: z.string().regex(/^0x[a-fA-F0-9]{64}$/),
-});
+  evidenceCommitment: z.string().regex(/^0x[a-fA-F0-9]{64}$/).optional(),
+}).refine(
+  ({ evidenceUrls, evidenceCommitment }) => Boolean(evidenceUrls.length) === Boolean(evidenceCommitment),
+  { message: "Provide both the evidence URL and digest, or leave both empty for issuer binding." },
+);
 

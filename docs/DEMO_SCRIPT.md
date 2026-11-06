@@ -6,8 +6,8 @@ This is a testnet demonstration. COVRA provides no real insurance coverage, coll
 2. Connect a demonstration wallet and show one of the five coverage classes, its frozen terms hash, risk subject, evidence host, and non-binding quote.
 3. Show the quote's signer and deadline. Explain that an agent credential is scoped and cannot spend funds by itself.
 4. Approve only the test USDC allowance needed for the wallet's explicit purchase, then purchase on Base Sepolia. Show the confirmed receipt and indexed policy state.
-5. Create a claim intake with a public evidence URL and commitment. Lock it on Base and show the 12-confirmation requirement.
-6. From the operator-only evidence workflow, select an attributable public HTTPS observation. Issue an `OBSERVED_PUBLIC` record only after the issuer retrieves and validates that source. Show the source URL, raw-source digest, public JSON, envelope digest, issuer wallet, expiry and independently recovered signature. If no genuine event is available, leave the claim pending; do not manufacture one.
+5. Open an owned claim intake with both public evidence fields empty. Give the claim UUID and the exact incident time to the approved issuer operator.
+6. Issue an `OBSERVED_PUBLIC` record from an attributable public HTTPS observation. Show the source URL, raw-source digest, public JSON, envelope digest, issuer wallet, expiry and independently recovered signature. Issuance binds the evidence digest to the pending intake. Resume the claim, lock it on Base and show the 12-confirmation requirement. If genuine eligible evidence is unavailable, leave the intake pending.
 7. Submit the exact Bradbury case, then verify the finalized receipt's transaction ID, adjudicator, method, every argument, and finalized state. A string search is not evidence.
 8. Run independent preflight checks and obtain three signatures from three distinct authorized attestors. Explain that the claim snapshots the five-member roster at lock time.
 9. Submit settlement on Base Sepolia. Show that the frontend first displays pending, then confirmed, and that `ClaimSettled`/`ClaimDenied` is independently verified before it says paid/denied.

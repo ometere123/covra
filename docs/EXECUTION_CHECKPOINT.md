@@ -2,6 +2,18 @@
 
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
+## 2026-11-06 verification and receipt recovery
+
+GitHub Actions run `41564107102` passed on `5c2f38f42736d71170d8e3eff037227b35822175`. The November 3 production browser verifier produced all 24 desktop/mobile results and a signed wallet login and prospective quote. Its old process handle no longer exists.
+
+The SDK's simplified receipt discarded decoded calldata on the real finalized allowlist transaction `0xd9ab1ba5e9fe068827dec59686e42d7cc555bace2e9d27ec367a6ab262aa7007`. The exact verifier rejected that representation. The same transaction fetched with `fullTransaction: true` retained the map for `allow_evidence_host("covra-lyart.vercel.app", true)` and passed exact verification. The browser client, chain-proof API and attestor preflight now request the full receipt. Browser claim submissions save their reported transaction hash and phase for recovery before polling. The recovery form restores these values on Resume and clears the saved entry after server verification. Browser Bradbury writes check the Phase 2 genesis before fee estimation. Both public Bradbury endpoints returned the expected genesis.
+
+Claim intake can now create an owned draft without a preexisting observation. The issuer needs that claim UUID to sign and binds the canonical digest and URL atomically on first issuance. Replays preserve the signed commitment. The claim form reads immutable adjudication arguments from the saved intake. DNS pinning handles both Node lookup result forms and the source request has an absolute HTTPS deadline. TypeScript passed and `npm test` passed 91 Vitest and 7 TAP checks, including an isolated issue/bind/replay test using real signatures and controlled source/database interfaces. This is regression coverage, separate from live policy-bound issuance.
+
+Supabase Cron job 1 remained active on the five-minute schedule. All five recent requests at 05:45 through 06:05 UTC returned HTTP 200 without timing out. The current deployment stream cursor reached block `55116152` at 06:05:03 UTC.
+
+Base Sepolia RPC chain ID was `84532`. At the read around block `55115872`, the configured funding wallet `0xa5840e65a15021d8b1648dB10176c04811f07873` and current pool `0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4` each held zero Circle test USDC. Live purchase, policy-bound evidence, adjudication and payout still require funding, an attributable eligible incident, and signatures from three configured attestors. The user has already been asked about these prerequisites.
+
 ## Current execution — hardened deployment and hosted replay verification
 
 ### Latest follow-through (supersedes counts/deployment IDs below)

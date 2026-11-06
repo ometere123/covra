@@ -43,8 +43,10 @@ function issuerHost(): string {
 function adminAuthorized(request: NextRequest): boolean {
   const expected = process.env.EVIDENCE_ISSUER_ADMIN_TOKEN;
   const supplied = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-  if (!expected || !supplied || supplied.length !== expected.length) return false;
-  return timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
+  if (!expected || !supplied) return false;
+  const suppliedBytes = Buffer.from(supplied);
+  const expectedBytes = Buffer.from(expected);
+  return suppliedBytes.length === expectedBytes.length && timingSafeEqual(suppliedBytes, expectedBytes);
 }
 
 async function safeSourceUrl(value: string, ownHost: string): Promise<URL> {
@@ -79,12 +81,14 @@ async function retrieveObservation(url: URL) {
       method: "GET",
       headers: { accept: "application/json" },
       servername: url.hostname,
-      timeout: 10_000,
+      signal: AbortSignal.timeout(10_000),
+      agent: false,
       lookup: (_hostname, options, callback) => {
         const family = typeof options.family === "number" ? options.family : 0;
-        const selected = addresses.find((entry) => family === 0 || entry.family === family);
-        if (!selected) return callback(new Error("No validated address matches the requested IP family"), "", 0);
-        callback(null, selected.address, selected.family);
+        const matching = addresses.filter((entry) => family === 0 || entry.family === family);
+        if (!matching.length) return callback(new Error("No validated address matches the requested IP family"), "", 0);
+        if (options.all) return callback(null, matching);
+        callback(null, matching[0].address, matching[0].family);
       },
     }, (incoming) => {
       const status = incoming.statusCode || 0;
@@ -108,9 +112,9 @@ async function retrieveObservation(url: URL) {
         settled = true;
         resolve({ status, headers: incoming.headers as Record<string, string | string[] | undefined>, bytes: new Uint8Array(Buffer.concat(chunks)) });
       });
+      incoming.on("aborted", () => fail(new Error("Observation source response was interrupted")));
       incoming.on("error", fail);
     });
-    request.on("timeout", () => request.destroy(new Error("Observation source request timed out")));
     request.on("error", fail);
     request.end();
   });
@@ -171,7 +175,7 @@ export async function POST(request: NextRequest) {
       throw new Error("Observed facts do not satisfy the mandatory coverage-class evidence schema");
     }
     const incidentAt = new Date(observation.event_time).getTime();
-    if (!Number.isFinite(incidentAt) || incidentAt < new Date(claim.incident_at).getTime() - 1000 || incidentAt > Date.now() + 300_000) {
+    if (!Number.isFinite(incidentAt) || incidentAt !== new Date(claim.incident_at).getTime() || incidentAt > Date.now() + 300_000) {
       throw new Error("Observed event time is inconsistent with the claim intake");
     }
 
@@ -188,7 +192,7 @@ export async function POST(request: NextRequest) {
       risk_spec: riskSpec,
       coverage_class: Number(claim.coverage_class),
       observation_id: body.observationId,
-      event_time: observation.event_time,
+      event_time: new Date(incidentAt).toISOString(),
       observed_at: new Date().toISOString(),
       observation_mode: "OBSERVED_PUBLIC" as const,
       source_details: {
@@ -206,28 +210,53 @@ export async function POST(request: NextRequest) {
     const signature = await account.signMessage({ message: issuerMessage(parsed) });
     const envelope = evidenceEnvelope.parse({ ...parsed, issuer: { ...parsed.issuer, signature } });
     const digest = sha256Digest(canonicalJson(envelope));
-    const inserted = await sql`insert into evidence_issuer_observations(
-      observation_id,coverage_class,evidence_digest,issuer_wallet,envelope,issued_at,expires_at
-    ) values(
-      ${body.observationId},${Number(claim.coverage_class)},${digest},${account.address.toLowerCase()},
-      ${sql.json(JSON.parse(JSON.stringify(envelope)))},${new Date(now * 1000).toISOString()},${new Date(expiresAt * 1000).toISOString()}
-    ) on conflict (observation_id) do nothing returning observation_id`;
-    if (!inserted.length) {
-      const existing = await sql`select evidence_digest,issuer_wallet,envelope
-        from evidence_issuer_observations where observation_id=${body.observationId} limit 1`;
-      const prior = existing[0];
-      const priorEnvelope = prior?.envelope as { claim_id?: string; source_details?: { origin_url?: string } } | undefined;
-      if (!prior || priorEnvelope?.claim_id?.toLowerCase() !== claimIdFromUuid(body.claimId, String(claim.claimant_wallet).toLowerCase()).toLowerCase() ||
-          priorEnvelope.source_details?.origin_url !== sourceUrl.toString()) {
-        return NextResponse.json({ error: "Observation identity is already bound to different content" }, { status: 409 });
+    return await sql.begin(async (tx) => {
+      const [active] = await tx`select status, evidence_manifest_hash, base_lock_tx_hash
+        from claims where id=${body.claimId} for update`;
+      if (!active || ['CANCELLED','PAID','DENIED','EXPIRED'].includes(String(active.status))) {
+        return NextResponse.json({ error: "The claim is no longer active" }, { status: 409 });
       }
-      return NextResponse.json({ observationId: body.observationId, evidenceDigest: String(prior.evidence_digest), issuerWallet: String(prior.issuer_wallet), publicUrl: source, observationMode: "OBSERVED_PUBLIC", idempotentReplay: true });
-    }
-    return NextResponse.json({
-      observationId: body.observationId, evidenceDigest: digest, issuerWallet: account.address,
-      publicUrl: source, observationMode: "OBSERVED_PUBLIC", expiresAt,
-      originUrl: sourceUrl.toString(),
-    }, { status: 201 });
+      const bindDraft = active.evidence_manifest_hash === null;
+      if (bindDraft && (active.status !== 'AWAITING_EVIDENCE' || active.base_lock_tx_hash)) {
+        return NextResponse.json({ error: "Only an unanchored evidence-pending intake can be bound" }, { status: 409 });
+      }
+      const inserted = await tx`insert into evidence_issuer_observations(
+        observation_id,coverage_class,evidence_digest,issuer_wallet,envelope,issued_at,expires_at
+      ) values(
+        ${body.observationId},${Number(claim.coverage_class)},${digest},${account.address.toLowerCase()},
+        ${tx.json(JSON.parse(JSON.stringify(envelope)))},${new Date(now * 1000).toISOString()},${new Date(expiresAt * 1000).toISOString()}
+      ) on conflict (observation_id) do nothing returning observation_id`;
+      let publishedDigest = digest;
+      let publishedWallet: string = account.address;
+      let publishedExpiry = expiresAt;
+      if (!inserted.length) {
+        const [prior] = await tx`select evidence_digest,issuer_wallet,envelope,state,expires_at
+          from evidence_issuer_observations where observation_id=${body.observationId} for update`;
+        const stored = evidenceEnvelope.safeParse(prior?.envelope);
+        if (!stored.success || stored.data.claim_id !== envelope.claim_id ||
+            stored.data.source_details.origin_url !== sourceUrl.toString() ||
+            stored.data.source_details.origin_payload_digest !== rawDigest) {
+          return NextResponse.json({ error: "Observation identity is already bound to different content" }, { status: 409 });
+        }
+        if (prior.state !== "ACTIVE" || new Date(prior.expires_at).getTime() <= Date.now()) {
+          return NextResponse.json({ error: "The observation is inactive" }, { status: 409 });
+        }
+        publishedDigest = sha256Digest(canonicalJson(stored.data));
+        if (publishedDigest !== prior.evidence_digest) throw new Error("Stored observation digest mismatch");
+        publishedWallet = String(prior.issuer_wallet);
+        publishedExpiry = stored.data.issuer.expires_at;
+      }
+      if (bindDraft) {
+        await tx`update claims set evidence_manifest_hash=${publishedDigest},
+          evidence_urls=${tx.json([source])},updated_at=now() where id=${body.claimId}`;
+      }
+      return NextResponse.json({
+        observationId: body.observationId, evidenceDigest: publishedDigest, issuerWallet: publishedWallet,
+        publicUrl: source, observationMode: "OBSERVED_PUBLIC", expiresAt: publishedExpiry,
+        originUrl: sourceUrl.toString(), claimBound: bindDraft,
+        ...(!inserted.length ? { idempotentReplay: true } : {}),
+      }, { status: inserted.length ? 201 : 200 });
+    });
   } catch (error) {
     return responseError(error);
   }
