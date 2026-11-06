@@ -9,8 +9,8 @@ import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 import type { EIP1193Provider } from "viem";
 import { assertExactBradburyReceipt } from "./bradbury-receipt";
+import { BRADBURY_PHASE_2_GENESIS, readFinalizedBradburyView } from "./bradbury-final-state";
 
-const BRADBURY_PHASE_2_GENESIS = "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4";
 type BradburySubmission = { txHash: string; feeDeposit: string };
 
 export function publicBradburyEndpoint(): string | null {
@@ -83,8 +83,7 @@ export function writeBradburyCase(
 export async function readBradburyCase(adjudicator: `0x${string}`, caseId: string) {
   const endpoint=publicBradburyEndpoint();
   if (!endpoint) throw new Error("Public Bradbury GenLayer node RPC required");
-  const client=createClient({chain:testnetBradbury,endpoint});
-  const raw=await client.readContract({address:adjudicator,functionName:"get_case",args:[caseId]});
+  const raw=await readFinalizedBradburyView(endpoint,adjudicator,"get_case",[caseId]);
   if (typeof raw!=="string"||!raw) throw new Error("Bradbury case does not exist");
   return JSON.parse(raw) as {
     id:string;state:string;verdict:string;revision:number;reason:string;citations:string;

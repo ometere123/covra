@@ -1,5 +1,9 @@
 # COVRA verification report
 
+## 2026-11-06 regression and hosted checks
+
+`npm run typecheck` and `npm test` passed with 95 Vitest and 7 TAP checks. New regressions exercise atomic first issuance and replay with controlled database and HTTPS interfaces, receipt recovery, exact finalized Bradbury RPC parameters, terminal-outcome reconciliation and malformed authorization. The live adjudicator returned an empty case register via explicit finalized reads. Hosted checks covered 24 desktop/mobile route combinations, signed wallet login, a prospective signed quote, agent and MCP scope boundaries, issuer HTTPS retrieval and schema rejection, and denial of a claim intake without a policy. See the [execution checkpoint](EXECUTION_CHECKPOINT.md) for CI, production deployment, and scheduled indexing evidence.
+
 ## Current verified results — 2026-11-03
 
 These supersede historical results below. Full funded cross-chain acceptance remains **incomplete**.

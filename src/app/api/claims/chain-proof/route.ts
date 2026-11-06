@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, isSuccessful } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
-import { TransactionHashVariant } from "genlayer-js/types";
 import { decodeEventLog } from "viem";
 import { z } from "zod";
 import { walletSession } from "@/lib/auth";
@@ -11,6 +10,7 @@ import { database } from "@/lib/db";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { canonicalJson, claimIdFromUuid, finalizedResultDigest } from "@/lib/claim-protocol";
 import { assertExactBradburyReceipt } from "@/lib/bradbury-receipt";
+import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "@/lib/bradbury-final-state";
 import { responseError, testnetGuard } from "@/lib/http";
 
 const schema=z.object({
@@ -108,6 +108,7 @@ export async function POST(request:NextRequest) {
       const endpoint=process.env.BRADBURY_NODE_RPC_URL;
       const adjudicator=process.env.BRADBURY_ADJUDICATOR_ADDRESS;
       if (!endpoint?.startsWith("https://")||!adjudicator) throw new Error("Bradbury execution node not configured");
+      await assertBradburyNodeIdentity(endpoint);
       const client=createClient({chain:testnetBradbury,endpoint});
       // The SDK's simplified receipt drops the decoded calldata map.
       const receipt=await client.waitForFinalization({hash:txHash as `0x${string}` & {length:66},fullTransaction:true});
@@ -141,10 +142,7 @@ export async function POST(request:NextRequest) {
       assertExactBradburyReceipt({
         receipt,transactionHash:txHash,recipient:adjudicator,functionName:expectedFunction,args:expectedArgs,
       });
-      const raw=await client.readContract({
-        address:adjudicator as `0x${string}`,functionName:"get_case",args:[actualId],
-        transactionHashVariant:TransactionHashVariant.LATEST_FINAL,
-      });
+      const raw=await readFinalizedBradburyView(endpoint,adjudicator,"get_case",[actualId]);
       if (typeof raw!=="string"||!raw) throw new Error("GenLayer case not found");
       const record=JSON.parse(raw);
       // Bradbury may record the appeal before the separate Base revision.
@@ -178,8 +176,7 @@ export async function POST(request:NextRequest) {
           revision:Number(record.revision),evidence_hash:String(record.evidence_hash),
           coverage_class:Number(record.risk),finalized_at:Number(record.finalized_at),
         });
-        const digest=await client.readContract({address:adjudicator as `0x${string}`,functionName:"get_decision_digest",
-          args:[actualId],transactionHashVariant:TransactionHashVariant.LATEST_FINAL});
+        const digest=await readFinalizedBradburyView(endpoint,adjudicator,"get_decision_digest",[actualId]);
         if (typeof digest!=="string"||digest.toLowerCase()!==expectedDecisionDigest.toLowerCase())
           throw new Error("Finalized GenLayer decision digest does not match the canonical case state");
       }

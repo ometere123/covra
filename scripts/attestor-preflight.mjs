@@ -10,12 +10,12 @@
 import { createHash } from "node:crypto";
 import { createClient, isSuccessful } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
-import { TransactionHashVariant } from "genlayer-js/types";
 import { createPublicClient, http, parseAbi, recoverMessageAddress } from "viem";
 import { baseSepolia } from "viem/chains";
 import { assertIncidentWithinPolicy } from "./claim-window.mjs";
 import { encodePreflightOutput } from "./preflight-io.mjs";
 import { assertExactBradburyReceipt } from "./bradbury-receipt.mjs";
+import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "../src/lib/bradbury-final-state.ts";
 
 function fail(reason) { throw new Error("ATTESTOR_PREFLIGHT_REJECTED: " + reason); }
 function hex32(value) { return typeof value === "string" && /^0x[0-9a-fA-F]{64}$/.test(value); }
@@ -100,6 +100,7 @@ async function main() {
   if (!hex32(finalizationTx)) fail("provide the actual finalized GenLayer transaction hash as second argument");
   if (!nodeUrl || !nodeUrl.startsWith("https://")) fail("missing full GenLayer BRADBURY_NODE_RPC_URL");
   if (!address(basePool) || !address(adjudicator) || !address(evidenceIssuer)) fail("missing Base/Bradbury/evidence-issuer addresses");
+  await assertBradburyNodeIdentity(nodeUrl);
   const gen=createClient({chain:testnetBradbury,endpoint:nodeUrl});
   const finalReceipt=await gen.waitForFinalization({hash:finalizationTx,fullTransaction:true});
   if (!isSuccessful(finalReceipt)) fail("claimed GenLayer finalization receipt is not successful");
@@ -109,10 +110,7 @@ async function main() {
   } catch (error) {
     fail("GenLayer transaction is not an exact finalized finalization call: "+String(error?.message||error));
   }
-  const raw=await gen.readContract({
-    address:adjudicator,functionName:"get_case",args:[caseId],
-    transactionHashVariant:TransactionHashVariant.LATEST_FINAL,
-  });
+  const raw=await readFinalizedBradburyView(nodeUrl,adjudicator,"get_case",[caseId]);
   if (typeof raw !== "string") fail("GenLayer node did not provide a case JSON string");
   const record=JSON.parse(raw);
   if (!record || record.state !== "FINALIZED" || record.id !== caseId) fail("GenLayer case is not finalized");
@@ -129,10 +127,7 @@ async function main() {
     evidence_hash:record.evidence_hash,coverage_class:record.risk,finalized_at:record.finalized_at,
   };
   const expectedResultDigest=sha256(canonical(digestFields));
-  const actualResultDigest=await gen.readContract({
-    address:adjudicator,functionName:"get_decision_digest",args:[caseId],
-    transactionHashVariant:TransactionHashVariant.LATEST_FINAL,
-  });
+  const actualResultDigest=await readFinalizedBradburyView(nodeUrl,adjudicator,"get_decision_digest",[caseId]);
   if (!same(expectedResultDigest,actualResultDigest)) fail("GenLayer finalized digest mismatch");
 
   const base=createPublicClient({chain:baseSepolia,transport:http(process.env.BASE_RPC_URL || "https://sepolia.base.org")});
