@@ -6,6 +6,10 @@ Overall assignment remains incomplete. Continue automatically with unblocked tas
 
 The signature coordinator now verifies Base Sepolia identity and simulates the exact `settle` call before emitting a bundle. The browser waits for the persisted Bradbury finalization proof, requires the bundle to name that transaction and simulates the same calldata before requesting a wallet signature. Base receipt reconciliation requires the terminal policy state corresponding to the specific settlement or denial event. The deployed pool returned `InvalidInput` for a read-only settlement with no policy or lock. No transaction was broadcast. At Base block `55126421` the funding wallet and pool each still held zero Circle test USDC.
 
+Commit `e60adac0e10ef14935bfe64e2e6cca7b927d5ac9` passed CI run `42176259656` and production deployment `dpl_99ifJUKFtbyLSMAL4NXwiuBekZsy` is READY. The hosted browser verifier passed 24 route/device checks, wallet login and a prospective signed quote. The settled-certificate positive regression uses isolated signing keys and a controlled RPC boundary. Live positive settlement remains pending funding, evidence and operator signatures.
+
+At 06:45 UTC job 1 dispatched successfully but HTTP response 932 timed out under the default `pg_net` deadline. The worker persisted the cursor at block `55128158` around four seconds after dispatch. The reviewed SQL updated the same production job to a 30-second timeout while retaining the five-minute cadence, active flag, Vault names and job ID. Run `supabase/cron/verify-indexer.sql` after the next scheduled interval to confirm HTTP success and cursor advancement.
+
 ## 2026-11-06 verification and receipt recovery
 
 GitHub Actions run `41564107102` passed on `5c2f38f42736d71170d8e3eff037227b35822175`. The November 3 production browser verifier produced all 24 desktop/mobile results and a signed wallet login and prospective quote. Its old process handle no longer exists.

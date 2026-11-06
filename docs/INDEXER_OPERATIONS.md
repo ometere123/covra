@@ -27,3 +27,5 @@ Vercel Hobby Cron is not used: its schedule precision does not support a five-mi
 - `covra_indexer_cron_secret` = the same secret as Vercel's `INDEXER_CRON_SECRET`
 
 Run the reviewed SQL file only after the hosted endpoint responds. It installs `*/5 * * * *` through `pg_cron` and `pg_net`, then verify `cron.job` and `cron.job_run_details`. The repository cannot claim Cron operational until an authenticated run has returned success, the cursor has advanced, and the reconciliation report is consistent.
+
+The installer updates an existing job in place and leaves its owner, active flag and history intact. It sets a 30-second `pg_net` timeout to accommodate cold starts and RPC calls. Treat `cron.job_run_details` success as proof of dispatch. Verify the corresponding HTTP response and durable cursor independently, since the request may time out while the hosted worker continues.
