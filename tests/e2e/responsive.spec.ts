@@ -85,14 +85,14 @@ test("all primary routes remain usable across supported viewport widths", async 
 
 test("mobile navigation and wallet-unavailable guidance are usable", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
-  await page.goto("/app/pools", { waitUntil: "domcontentloaded" });
+  await page.goto("/app/pools", { waitUntil: "networkidle" });
 
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(page.locator(".app-sidebar.sidebar-mobile-open")).toBeVisible();
   await page.getByRole("link", { name: "Coverage", exact: true }).click();
   await expect(page).toHaveURL(/\/app\/coverage$/);
 
-  await page.goto("/app/pools", { waitUntil: "domcontentloaded" });
+  await page.goto("/app/pools", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Connect wallet", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: /EIP-1193|in-app browser|wallet/i })).toBeVisible();
 });
