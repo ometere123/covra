@@ -1,0 +1,98 @@
+import { test, expect } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+import { join } from "node:path";
+
+const routes = [
+  "/",
+  "/app",
+  "/app/coverage",
+  "/app/quote",
+  "/app/policies",
+  "/app/claims",
+  "/app/pools",
+  "/app/agents",
+  "/app/activity",
+  "/app/settings",
+  "/underwrite",
+  "/developers",
+];
+
+const widths = [320, 360, 375, 390, 414, 430, 768, 1024];
+
+function slug(route: string) {
+  return route === "/" ? "landing" : route.replace(/^\//, "").replaceAll("/", "-");
+}
+
+test("all primary routes remain usable across supported viewport widths", async ({ page }, testInfo) => {
+  test.setTimeout(240_000);
+  mkdirSync(testInfo.outputDir, { recursive: true });
+
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of routes) {
+      await page.goto(route, { waitUntil: "domcontentloaded" });
+      await expect(page.locator("body")).toBeVisible();
+
+      const layout = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        documentWidth: document.documentElement.scrollWidth,
+        bodyWidth: document.body.scrollWidth,
+      }));
+      expect(layout.documentWidth, `${route} document overflow at ${width}px`).toBeLessThanOrEqual(layout.viewport + 1);
+      expect(layout.bodyWidth, `${route} body overflow at ${width}px`).toBeLessThanOrEqual(layout.viewport + 1);
+
+      const outOfViewport = await page.locator("button:visible, input:visible, select:visible, textarea:visible, a:visible").evaluateAll((elements, viewportWidth) =>
+        elements.flatMap(element => {
+          const rect = element.getBoundingClientRect();
+          // The closed mobile sidebar is translated off the left edge by design;
+          // only right-edge overflow can expand the document and break the task.
+          return rect.right > viewportWidth + 1
+            ? [{ tag: element.tagName, text: (element.textContent || "").trim().slice(0, 80), right: rect.right, left: rect.left }]
+            : [];
+        }),
+        width,
+      );
+      expect(outOfViewport, `${route} has controls outside the ${width}px viewport`).toEqual([]);
+
+      if (width === 320 || width === 1024) {
+        await page.screenshot({ path: join(testInfo.outputDir, `${width}-${slug(route)}.png`), fullPage: true });
+      }
+
+      if (route === "/app/pools") {
+        const risk = page.locator("#pool-risk");
+        const amount = page.locator("#pool-amount");
+        const withdrawal = page.locator("#share-amount");
+        await expect(risk).toBeVisible();
+        await expect(amount).toBeVisible();
+        await expect(withdrawal).toBeVisible();
+        await risk.selectOption("1");
+        await amount.fill("100.00");
+        await withdrawal.fill("1");
+        await expect(amount).toHaveValue("100.00");
+        await expect(withdrawal).toHaveValue("1");
+        for (const name of [/Approve & deposit test USDC/i, /Request withdrawal/i]) {
+          const action = page.getByRole("button", { name });
+          await expect(action).toBeVisible();
+          const minHeight = await action.evaluate(element => Number.parseFloat(getComputedStyle(element).minHeight));
+          expect(minHeight).toBeGreaterThanOrEqual(width <= 600 ? 46 : 0);
+        }
+        const formColumns = await page.locator(".pool-form-layout").evaluate(element => getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length);
+        if (width <= 900) expect(formColumns).toBe(1);
+      }
+    }
+  }
+});
+
+test("mobile navigation and wallet-unavailable guidance are usable", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/app/pools", { waitUntil: "domcontentloaded" });
+
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(page.locator(".app-sidebar.sidebar-mobile-open")).toBeVisible();
+  await page.getByRole("link", { name: "Coverage", exact: true }).click();
+  await expect(page).toHaveURL(/\/app\/coverage$/);
+
+  await page.goto("/app/pools", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Connect wallet", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: /EIP-1193|in-app browser|wallet/i })).toBeVisible();
+});

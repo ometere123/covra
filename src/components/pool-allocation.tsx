@@ -86,22 +86,26 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
         const ratio=assets>0?Math.min(100,Math.round(reserved/assets*100)):0;
         return <div className="pool-card" key={p.classId}><span className="pool-card-number">POOL / 0{p.classId+1}</span><h3>{p.name}</h3><strong>{formatUsdc(assets)}</strong><div className="pool-utilization"><span style={{width:ratio+"%"}}/></div><small><span>{ratio}% reserved</span><span>{formatUsdc(assets-reserved)} free</span></small></div>;
       }):<div className="pool-empty"><EmptyState title="No verified pool balances" text="Deploy the Base Sepolia pool contract and run the reconciler before allocating capital."/></div>}</div>
-      <div className="form-layout" style={{gridTemplateColumns:"minmax(0,1fr) 350px"}}>
+      <div className="form-layout pool-form-layout">
         <div className="panel form-panel">
           <div className="form-block-title"><span>01</span> Capital allocation</div>
           <div className="field"><label htmlFor="pool-risk">RISK POOL</label><select id="pool-risk" value={risk} onChange={e=>setRisk(Number(e.target.value))}>{coverages.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-          <div className="field"><label htmlFor="pool-amount">TEST USDC TO DEPOSIT</label><input id="pool-amount" type="number" className="input" min={1} max={100000} value={amount} onChange={e=>setAmount(Number(e.target.value))}/></div>
-          <div className="field-hint">Deposits mint non-transferable pro-rata accounting shares. Withdrawals cannot exceed unreserved capital. This product does not promise principal protection or guaranteed returns.</div>
-          <button className="primary-action" style={{marginTop:21}} disabled={busy||!ready} onClick={deposit}><CircleDollarSign size={15}/>{busy?"Waiting for wallet…":"Approve & deposit test USDC"}<ArrowUpRight size={14}/></button>
+          <div className="field"><label htmlFor="pool-amount">TEST USDC TO DEPOSIT</label><input id="pool-amount" type="number" inputMode="decimal" step="0.01" className="input" min={1} max={100000} value={amount} onChange={e=>setAmount(Number(e.target.value))} aria-describedby="pool-deposit-hint"/></div>
+          <div id="pool-deposit-hint" className="field-hint">Deposits mint non-transferable pro-rata accounting shares. Withdrawals cannot exceed unreserved capital. This product does not promise principal protection or guaranteed returns.</div>
+          {!wallet.address&&<button type="button" className="secondary-action pool-wallet-action" disabled={busy||wallet.busy} onClick={()=>void wallet.connect().catch(()=>undefined)}><CircleDollarSign size={15}/>{wallet.busy?"Opening wallet…":"Connect wallet to continue"}</button>}
+          {wallet.address&&wallet.chainId!==84532&&<button type="button" className="secondary-action pool-wallet-action" disabled={busy||wallet.busy} onClick={()=>void wallet.switchToBase().catch(()=>undefined)}>Switch to Base Sepolia <ArrowUpRight size={14}/></button>}
+          {!ready&&<div className="field-hint pool-readiness">Pool balances are not confirmed yet; deposits remain disabled until Base Sepolia synchronization is healthy.</div>}
+          <button type="button" className="primary-action pool-action" disabled={busy||!ready||!wallet.address||wallet.chainId!==84532} onClick={deposit}><CircleDollarSign size={15}/>{busy?"Waiting for wallet…":"Approve & deposit test USDC"}<ArrowUpRight size={14}/></button>
         </div>
         <aside className="panel form-panel">
           <div className="form-block-title"><span>02</span> Exit position</div>
           <div className="field"><label htmlFor="share-amount">SHARES TO WITHDRAW (RAW INTEGER)</label><input className="input" id="share-amount" placeholder="Exact shares" value={withdrawShares} onChange={e=>setWithdrawShares(e.target.value)}/><span className="field-hint">Share values are raw on-chain units. A future audited release will display them with precision-aware conversions.</span></div>
-          <button className="secondary-action" disabled={busy||!ready} onClick={withdraw}>Request withdrawal <ArrowUpRight size={14}/></button>
-          <div className="feedback" style={{marginTop:20}}><Info size={15}/> Withdrawing while policies are active may be limited by reserved liabilities.</div>
+          <button type="button" className="secondary-action" disabled={busy||!ready||!wallet.address||wallet.chainId!==84532} onClick={withdraw}>Request withdrawal <ArrowUpRight size={14}/></button>
+          <div className="feedback pool-withdraw-note"><Info size={15}/> Withdrawing while policies are active may be limited by reserved liabilities.</div>
         </aside>
       </div>
       {error&&<div className="feedback feedback-error">{error}</div>}
+      {wallet.error&&<div className="feedback feedback-error" role="alert">{wallet.error}</div>}
       {tx&&<div className="feedback"><CheckCircle2 size={15}/> Transaction confirmed. <a href={"https://sepolia.basescan.org/tx/"+tx} target="_blank" rel="noreferrer">Inspect on Base Sepolia ↗</a></div>}
     </>
   );

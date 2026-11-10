@@ -14,13 +14,13 @@ export function WalletButton({ dark = false }: { dark?: boolean }) {
   };
   return (
     <div className={"wallet-wrap " + (dark ? "wallet-on-dark" : "")}>
-      <button type="button" className="wallet-main" onClick={() => wallet.address ? setOpen(!open) : action(wallet.connect)}>
+      <button type="button" className="wallet-main" aria-haspopup={wallet.address ? "dialog" : undefined} aria-expanded={wallet.address ? open : undefined} onClick={() => wallet.address ? setOpen(!open) : action(wallet.connect)}>
         <Wallet size={16} strokeWidth={1.8}/>
         <span>{wallet.address ? compactAddress(wallet.address) : wallet.busy ? "Connecting" : "Connect wallet"}</span>
         {wallet.address && <ChevronDown size={14}/>}
       </button>
       {open && wallet.address && (
-        <div className="wallet-popover">
+        <div className="wallet-popover" role="dialog" aria-label="Wallet session">
           <div className="wallet-popover-header">WALLET SESSION</div>
           <div className="wallet-ident">{compactAddress(wallet.address)}</div>
           <div className="wallet-status"><span className={wallet.chainId === 84532 ? "dot-network" : "dot-orange"}/>
@@ -34,7 +34,7 @@ export function WalletButton({ dark = false }: { dark?: boolean }) {
           {feedback && <p className="wallet-feedback">{feedback}</p>}
         </div>
       )}
-      {feedback && !open && <div className="wallet-flash">{feedback}</div>}
+      {feedback && !open && <div className="wallet-flash" role="status">{feedback}</div>}
     </div>
   );
 }

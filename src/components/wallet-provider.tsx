@@ -23,7 +23,7 @@ declare global {
 }
 
 function injected() {
-  if (typeof window === "undefined" || !window.ethereum) throw new Error("Install or enable an injected EIP-1193 wallet (such as MetaMask).");
+  if (typeof window === "undefined" || !window.ethereum) throw new Error("No injected EIP-1193 wallet was detected. On mobile, open COVRA in your wallet's in-app browser or enable an injected wallet browser extension.");
   return window.ethereum;
 }
 
@@ -111,20 +111,29 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const switchToBase = useCallback(async () => {
-    const provider = injected();
+    setBusy(true); setError("");
     try {
+      const provider = injected();
       await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x14a34" }] });
     } catch (e: unknown) {
-      if ((e as { code?: number }).code !== 4902) throw e;
-      await provider.request({
-        method: "wallet_addEthereumChain",
-        params: [{
-          chainId: "0x14a34", chainName: "Base Sepolia",
-          nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-          rpcUrls: ["https://sepolia.base.org"],
-          blockExplorerUrls: ["https://sepolia.basescan.org"],
-        }],
-      });
+      try {
+        const provider = injected();
+        if ((e as { code?: number }).code !== 4902) throw e;
+        await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: "0x14a34", chainName: "Base Sepolia",
+            nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://sepolia.base.org"],
+            blockExplorerUrls: ["https://sepolia.basescan.org"],
+          }],
+        });
+      } catch (nested) {
+        setError(nested instanceof Error ? nested.message : "Unable to switch the wallet to Base Sepolia.");
+        throw nested;
+      }
+    } finally {
+      setBusy(false);
     }
     setChainId(84532);
   }, []);
