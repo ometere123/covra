@@ -384,6 +384,25 @@ em { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-styl
 .pool-readiness { margin-top: 14px; }
 .pool-action { margin-top: 21px; }
 .pool-withdraw-note { margin-top: 20px; }
+.withdrawal-panel { min-width: 0; }
+.withdrawal-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 17px 0 21px; border-top: 1px solid var(--stone); border-left: 1px solid var(--stone); }
+.withdrawal-metric { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px 13px; border-right: 1px solid var(--stone); border-bottom: 1px solid var(--stone); }
+.withdrawal-metric span { color: var(--muted); font-size: 9px; line-height: 1.45; text-transform: uppercase; letter-spacing: .08em; }
+.withdrawal-metric strong { min-width: 0; color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 400; overflow-wrap: anywhere; }
+.withdrawal-metric-emphasis { background: var(--ultra-soft); }
+.amount-action-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; }
+.amount-action-row .input { min-width: 0; }
+.max-action { min-width: 55px; padding-inline: 13px; }
+.withdrawal-validation { margin-top: 7px; color: var(--oxide-dark); }
+.withdrawal-status { display: block; margin-top: 14px; overflow-wrap: anywhere; }
+.withdrawal-preview { margin-top: 17px; padding: 15px; border: 1px solid #c6d2ea; background: var(--ultra-soft); }
+.withdrawal-preview p { margin: 10px 0 14px; color: var(--ink-soft); font-size: 11px; line-height: 1.65; }
+.withdrawal-preview-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; margin-bottom: 13px; padding-top: 11px; border-top: 1px solid #c6d2ea; font-size: 11px; }
+.withdrawal-preview-grid span { color: var(--muted); }
+.withdrawal-preview-grid strong { color: var(--ink); font-weight: 600; text-align: right; }
+.withdrawal-wallet-action, .withdrawal-submit { width: 100%; margin-top: 18px; }
+.withdrawal-reserve-note { display: flex; align-items: flex-start; gap: 8px; }
+.withdrawal-reserve-note svg, .pool-withdraw-note svg { flex: 0 0 auto; margin-top: 2px; }
 
 /* Developer and underwriting pages */
 .sub-page { background: var(--porcelain); min-height: 100vh; }
@@ -524,6 +543,8 @@ em { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-styl
   .field-grid { grid-template-columns: 1fr; gap: 0; }
   .form-panel { padding: 20px; }
   .form-panel .primary-action, .form-panel .secondary-action { width: 100%; min-height: 46px; }
+  .withdrawal-metrics { grid-template-columns: 1fr; }
+  .amount-action-row { grid-template-columns: minmax(0, 1fr) 72px; }
   .feature-callout { align-items: flex-start; flex-direction: column; }
   .sub-header { height: 74px; }
   .sub-header nav { display: none; }

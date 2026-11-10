@@ -61,16 +61,21 @@ test("all primary routes remain usable across supported viewport widths", async 
       if (route === "/app/pools") {
         const risk = page.locator("#pool-risk");
         const amount = page.locator("#pool-amount");
-        const withdrawal = page.locator("#share-amount");
+        const withdrawal = page.locator("#withdraw-amount");
+        const withdrawalRisk = page.locator("#withdraw-risk");
         await expect(risk).toBeVisible();
         await expect(amount).toBeVisible();
         await expect(withdrawal).toBeVisible();
+        await expect(withdrawalRisk).toBeVisible();
         await risk.selectOption("1");
+        await withdrawalRisk.selectOption("2");
         await amount.fill("100.00");
-        await withdrawal.fill("1");
+        await withdrawal.fill("1.25");
         await expect(amount).toHaveValue("100.00");
-        await expect(withdrawal).toHaveValue("1");
-        for (const name of [/Approve & deposit test USDC/i, /Request withdrawal/i]) {
+        await expect(withdrawal).toHaveValue("1.25");
+        await expect(page.getByText("Owned shares", { exact: true })).toBeVisible();
+        await expect(page.getByRole("button", { name: "Max", exact: true })).toBeVisible();
+        for (const name of [/Approve & deposit test USDC/i, /Confirm & request withdrawal/i]) {
           const action = page.getByRole("button", { name });
           await expect(action).toBeVisible();
           const minHeight = await action.evaluate(element => Number.parseFloat(getComputedStyle(element).minHeight));
@@ -95,4 +100,31 @@ test("mobile navigation and wallet-unavailable guidance are usable", async ({ pa
   await page.goto("/app/pools", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Connect wallet", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: /EIP-1193|in-app browser|wallet/i })).toBeVisible();
+});
+
+test("wrong-network wallet rejection is explained without claiming a connection", async ({ page }) => {
+  await page.addInitScript(() => {
+    const provider = {
+      request: async ({ method }: { method: string }) => {
+        if (method === "eth_accounts") return ["0x1111111111111111111111111111111111111111"];
+        if (method === "eth_chainId") return "0x1";
+        if (method === "wallet_switchEthereumChain") {
+          throw Object.assign(new Error("User rejected the request"), { code: 4001 });
+        }
+        if (method === "wallet_addEthereumChain") {
+          throw Object.assign(new Error("User rejected the request"), { code: 4001 });
+        }
+        return null;
+      },
+      on: () => undefined,
+      removeListener: () => undefined,
+    };
+    Object.defineProperty(window, "ethereum", { configurable: true, value: provider });
+  });
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto("/app/pools", { waitUntil: "networkidle" });
+  const switchButtons = page.getByRole("button", { name: "Switch to Base Sepolia", exact: true });
+  await expect(switchButtons.first()).toBeVisible();
+  await switchButtons.first().click();
+  await expect(page.getByRole("alert").filter({ hasText: /rejected/i }).first()).toBeVisible();
 });
