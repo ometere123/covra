@@ -1,0 +1,309 @@
+{
+  "status": "ADJUDICATED_WAITING_APPEAL_WINDOW",
+  "chainId": 84532,
+  "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+  "adjudicator": "0xaefc8672272392310a2ea102787e28bb1f34e1d3",
+  "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+  "taskId": "covra-service-failure-pilot-2026-11-11-01",
+  "taskHash": "0x97ea456fd40203a4ac6424955312ec10aa200ceba0a855bf01022c7d408b0f74",
+  "deadlineIso": "2026-11-11T09:25:00.000Z",
+  "demoTokenConfigured": true,
+  "deploymentUrl": "https://covra-1lr9z0lgc-delealufejoel-4184s-projects.vercel.app",
+  "updatedAt": "2026-11-11T09:46:05.089Z",
+  "observerCompleted": true,
+  "claim": {
+    "claim": {
+      "id": "71253fab-cce9-452f-ac02-e84babfb8968",
+      "status": "AWAITING_EVIDENCE",
+      "policy_id": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+      "created_at": "2026-11-11T09:27:31.820Z"
+    },
+    "onchainClaimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+    "evidenceDigest": null,
+    "next": "Give the claim ID to the approved evidence issuer. Resume the claim after the observation has been bound.",
+    "settlementStatus": "NO_PAYOUT_AUTHORIZED"
+  },
+  "observationCommit": "e0b235c732b7afa60c37cfc719d26c477945ad14",
+  "observationUrl": "https://raw.githubusercontent.com/ometere123/covra/e0b235c732b7afa60c37cfc719d26c477945ad14/testbed/class0/observations/class0-covra-service-failure-pilot-2026-11-11-01.json",
+  "evidence": {
+    "observationId": "class0-covra-service-failure-pilot-2026-11-11-01",
+    "evidenceDigest": "0xd8a2318604d39bd6bd39391cf020455e283e6ec00bea797a51d6a3de7b517fff",
+    "issuerWallet": "0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5",
+    "publicUrl": "https://covra-lyart.vercel.app/api/evidence-issuer/observations/class0-covra-service-failure-pilot-2026-11-11-01",
+    "observationMode": "OBSERVED_PUBLIC",
+    "expiresAt": 1803893780,
+    "originUrl": "https://raw.githubusercontent.com/ometere123/covra/e0b235c732b7afa60c37cfc719d26c477945ad14/testbed/class0/observations/class0-covra-service-failure-pilot-2026-11-11-01.json",
+    "claimBound": true
+  },
+  "baseLock": {
+    "chainId": 84532,
+    "transactionHash": "0x561ad6d0efbcf681953fb22845f22e00a6b65ae809c27b2132b9e5abf394df08",
+    "blockNumber": "57340019",
+    "blockHash": "0x1aef7f532c9f8138d6e3899db73c0a30297da6f55447933a393a7f95504f164e",
+    "gasUsed": "152374",
+    "claimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+    "evidenceDigest": "0xd8a2318604d39bd6bd39391cf020455e283e6ec00bea797a51d6a3de7b517fff",
+    "lock": {
+      "claimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+      "evidenceDigest": "0xd8a2318604d39bd6bd39391cf020455e283e6ec00bea797a51d6a3de7b517fff",
+      "openedAt": "1794389872",
+      "revision": 0,
+      "rosterVersion": "1"
+    }
+  },
+  "indexerAfterLock": {
+    "status": 200,
+    "body": {
+      "indexed": 0,
+      "scanned": 0,
+      "fromBlock": "57342158",
+      "throughBlock": "57342438",
+      "caughtUp": true,
+      "replayOnly": false,
+      "confirmations": 12,
+      "followups": {
+        "checked": 0,
+        "completed": 0,
+        "waiting": 0,
+        "failed": 0
+      }
+    }
+  },
+  "bradburySubmit": {
+    "transactionHash": "0x92cb881154e1adc3a90795a63cc8f786ecf2df10b30bee95e29e62f9e02af84a",
+    "feeDeposit": "100000000000010352",
+    "status": "FINALIZED",
+    "executionResult": "FINISHED_WITH_RETURN",
+    "functionName": "submit_case",
+    "receipt": {
+      "observedAt": "1794390293",
+      "sender": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "recipient": "0xaeFC8672272392310A2eA102787e28bB1f34e1D3",
+      "initialRotations": "3",
+      "txSlot": "2",
+      "createdTimestamp": "1794389890",
+      "lastVoteTimestamp": "1794389911",
+      "randomSeed": "0xe464828e4942b4af2bb51b22e8bc658c4d38e20b307538968d7b05fe3f6d4fb7",
+      "result": 1,
+      "txExecutionHash": "0x384b766909eb5c794e940e53e1b84d587d743e79e035b9b5bcd79e4f7c22401c",
+      "txCalldata": "0xf9041bb9041716005c7375626d69745f6361736504617267736d940430786339626130393065333730366438396434336661613163646536616665306362326431623063623936316366306439313035303733616464656131323732323394043078383838626332363264633235316364613634326436383433613364363965393464343033383731613838656538653537306330346636633462653765616663649404307863396261303930653337303664383964343366616131636465366166653063623264316230636239363163663064393130353037336164646561313237323233d402307861353834306536356131353032316438623136343864423130313736633034383131663037383733a40237313235336661622d636365392d343532662d616330322d653834626162666238393638019404307863326334336230666635383537323535383765346161303438653832346139373961646331363730383632386361323366333563623363346364636536353534c4187b22636f766572616765436c617373223a302c2265766964656e6365497373756572486f7374223a22636f7672612d6c796172742e76657263656c2e617070222c227265666572656e636548617368223a22307839376561343536666434303230336134616336343234393535333132656331306161323030636562613061383535626630313032326337643430386230663734222c2273746174656d656e74223a2241207369676e6564207075626c696320746573746e6574207461736b206d7573742064656c697665722069747320696d6d757461626c65204a534f4e206172746966616374206265666f7265207468652066726f7a656e2055544320646561646c696e653b2061206f6e652d5553444320746573746e6574206163636f756e74696e672070656e616c7479206973207265636f72646564206f6e6c7920696620697420697320616273656e742e222c227375626a656374223a22636f7672612d736572766963652d6661696c7572652d70696c6f742d323032362d31312d31312d3031227d9404307862353933373566663532343639353465363561313533636163303066346130373164386438366130356633373736383335363033626131666432646164306165840768747470733a2f2f636f7672612d6c796172742e76657263656c2e6170702f6170692f65766964656e63652d6973737565722f6f62736572766174696f6e732f636c617373302d636f7672612d736572766963652d6661696c7572652d70696c6f742d323032362d31312d31312d30319404307864386132333138363034643339626436626433393339316366303230343535653238336536656330306265613739376135316436613364653762353137666666c401323032362d31312d31315430393a32353a30302e3030305aa10600",
+      "eqBlocksOutputs": "0x0e076e645f6f75747305",
+      "messages": [],
+      "queueType": 0,
+      "queuePosition": "0",
+      "activator": "0x9b925f790500ab245F0a7ce67Eb21D951eD9a80d",
+      "lastLeader": "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2",
+      "status": 7,
+      "txId": "0x92cb881154e1adc3a90795a63cc8f786ecf2df10b30bee95e29e62f9e02af84a",
+      "readStateBlockRange": {
+        "activationBlock": "314792",
+        "processingBlock": "314792",
+        "proposalBlock": "314793"
+      },
+      "numOfRounds": "0",
+      "lastRound": {
+        "round": "0",
+        "leaderIndex": "1",
+        "votesCommitted": "5",
+        "votesRevealed": "5",
+        "appealBond": "0",
+        "rotationsLeft": "3",
+        "result": 1,
+        "validatorsCount": "5",
+        "roundValidators": [
+          "0x2f33669F12F93e204ccf01311419fDb80a07903d",
+          "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2",
+          "0x2afe96a5f3d9f2977f9131AE1B99b5F99e5FDee8",
+          "0x140457FB2EAb027161A6ccDB378544DCe3Ea3A1D",
+          "0x7d9e5882155a5fb1cb5d4B15135bF5CE7358D9e8"
+        ],
+        "validatorVotes": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "validatorVotesHash": [
+          "0x1d98ea26220cbf5229879dbdc55946bd718f5c9f8fe789b1288f4bfdc3d8819c",
+          "0x24e6b0d47d2d57cd07d3f5f744df6015b2b40d40c9bef951fae27450a846cc8d",
+          "0x5cd31a5f8e64763835dcf1f31d15de7464d1bca3da92f0a4f2cbb3d31a38d196",
+          "0x15820600bb7a4d5d2c2156746bc6979b72f7cabe128da7f5edd19ed3b5697c70",
+          "0x35b2553be82ee60dfaf89a660de0c58ddfc0351a5526fbff8af4fa67b5022631"
+        ],
+        "validatorResultHash": [
+          "0x6c1460a0e7c5f61a3a6740041c6497853191e1146e35d7af7006af0ebd7ee6fb",
+          "0x6c1460a0e7c5f61a3a6740041c6497853191e1146e35d7af7006af0ebd7ee6fb",
+          "0x6c1460a0e7c5f61a3a6740041c6497853191e1146e35d7af7006af0ebd7ee6fb",
+          "0x6c1460a0e7c5f61a3a6740041c6497853191e1146e35d7af7006af0ebd7ee6fb",
+          "0x6c1460a0e7c5f61a3a6740041c6497853191e1146e35d7af7006af0ebd7ee6fb"
+        ],
+        "validatorVotesName": [
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN"
+        ]
+      },
+      "consumedValidatorsCount": "5",
+      "numOfInitialValidators": "5",
+      "txExecutionResult": 1,
+      "consumedValidators": [
+        "0x2f33669F12F93e204ccf01311419fDb80a07903d",
+        "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2",
+        "0x2afe96a5f3d9f2977f9131AE1B99b5F99e5FDee8",
+        "0x140457FB2EAb027161A6ccDB378544DCe3Ea3A1D",
+        "0x7d9e5882155a5fb1cb5d4B15135bF5CE7358D9e8"
+      ],
+      "txData": "0xf9041bb9041716005c7375626d69745f6361736504617267736d940430786339626130393065333730366438396434336661613163646536616665306362326431623063623936316366306439313035303733616464656131323732323394043078383838626332363264633235316364613634326436383433613364363965393464343033383731613838656538653537306330346636633462653765616663649404307863396261303930653337303664383964343366616131636465366166653063623264316230636239363163663064393130353037336164646561313237323233d402307861353834306536356131353032316438623136343864423130313736633034383131663037383733a40237313235336661622d636365392d343532662d616330322d653834626162666238393638019404307863326334336230666635383537323535383765346161303438653832346139373961646331363730383632386361323366333563623363346364636536353534c4187b22636f766572616765436c617373223a302c2265766964656e6365497373756572486f7374223a22636f7672612d6c796172742e76657263656c2e617070222c227265666572656e636548617368223a22307839376561343536666434303230336134616336343234393535333132656331306161323030636562613061383535626630313032326337643430386230663734222c2273746174656d656e74223a2241207369676e6564207075626c696320746573746e6574207461736b206d7573742064656c697665722069747320696d6d757461626c65204a534f4e206172746966616374206265666f7265207468652066726f7a656e2055544320646561646c696e653b2061206f6e652d5553444320746573746e6574206163636f756e74696e672070656e616c7479206973207265636f72646564206f6e6c7920696620697420697320616273656e742e222c227375626a656374223a22636f7672612d736572766963652d6661696c7572652d70696c6f742d323032362d31312d31312d3031227d9404307862353933373566663532343639353465363561313533636163303066346130373164386438366130356633373736383335363033626131666432646164306165840768747470733a2f2f636f7672612d6c796172742e76657263656c2e6170702f6170692f65766964656e63652d6973737565722f6f62736572766174696f6e732f636c617373302d636f7672612d736572766963652d6661696c7572652d70696c6f742d323032362d31312d31312d30319404307864386132333138363034643339626436626433393339316366303230343535653238336536656330306265613739376135316436613364653762353137666666c401323032362d31312d31315430393a32353a30302e3030305aa10600",
+      "txDataDecoded": {
+        "callData": {},
+        "leaderOnly": false,
+        "type": "call"
+      },
+      "currentTimestamp": "1794390293",
+      "statusName": "FINALIZED",
+      "lifecycle": {
+        "state": "finalized",
+        "outcome": "accepted"
+      },
+      "resultName": "MAJORITY_AGREE",
+      "txExecutionResultName": "FINISHED_WITH_RETURN"
+    }
+  },
+  "bradburyCase": {
+    "appeal_used": false,
+    "citations": "source_provenance states COVRA controls repository, workflow and task observer; facts.operator_independence is NOT_VERIFIED.",
+    "claim_id": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+    "claimed_bps": 100,
+    "decided_at": 1794390077,
+    "event_time": "2026-11-11T09:25:00.000Z",
+    "evidence_hash": "0xd8a2318604d39bd6bd39391cf020455e283e6ec00bea797a51d6a3de7b517fff",
+    "finalized_at": 0,
+    "id": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+    "insured_wallet": "0xa5840e65a15021d8b1648db10176c04811f07873",
+    "policy_id": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+    "reason": "Self-controlled source with unverified operator independence; claimant-reported failure lacks independent attestation.",
+    "revision": 0,
+    "risk": 0,
+    "risk_spec": {
+      "coverageClass": 0,
+      "evidenceIssuerHost": "covra-lyart.vercel.app",
+      "referenceHash": "0x97ea456fd40203a4ac6424955312ec10aa200ceba0a855bf01022c7d408b0f74",
+      "statement": "A signed public testnet task must deliver its immutable JSON artifact before the frozen UTC deadline; a one-USDC testnet accounting penalty is recorded only if it is absent.",
+      "subject": "covra-service-failure-pilot-2026-11-11-01"
+    },
+    "risk_spec_hash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae",
+    "severity": 0,
+    "source": "https://covra-lyart.vercel.app/api/evidence-issuer/observations/class0-covra-service-failure-pilot-2026-11-11-01",
+    "state": "DECIDED",
+    "submitter": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "terms_hash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+    "verdict": "INSUFFICIENT_EVIDENCE"
+  },
+  "bradburyAdjudicate": {
+    "transactionHash": "0x9d592885d77fda8215bcafcc304e6611edcda27511838cd09fe04801dd0cc597",
+    "feeDeposit": "100000000000010352",
+    "status": "FINALIZED",
+    "executionResult": "FINISHED_WITH_RETURN",
+    "functionName": "adjudicate",
+    "receipt": {
+      "observedAt": "1794390293",
+      "sender": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "recipient": "0xaeFC8672272392310A2eA102787e28bB1f34e1D3",
+      "initialRotations": "3",
+      "txSlot": "3",
+      "createdTimestamp": "1794390077",
+      "lastVoteTimestamp": "1794390229",
+      "randomSeed": "0x2221251be7fc94bae2e458daa5800c60df181234b4d72ed0ef0d9ceb67c9f08d",
+      "result": 1,
+      "txExecutionHash": "0x3c8e999929dbda99934353b95e2365a07f93e1e04657e459f7e05f357fa6348a",
+      "txCalldata": "0xf85ab85716005461646a7564696361746504617267730d940430786339626130393065333730366438396434336661613163646536616665306362326431623063623936316366306439313035303733616464656131323732323300",
+      "eqBlocksOutputs": "0x0e076e645f6f7574730d93130026096369746174696f6e73e407736f757263655f70726f76656e616e63652073746174657320434f56524120636f6e74726f6c73207265706f7369746f72792c20776f726b666c6f7720616e64207461736b206f627365727665723b2066616374732e6f70657261746f725f696e646570656e64656e6365206973204e4f545f56455249464945442e06726561736f6eb40753656c662d636f6e74726f6c6c656420736f75726365207769746820756e7665726966696564206f70657261746f7220696e646570656e64656e63653b20636c61696d616e742d7265706f72746564206661696c757265206c61636b7320696e646570656e64656e74206174746573746174696f6e2e087365766572697479010776657264696374ac01494e53554646494349454e545f45564944454e4345",
+      "messages": [],
+      "queueType": 0,
+      "queuePosition": "0",
+      "activator": "0x140457FB2EAb027161A6ccDB378544DCe3Ea3A1D",
+      "lastLeader": "0xA003E629B6156De5A61A67f9e767602442b66A7A",
+      "status": 7,
+      "txId": "0x9d592885d77fda8215bcafcc304e6611edcda27511838cd09fe04801dd0cc597",
+      "readStateBlockRange": {
+        "activationBlock": "314810",
+        "processingBlock": "314810",
+        "proposalBlock": "314829"
+      },
+      "numOfRounds": "0",
+      "lastRound": {
+        "round": "0",
+        "leaderIndex": "3",
+        "votesCommitted": "5",
+        "votesRevealed": "5",
+        "appealBond": "0",
+        "rotationsLeft": "3",
+        "result": 1,
+        "validatorsCount": "5",
+        "roundValidators": [
+          "0x4E2aa9efBF40E9f9d4F944407c062e1DBa9c013D",
+          "0x09c066924fbB6918154a853C2e9Db316a3100939",
+          "0x7d9e5882155a5fb1cb5d4B15135bF5CE7358D9e8",
+          "0xA003E629B6156De5A61A67f9e767602442b66A7A",
+          "0x854967Dbe3B5eb71760d4b4C49C6936d89198427"
+        ],
+        "validatorVotes": [
+          1,
+          1,
+          3,
+          4,
+          1
+        ],
+        "validatorVotesHash": [
+          "0x11bb0b89ec24f7b99fcff956cdae44e37a4a322aa989b3bc7af27a518551ffe0",
+          "0x8bb9288996ef943d0ffc4fc0f82cf89f8d686da5080b57ea8c8dc92f4720abc5",
+          "0x023b167ce32332762f2034d498d0fde1936655a16e40e967afe05702eec9d5f1",
+          "0xef08494e5de0d7993dec03e03e4676e4377a7dbb047cde48b01e8716d8a2a8c0",
+          "0xa5160be5a07cc61a712a604fc21ba7f938c703d1c568beaefabb46001cef5f9b"
+        ],
+        "validatorResultHash": [
+          "0xdab98946dbd9e73d50ddd7a42013287ea88f4a09c874f21cdbd307c1cb7e9bf4",
+          "0xdab98946dbd9e73d50ddd7a42013287ea88f4a09c874f21cdbd307c1cb7e9bf4",
+          "0x4c9a9c3279e8d4a194e8d878693735655f5d945abea993c197b16be147cc0036",
+          "0xae8a24b70d66e79b9b8fe297e25a610e2d60631fd4e6836d5f82ee18696d51bb",
+          "0xdab98946dbd9e73d50ddd7a42013287ea88f4a09c874f21cdbd307c1cb7e9bf4"
+        ],
+        "validatorVotesName": [
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "TIMEOUT",
+          "NONDET_DISAGREE",
+          "FINISHED_WITH_RETURN"
+        ]
+      },
+      "consumedValidatorsCount": "5",
+      "numOfInitialValidators": "5",
+      "txExecutionResult": 1,
+      "consumedValidators": [
+        "0x4E2aa9efBF40E9f9d4F944407c062e1DBa9c013D",
+        "0x09c066924fbB6918154a853C2e9Db316a3100939",
+        "0x7d9e5882155a5fb1cb5d4B15135bF5CE7358D9e8",
+        "0xA003E629B6156De5A61A67f9e767602442b66A7A",
+        "0x854967Dbe3B5eb71760d4b4C49C6936d89198427"
+      ],
+      "txData": "0xf85ab85716005461646a7564696361746504617267730d940430786339626130393065333730366438396434336661613163646536616665306362326431623063623936316366306439313035303733616464656131323732323300",
+      "txDataDecoded": {
+        "callData": {},
+        "leaderOnly": false,
+        "type": "call"
+      },
+      "currentTimestamp": "1794390293",
+      "statusName": "FINALIZED",
+      "lifecycle": {
+        "state": "finalized",
+        "outcome": "accepted"
+      },
+      "resultName": "MAJORITY_AGREE",
+      "txExecutionResultName": "FINISHED_WITH_RETURN"
+    }
+  },
+  "earliestFinalizationAt": "2026-11-14T09:41:17.000Z"
+}
