@@ -1,0 +1,27 @@
+name: COVRA class0 controlled testbed observer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the signed task agreement
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wait for the frozen deadline and observe the task
+        run: node scripts/class0-observe.mjs --wait --agreement testbed/class0/task-agreement.json
+      - name: Publish the public observation record
+        run: |
+          git config user.name "covra-testbed-observer[bot]"
+          git config user.email "covra-testbed-observer[bot]@users.noreply.github.com"
+          git add testbed/class0/observations
+          git commit -m "Record class0 controlled testbed observation" || true
+          git push
