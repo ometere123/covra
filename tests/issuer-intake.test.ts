@@ -22,7 +22,7 @@ it("binds the real signed envelope in the intake transaction and keeps it on rep
   const key = `0x${"12".repeat(32)}` as const;
   const wallet = privateKeyToAccount(key).address;
   const host = "issuer.example.org";
-  const sourceUrl = "https://source.example.org/incident.json";
+  const sourceUrl = "https://raw.githubusercontent.com/ometere123/covra/e0b235c732b7afa60c37cfc719d26c477945ad14/testbed/class0/observations/fixture.json";
   const claimId = "90567594-7fb1-4209-a1f9-71cd4babf0a0";
   const observationId = "isolated-incident";
   const referenceHash = sha256Digest("fixture");
@@ -44,7 +44,7 @@ it("binds the real signed envelope in the intake transaction and keeps it on rep
     });
     const request = new EventEmitter();
     return Object.assign(request, { end() {
-      const response = Object.assign(new EventEmitter(), { statusCode: 200, headers: { "content-type": "application/json" } });
+      const response = Object.assign(new EventEmitter(), { statusCode: 200, headers: { "content-type": "text/plain; charset=utf-8" } });
       receive(response);
       response.emit("data", Buffer.from(JSON.stringify(observation)));
       response.emit("end");

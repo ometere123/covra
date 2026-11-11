@@ -110,7 +110,12 @@ async function retrieveObservation(url: URL) {
     request.end();
   });
   const contentType = String(response.headers["content-type"] || "").toLowerCase();
-  if (!contentType.includes("json")) throw new Error("Observation source must return JSON");
+  // GitHub's immutable raw endpoint serves valid `.json` bytes as
+  // `text/plain`. Permit that one public content host only after the same
+  // strict JSON/schema parse below; arbitrary text sources remain rejected.
+  const immutableGithubJson = url.hostname.toLowerCase() === "raw.githubusercontent.com" &&
+    contentType.split(";", 1)[0].trim() === "text/plain";
+  if (!contentType.includes("json") && !immutableGithubJson) throw new Error("Observation source must return JSON");
   const declaredLength = Number(response.headers["content-length"] || 0);
   if (declaredLength > MAX_SOURCE_BYTES) throw new Error("Observation source response is too large");
   const bytes = response.bytes;
