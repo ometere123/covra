@@ -1,0 +1,56 @@
+{
+  "verifiedAt": "2026-11-11T08:26:00Z",
+  "network": "Base Sepolia",
+  "chainId": 84532,
+  "token": {
+    "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "symbol": "USDC",
+    "decimals": 6
+  },
+  "fundingWallet": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+  "balanceMicroUsdc": "105000000",
+  "balanceUsdc": "105",
+  "transfers": [
+    {
+      "transactionHash": "0x0f81f74cee8a34b1f984af6d8925b09c50bb58ca2d56ebea4f1cbcaff994573c",
+      "blockNumber": "57322047",
+      "blockHash": "0x915313e13e0b3ae5e1547061e95da3b4b775b44ece82444e7d26a7ec1db52434",
+      "status": "success",
+      "gasUsed": "57359",
+      "effectiveGasPriceWei": "6000000",
+      "from": "0xFd69A5D0b8330dC86e266304B3D1ABE3F57b9D09",
+      "to": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "amountMicroUsdc": "80000000",
+      "amountUsdc": "80",
+      "explorer": "https://sepolia.basescan.org/tx/0x0f81f74cee8a34b1f984af6d8925b09c50bb58ca2d56ebea4f1cbcaff994573c"
+    },
+    {
+      "transactionHash": "0xa13b1b503f3fa29e6ffc4a757503b4ad30b84d24fefe3fb58098221c1cdca435",
+      "blockNumber": "57322095",
+      "blockHash": "0xcd4a74c6e23b36c4830b36a8c3d768667439e647c6cbdbc71c20e01497795f01",
+      "status": "success",
+      "gasUsed": "45059",
+      "effectiveGasPriceWei": "6500000",
+      "from": "0xFaEc9cDC3Ef75713b48f46057b98ba04885e3391",
+      "to": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "amountMicroUsdc": "20000000",
+      "amountUsdc": "20",
+      "explorer": "https://sepolia.basescan.org/tx/0xa13b1b503f3fa29e6ffc4a757503b4ad30b84d24fefe3fb58098221c1cdca435"
+    },
+    {
+      "transactionHash": "0x6859db6489030ab4629d92243b88f0efa494c9769b63d0f2ef325e89274945b5",
+      "blockNumber": "57322458",
+      "blockHash": "0x580fd50675bbf5de333e232bd92f84e75cfe12c0e9b940cb8571bc7c9a492be4",
+      "status": "success",
+      "gasUsed": "45059",
+      "effectiveGasPriceWei": "6000000",
+      "from": "0xFd69A5D0b8330dC86e266304B3D1ABE3F57b9D09",
+      "to": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "amountMicroUsdc": "5000000",
+      "amountUsdc": "5",
+      "explorer": "https://sepolia.basescan.org/tx/0x6859db6489030ab4629d92243b88f0efa494c9769b63d0f2ef325e89274945b5"
+    }
+  ],
+  "totalTransferredMicroUsdc": "105000000",
+  "addressMatch": true
+}
