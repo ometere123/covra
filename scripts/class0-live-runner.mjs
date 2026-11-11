@@ -31,8 +31,8 @@ const save = (patch) => { Object.assign(state, patch, { updatedAt: new Date().to
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const cli = process.platform === "win32" ? (name) => `${name}.cmd` : (name) => name;
 function runCli(name, args, input) {
-  const result = spawnSync(cli(name), args, { cwd: process.cwd(), input, encoding: "utf8", maxBuffer: 4 * 1024 * 1024, windowsHide: true });
-  if (result.status !== 0) throw new Error(`${name} failed with exit ${result.status}`);
+  const result = spawnSync(cli(name), args, { cwd: process.cwd(), input, encoding: "utf8", maxBuffer: 4 * 1024 * 1024, windowsHide: true, shell: process.platform === "win32" });
+  if (result.status !== 0) throw new Error(`${name} failed with exit ${result.status ?? result.error?.code ?? "unknown"}`);
   return result.stdout || "";
 }
 const json = (value) => JSON.stringify(value, (_, entry) => typeof entry === "bigint" ? entry.toString() : entry);
