@@ -1,0 +1,116 @@
+{
+  "chainId": 84532,
+  "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "owner": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+  "coverageClass": 0,
+  "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+  "quote": {
+    "mode": "testnet-ready",
+    "coverageClass": 0,
+    "coverageUsd": 100,
+    "durationDays": 1,
+    "premiumUsd": 1,
+    "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+    "riskSpec": {
+      "coverageClass": 0,
+      "subject": "covra-service-failure-pilot-2026-11-11-01",
+      "referenceHash": "0x97ea456fd40203a4ac6424955312ec10aa200ceba0a855bf01022c7d408b0f74",
+      "statement": "A signed public testnet task must deliver its immutable JSON artifact before the frozen UTC deadline; a one-USDC testnet accounting penalty is recorded only if it is absent.",
+      "evidenceIssuerHost": "covra-lyart.vercel.app"
+    },
+    "quote": {
+      "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+      "insured": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "beneficiary": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "coverageClass": 0,
+      "premium": "1000000",
+      "limit": "100000000",
+      "startsAt": "1794388591",
+      "endsAt": "1794474991",
+      "claimDeadline": "1795684591",
+      "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+      "riskSpecHash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae",
+      "nonce": "265516072749703952866508937819757262666",
+      "quoteDeadline": "1794388291"
+    },
+    "signature": "0xe638fc6c7068d288ed7c28ba344a785772f4e858a82f35bbf065eb079acd60f72e05a29ecbb71e188a6dd0be08fbc2a9d135e035e0283acfc804505ff63968d61c",
+    "source": "Hosted /api/quotes after wallet authentication; deterministic testnet pricing only.",
+    "agreementCommit": "204dfc5a1c4f1ed20b98caab5e0e3a9a8c9c98d2"
+  },
+  "allocation": {
+    "depositMicroUsdc": "99000000",
+    "premiumMicroUsdc": "1000000",
+    "requiredMicroUsdc": "100000000"
+  },
+  "receipts": {
+    "fundingApproval": {
+      "hash": "0x8d210aa7e7c0d57f09f8e66621b25490b0db24bcfcc57406d9cf3403ccf092e0",
+      "status": "success",
+      "blockNumber": "57329604",
+      "blockHash": "0xf317a1a428c1f494e4cab08989d03c31af128e400633a9075e00814e87ccd6ab",
+      "gasUsed": "55449",
+      "effectiveGasPrice": "6000000",
+      "transactionIndex": 3
+    },
+    "deposit": {
+      "hash": "0x2e92c6def763b884f19a04234b77974ebf831be202291e9d416690f7fb7011c7",
+      "status": "success",
+      "blockNumber": "57329620",
+      "blockHash": "0xbc6a7a705c47f8ee2ef24597d4532317efbce183e53e7e5a9ceb69bc9b473c23",
+      "gasUsed": "149442",
+      "effectiveGasPrice": "6000000",
+      "transactionIndex": 2
+    },
+    "purchaseApproval": {
+      "hash": "0xe2f53b51e741d02700f0075b609ad8863f3f9c01442c7869699fa7f614c83921",
+      "status": "success",
+      "blockNumber": "57329637",
+      "blockHash": "0xf738cc84ee4f5736974390362f1c6137a9853715c0f6ff10dfb3d3701502718e",
+      "gasUsed": "55437",
+      "effectiveGasPrice": "6000000",
+      "transactionIndex": 3
+    },
+    "purchase": {
+      "hash": "0xd67322063ddf6f261a1a820c23371c058b53dcbf2d9e50b7e742e5088a007e4f",
+      "status": "success",
+      "blockNumber": "57329654",
+      "blockHash": "0x490bc48e690a382c80eba24a6f78237e292d879997465dd422996ff6f2c03893",
+      "gasUsed": "262885",
+      "effectiveGasPrice": "6000000",
+      "transactionIndex": 2
+    }
+  },
+  "postflight": {
+    "block": "57330633",
+    "usdcBalanceMicro": "5000000",
+    "pool": {
+      "assets": "100000000",
+      "reserved": "100000000",
+      "premiumsWritten": "1000000",
+      "paid": "0",
+      "totalShares": "99000000"
+    },
+    "shares": "99000000",
+    "policy": {
+      "insured": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "beneficiary": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "coverageClass": 0,
+      "state": 1,
+      "limit": "100000000",
+      "startsAt": "1794388591",
+      "endsAt": "1794474991",
+      "claimDeadline": "1795684591",
+      "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+      "riskSpecHash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae"
+    },
+    "assertions": {
+      "policyStateActive": true,
+      "premiumEnteredPool": true,
+      "reserveMatchesLimit": true,
+      "walletBalanceAfterPurchase": true
+    }
+  },
+  "status": "confirmed_recovered_after_local_recording_failure",
+  "note": "Approval, deposit and purchase receipts were recovered from Base Sepolia after the first recorder failed while serializing a viem tuple. No transaction was resubmitted."
+}

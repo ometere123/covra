@@ -1,0 +1,33 @@
+{
+  "mode": "testnet-ready",
+  "coverageClass": 0,
+  "coverageUsd": 100,
+  "durationDays": 1,
+  "premiumUsd": 1,
+  "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+  "riskSpec": {
+    "coverageClass": 0,
+    "subject": "covra-service-failure-pilot-2026-11-11-01",
+    "referenceHash": "0x97ea456fd40203a4ac6424955312ec10aa200ceba0a855bf01022c7d408b0f74",
+    "statement": "A signed public testnet task must deliver its immutable JSON artifact before the frozen UTC deadline; a one-USDC testnet accounting penalty is recorded only if it is absent.",
+    "evidenceIssuerHost": "covra-lyart.vercel.app"
+  },
+  "quote": {
+    "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+    "insured": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "beneficiary": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "coverageClass": 0,
+    "premium": "1000000",
+    "limit": "100000000",
+    "startsAt": "1794388591",
+    "endsAt": "1794474991",
+    "claimDeadline": "1795684591",
+    "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+    "riskSpecHash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae",
+    "nonce": "265516072749703952866508937819757262666",
+    "quoteDeadline": "1794388291"
+  },
+  "signature": "0xe638fc6c7068d288ed7c28ba344a785772f4e858a82f35bbf065eb079acd60f72e05a29ecbb71e188a6dd0be08fbc2a9d135e035e0283acfc804505ff63968d61c",
+  "source": "Hosted /api/quotes after wallet authentication; deterministic testnet pricing only.",
+  "agreementCommit": "204dfc598c66b3d25c5d221f29ff0d4c6cc269c2"
+}
