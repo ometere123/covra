@@ -305,5 +305,35 @@
       "txExecutionResultName": "FINISHED_WITH_RETURN"
     }
   },
-  "earliestFinalizationAt": "2026-11-14T09:41:17.000Z"
+  "earliestFinalizationAt": "2026-11-14T09:41:17.000Z",
+  "reconciliation": {
+    "script": "scripts/reconcile-class0-live.mjs",
+    "claimLedgerStatus": "DECIDED",
+    "baseLockTxHash": "0x561ad6d0efbcf681953fb22845f22e00a6b65ae809c27b2132b9e5abf394df08",
+    "bradburySubmitTxHash": "0x92cb881154e1adc3a90795a63cc8f786ecf2df10b30bee95e29e62f9e02af84a",
+    "bradburyDecisionTxHash": "0x9d592885d77fda8215bcafcc304e6611edcda27511838cd09fe04801dd0cc597",
+    "indexer": {
+      "status": 200,
+      "fromBlock": "57343650",
+      "throughBlock": "57346652",
+      "caughtUp": true,
+      "followupsFailed": 0,
+      "reconciliation": {
+        "head": "57346890",
+        "confirmedBlock": "57346878",
+        "policyChecks": 1,
+        "claimChecks": 1,
+        "mismatchCount": 0
+      }
+    }
+  },
+  "settlement": {
+    "status": "NOT_AUTHORIZED_INSUFFICIENT_EVIDENCE",
+    "appealSubmitted": false,
+    "operatorIndependence": "NOT_VERIFIED",
+    "negativeControls": [
+      { "operation": "settle with verdict 0", "result": "rejected", "error": "InvalidInput" },
+      { "operation": "settle denial with zero signatures", "result": "rejected", "error": "InvalidAttestation" }
+    ]
+  }
 }
