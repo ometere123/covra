@@ -1,5 +1,15 @@
 # Execution checkpoint
 
+## 2026-11-11 focused product verification
+
+The current production pool and Bradbury deployment were verified before this product change; no contract was redeployed. The landing schematic now verifies Base bytecode/pool reads on chain `84532` and a finalized `get_case_count` read through the Bradbury Phase 2 node before displaying `DEPLOYED`. It distinguishes `DEPLOYED / UNFUNDED`, unavailable verification, and claim-specific settlement prerequisites; environment-variable presence alone is not used as deployment proof.
+
+Capital history was reconstructed from the production `claim_chain_events` ledger and independently checked against Base Sepolia receipts and Circle USDC `Transfer` logs. The configured wallet deposited `5 USDC` into each of the five classes and later withdrew `5 USDC` from class 0, `3 + 2 USDC` from class 1, and `5 USDC` from classes 2–4. All eleven receipts were successful and paid the deployed pool or the configured wallet as expected. Exact hashes, blocks, shares, transfer deltas and final on-chain reads are in [base-capital-history-2026-11-11.json](deployments/base-capital-history-2026-11-11.json). At checked block `57187469`, the pool and all five share ledgers were zero; no current capital, policy or payout is claimed.
+
+The wallet-scoped `/api/activity` route now reads only `CapitalDeposited` and `CapitalWithdrawn` rows whose indexed `underwriter` matches the authenticated wallet session. It returns confirmed status, class, integer micro-USDC, shares, chain timestamp, block, and BaseScan link; unauthenticated requests receive `401`. Migration `012_capital_event_timestamps.sql` was applied to the authenticated `covra` Supabase production project after reconciling the CLI migration history with the already-applied 001–011 schema. The eleven verified event rows were backfilled with their Base block timestamps. The dashboard and Activity screen now merge these real rows with policy/claim records and show an empty/error state when none exist.
+
+This release is a product/read-model improvement only. No pool or adjudicator transaction was submitted. No policy purchase, claim, evidence observation, Bradbury adjudication, appeal, attestation quorum or settlement exists in the reconstructed ledger. The production app must continue to describe the system as testnet-only and show no funded lifecycle until those prerequisites have real receipts.
+
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
 ## 2026-11-06 settlement simulation

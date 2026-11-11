@@ -96,11 +96,19 @@ export async function POST(request: NextRequest) {
       logs.push(...await baseClient.getLogs({ address: contract, ...range }));
     }
     let indexed = 0;
+    const blockTimestamps = new Map<string, string | null>();
     for (const item of logs) {
       if (item.transactionHash === null || item.blockNumber === null || item.logIndex === null || item.blockHash === null) {
         throw halted("RPC returned a pending log inside the confirmed backfill range");
       }
       const transactionHash = item.transactionHash.toLowerCase();
+      const blockKey = String(item.blockNumber);
+      let blockTimestamp = blockTimestamps.get(blockKey);
+      if (blockTimestamp === undefined) {
+        const block = await baseClient.getBlock({ blockNumber: item.blockNumber });
+        blockTimestamp = block.timestamp === undefined ? null : new Date(Number(block.timestamp) * 1000).toISOString();
+        blockTimestamps.set(blockKey, blockTimestamp);
+      }
       let decoded: { eventName?: string; args?: unknown };
       try {
         decoded = decodeEventLog({ abi: poolsAbi, data: item.data, topics: item.topics }) as typeof decoded;
@@ -132,9 +140,9 @@ export async function POST(request: NextRequest) {
       const claimId = claimRows.length ? claimRows[0].id : null;
       const payload = serialized(args);
       const inserted = await sql`insert into claim_chain_events(
-        chain_id,tx_hash,log_index,claim_id,event_type,block_number,block_hash,payload
+        chain_id,tx_hash,log_index,claim_id,event_type,block_number,block_hash,block_timestamp,payload
       ) values(84532,${transactionHash},${Number(item.logIndex ?? 0)},${claimId},
-        ${eventName},${String(item.blockNumber)},${item.blockHash},${sql.json(JSON.parse(payload))})
+        ${eventName},${String(item.blockNumber)},${item.blockHash},${blockTimestamp},${sql.json(JSON.parse(payload))})
         on conflict do nothing returning tx_hash`;
       if (!inserted.length) return;
       indexed += 1;

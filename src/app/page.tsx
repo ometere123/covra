@@ -1,10 +1,11 @@
 import Link from "next/link";
 import {
   ArrowRight, ArrowUpRight, ShieldCheck, Activity, Bot, ArrowDownRight,
-  FileCheck2, Landmark, Network, Blocks, Radar, LockKeyhole, Sparkles, Globe2
+  FileCheck2, Landmark, Network, Blocks, Radar, LockKeyhole, Globe2
 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { WalletButton } from "@/components/wallet-button";
+import { ProtocolStateVisual } from "@/components/protocol-state-visual";
 import { coverages } from "@/lib/catalog";
 
 const symbols = [Bot, Activity, ShieldCheck, Blocks, Radar];
@@ -34,17 +35,7 @@ export default function Home() {
             <div className="hero-trust"><span><ShieldCheck size={15}/> Five risk classes</span><span><Network size={15}/> GenLayer consensus</span><span><Landmark size={15}/> Base USDC reserves</span></div>
           </div>
           <div className="hero-visual" aria-label="Protocol state schematic">
-            <div className="visual-topline"><span>COVRA / PROTOCOL STATE</span><span className="visual-top-dot"/> <span>LIVE CONFIGURATION</span></div>
-            <div className="visual-core">
-              <div className="visual-circle-outer"><div className="visual-orbit-dot"/><div className="visual-circle-inner"><span>DEPLOYMENT STATE</span><strong>Awaiting</strong><Network size={33} strokeWidth={1.2}/></div></div>
-              <div className="visual-meta visual-meta-left"><span className="visual-label">DEFINED CLASSES</span><strong>05</strong><span>PROTOCOL CONFIG</span></div>
-              <div className="visual-meta visual-meta-right"><span className="visual-label">SETTLEMENT ASSET</span><strong>USDC</strong><span>BASE SEPOLIA</span></div>
-            </div>
-            <div className="visual-cards">
-              <div><span>01 / BASE</span><strong>Pool awaiting deployment</strong><div className="visual-bar"><i/></div></div>
-              <div><span>02 / BRADBURY</span><strong>Adjudicator awaiting deployment</strong><div className="visual-bar visual-bar-ultra"><i/></div></div>
-            </div>
-            <div className="visual-footer"><span>NO FABRICATED ACTIVITY</span><span>BASE 84532 · BRADBURY 4221</span></div>
+            <ProtocolStateVisual />
           </div>
           <div className="hero-caption">THE NEW RISK STACK <ArrowDownRight size={24}/></div>
         </section>

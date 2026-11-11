@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import { Activity, ArrowRight, ArrowUpRight, Banknote, Layers3, ShieldCheck, Wallet } from "lucide-react";
+import { Activity, ArrowRight, ArrowUpRight, Banknote, ExternalLink, Layers3, ShieldCheck, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { coverages, formatUsdc } from "@/lib/catalog";
+import { formatMicroUsdc } from "@/lib/capital-history";
 import { PageHeading, Panel, StatusTag, SyncNotice } from "@/components/ui";
 import { useWallet } from "@/components/wallet-provider";
 
@@ -13,7 +14,7 @@ type Pool = {
   reservedMicroUsdc: string;
   paidMicroUsdc: string;
 };
-type TimelineEvent = { time: string; title: string; detail: string };
+type TimelineEvent = { time: string; title: string; detail: string; status?: string; link?: string };
 
 export default function Dashboard() {
   const { authenticated } = useWallet();
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const [poolMessage, setPoolMessage] = useState("");
   const [policies, setPolicies] = useState<any[]>([]);
   const [claims, setClaims] = useState<any[]>([]);
+  const [capitalEvents, setCapitalEvents] = useState<any[]>([]);
   const [accountState, setAccountState] = useState("SIGNED_OUT");
 
   useEffect(() => {
@@ -48,10 +50,12 @@ export default function Dashboard() {
     void Promise.all([
       fetch("/api/policies", { cache: "no-store" }).then(r => r.json()),
       fetch("/api/claims", { cache: "no-store" }).then(r => r.json()),
-    ]).then(([policyPayload, claimPayload]) => {
+      fetch("/api/activity", { cache: "no-store" }).then(r => r.json()),
+    ]).then(([policyPayload, claimPayload, capitalPayload]) => {
       setPolicies(Array.isArray(policyPayload.items) ? policyPayload.items : []);
       setClaims(Array.isArray(claimPayload.items) ? claimPayload.items : []);
-      setAccountState(policyPayload.state === "CONFIRMED" && claimPayload.state === "CONFIRMED" ? "CONFIRMED" : String(policyPayload.state || claimPayload.state || "SYNCHRONIZATION_ERROR"));
+      setAccountState(policyPayload.state === "CONFIRMED" && claimPayload.state === "CONFIRMED" && capitalPayload.state === "CONFIRMED" ? "CONFIRMED" : String(policyPayload.state || claimPayload.state || capitalPayload.state || "SYNCHRONIZATION_ERROR"));
+      setCapitalEvents(Array.isArray(capitalPayload.items) ? capitalPayload.items : []);
     }).catch(() => {
       setPolicies([]);
       setClaims([]);
@@ -64,8 +68,9 @@ export default function Dashboard() {
   const paid = pools?.reduce((sum, pool) => sum + Number(pool.paidMicroUsdc) / 1e6, 0) ?? null;
   const utilization = assets !== null && assets > 0 && reserved !== null ? Math.round((reserved / assets) * 100) : null;
   const timeline: TimelineEvent[] = [
-    ...policies.map(policy => ({ time: String(policy.created_at), title: "Base policy indexed", detail: String(policy.policy_id) })),
-    ...claims.map(claim => ({ time: String(claim.created_at), title: "Claim state indexed", detail: String(claim.id) })),
+    ...policies.map(policy => ({ time: String(policy.created_at), title: "Base policy indexed", detail: String(policy.policy_id), link: policy.base_tx_hash ? `https://sepolia.basescan.org/tx/${policy.base_tx_hash}` : undefined })),
+    ...claims.map(claim => ({ time: String(claim.created_at), title: "Claim state indexed", detail: String(claim.id), link: claim.base_lock_tx_hash ? `https://sepolia.basescan.org/tx/${claim.base_lock_tx_hash}` : undefined })),
+    ...capitalEvents.map(event => ({ time: String(event.timestamp), title: String(event.title), detail: `${String(event.className)} · ${formatMicroUsdc(String(event.usdcAmountMicroUsdc))} · ${String(event.shares)} shares`, status: "Confirmed", link: String(event.explorerUrl) })),
   ].sort((a, b) => b.time.localeCompare(a.time)).slice(0, 5);
   const displayedPolicies = policies.map(policy => ({
     id: String(policy.policy_id),
@@ -103,7 +108,7 @@ export default function Dashboard() {
         </div>
       </Panel>
       <Panel title="Recent account activity" action={{ label: "See activity", href: "/app/activity" }}>
-        {!authenticated ? <div className="empty-state"><Wallet size={22} /><strong>Wallet required</strong><p>Sign in to inspect activity derived from your own indexed records.</p></div> : timeline.length ? <div className="activity-list">{timeline.map(event => <div className="activity-row" key={event.title + event.detail}><div className="activity-marker"><Activity size={15} /></div><div className="activity-main"><strong>{event.title}</strong><p>{event.detail}</p></div><span className="activity-time">{new Date(event.time).toLocaleString("en-GB")}</span></div>)}</div> : <div className="empty-state"><Activity size={22} /><strong>No indexed activity</strong><p>The timeline begins after a verified Base policy or claim record is reconciled.</p></div>}
+        {!authenticated ? <div className="empty-state"><Wallet size={22} /><strong>Wallet required</strong><p>Sign in to inspect activity derived from your own indexed records.</p></div> : timeline.length ? <div className="activity-list">{timeline.map(event => <div className="activity-row" key={event.title + event.detail}><div className="activity-marker"><Activity size={15} /></div><div className="activity-main"><strong>{event.title}</strong><p>{event.detail}{event.status ? ` · ${event.status}` : ""}</p>{event.link && <a className="activity-link" href={event.link} target="_blank" rel="noreferrer">View transaction <ExternalLink size={12}/></a>}</div><span className="activity-time">{new Date(event.time).toLocaleString("en-GB")}</span></div>)}</div> : <div className="empty-state"><Activity size={22} /><strong>No indexed activity</strong><p>The timeline begins after a verified Base capital, policy or claim record is reconciled.</p></div>}
       </Panel>
     </div>
     <div className="dashboard-two">

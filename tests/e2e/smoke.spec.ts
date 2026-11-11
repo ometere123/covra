@@ -8,6 +8,17 @@ test("landing page introduces all five coverage classes", async ({ page }) => {
   ]) await expect(page.getByText(risk, { exact: true }).first()).toBeVisible();
 });
 
+test("landing page reports verified deployment state without a fabricated awaiting label", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".visual-circle-inner strong")).toHaveText(/Deployed|Unavailable|Verifying/);
+  await expect(page.locator(".visual-cards")).not.toContainText(/awaiting deployment/i);
+});
+
+test("capital activity is not exposed before wallet authentication", async ({ request }) => {
+  const response = await request.get("/api/activity");
+  expect(response.status()).toBe(401);
+});
+
 test("workspace surfaces show testnet configuration and empty-state truth", async ({ page }) => {
   await page.goto("/app");
   await expect(page.getByText(/testnet|awaiting deployment|no indexed/i).first()).toBeVisible();
