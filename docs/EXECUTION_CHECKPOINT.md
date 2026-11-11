@@ -10,6 +10,14 @@ The wallet-scoped `/api/activity` route now reads only `CapitalDeposited` and `C
 
 This release is a product/read-model improvement only. No pool or adjudicator transaction was submitted. No policy purchase, claim, evidence observation, Bradbury adjudication, appeal, attestation quorum or settlement exists in the reconstructed ledger. The production app must continue to describe the system as testnet-only and show no funded lifecycle until those prerequisites have real receipts.
 
+### Release verification — c2aaffd (2026-11-11)
+
+Local release gates passed after the dashboard hook-order correction: `npm run lint` (zero errors; two pre-existing warnings in claims/quote), `npm run typecheck`, `npm run test` (24 Vitest files / 109 tests and 10 TAP tests), `npm run build`, and Chromium Playwright (9 tests, including the responsive route sweep). The existing Solidity, Bradbury schema/Direct Mode and contract verification gates remain unchanged by this frontend/read-model-only release.
+
+Commit `c2aaffd30cecbce3e530465dcd1a54640d053b72` was pushed to `main` and passed GitHub Actions quality gate run [42938614172](https://github.com/ometere123/covra/actions/runs/42938614172). The existing Vercel Hobby project `covra` deployed it as `dpl_ERXTDd9n6dgpyqMusaF4vTHpECgf`, reached `READY`, and was aliased to [https://covra-lyart.vercel.app](https://covra-lyart.vercel.app). Vercel runtime logs for the first 30 minutes after deployment returned zero error records.
+
+Production verification: `/api/health` returned HTTP 200 with `mode: testnet`; `/api/pools` returned five confirmed classes with zero assets; `/api/protocol-status` independently verified the Base Sepolia bytecode/pool (`DEPLOYED_UNFUNDED`) and Bradbury adjudicator (`DEPLOYED`, finalized case count `0`), and correctly returned settlement `NOT_READY` because no capital is available. `/api/activity` returned HTTP 401 without a wallet session. The landing page no longer contains the stale `awaiting deployment` label. The hosted wallet/agent/MCP verifier passed nonce replay and race rejection, scoped policy read, MCP claim-scope rejection and credential revocation; no policy, claim or payout was created.
+
 Overall assignment remains incomplete. Continue automatically with unblocked tasks.
 
 ## 2026-11-06 settlement simulation
