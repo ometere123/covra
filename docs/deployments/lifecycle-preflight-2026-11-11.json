@@ -1,0 +1,83 @@
+{
+  "checkedAt": "2026-11-11T01:52:40.592Z",
+  "verdict": "BLOCKED",
+  "network": {
+    "baseSepoliaChainId": 84532,
+    "bradburyChainId": 4221,
+    "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+    "adjudicator": "0xaefc8672272392310a2ea102787e28bb1f34e1d3",
+    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  "coverageSelection": {
+    "candidate": "Dependency Outage",
+    "classId": 1,
+    "status": "CONDITIONAL_ONLY",
+    "reason": "The class has an objective threshold, but no eligible named provider, frozen monitoring-method digest, policy-window incident, two independent probes and corroborating source have been established. No class currently meets the evidence and independence gate.",
+    "termsHash": "0xb17a9c519c2f2eff825e3d30ea3d620a34a86f8b5136195eb8c8b0448f213d60",
+    "requiredFacts": ["provider_id", "outage_minutes >= 30", "independent_probes >= 2", "monitoring_method_hash"],
+    "issuerHost": "covra-lyart.vercel.app",
+    "observationMode": "OBSERVED_PUBLIC"
+  },
+  "conditionalMinimumEconomics": {
+    "coverageUsd": "100",
+    "durationDays": 180,
+    "premiumMicroUsdc": "1000000",
+    "limitMicroUsdc": "100000000",
+    "minimumPoolDepositMicroUsdc": "99000000",
+    "totalUsdcIfOneWalletFundsCapitalAndPremium": "100000000",
+    "quoteMethod": "deterministic-testnet-rate with $1 minimum premium; not actuarial pricing"
+  },
+  "fundingAddresses": {
+    "executionUnderwriterAndInsuredCandidate": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "poolDepositTarget": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+    "quoteSigner": "0x870d04144Ef72B02B1740D7c6a893036F29fb3A4",
+    "evidenceIssuer": "0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5"
+  },
+  "baseReadiness": {
+    "poolCodeAndReceipt": "VERIFIED",
+    "paused": false,
+    "attestorCount": 5,
+    "attestorRosterVersion": "1",
+    "assetsMicroUsdc": "0",
+    "reservedMicroUsdc": "0",
+    "ownerEth": "0.139954357647299992",
+    "ownerUsdc": "0",
+    "approvalEstimateGas": "56240",
+    "approvalEstimateCostEthAtCheckedGasPrice": "0.00000033744",
+    "checkedBlock": "57200180"
+  },
+  "attestors": {
+    "roster": [
+      "0xD1fcB05420B51b2dF3fa3036d491BBA656CB8a1b",
+      "0xA1afCA241Ad6a84acEcb3e7cC43c57df65cF7826",
+      "0x9a69739ebEbfE1d57D71F0a4668a9FcE181C4A99",
+      "0xe37B7fb260aB56C803ce5aCe5f0f2011eaC48720",
+      "0xe59e5423E14bdb46d2EEefd3A39049a168De4591"
+    ],
+    "onchainMembership": "VERIFIED",
+    "privateKeyCustody": "UNVERIFIED",
+    "independentAvailability": "0_OF_3_CONFIRMED",
+    "observation": "No attestor private-key variables are present in the authorized Vercel environment or local COVRA keychain service. Public addresses alone do not authorize signing."
+  },
+  "serviceReadiness": {
+    "productionHealth": "200",
+    "evidenceIssuerConfigured": true,
+    "evidenceNegativeControls": "PASSED",
+    "indexerCron": "ACTIVE */5 * * * *",
+    "recentCronHttp200": 5,
+    "cursor": "57198152",
+    "databasePolicies": 0,
+    "databaseClaims": 0,
+    "databaseObservations": 0,
+    "capitalEventRows": 11,
+    "bradburyNodeAndGenesis": "VERIFIED",
+    "adjudicatorFinalizedCaseCount": 0
+  },
+  "blockers": [
+    "No eligible named provider and independently reviewed monitoring method has been selected for a frozen risk specification.",
+    "No authentic policy-window incident and independently retrievable evidence currently exists.",
+    "Three separately controlled authorized attestor operators and private-key custody have not been made available.",
+    "Configured execution wallet has zero Circle test USDC; ordinary testnet funding is required before any deposit or purchase."
+  ],
+  "noTransactionsSubmitted": true
+}
