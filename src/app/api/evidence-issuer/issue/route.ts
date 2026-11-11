@@ -135,7 +135,14 @@ function ttlSeconds(): number {
 export async function POST(request: NextRequest) {
   try {
     testnetGuard();
-    if (!matchesBearerSecret(request.headers.get("authorization"), process.env.EVIDENCE_ISSUER_ADMIN_TOKEN)) {
+    // The original admin token remains the normal operational credential. A
+    // separately managed demo token may be enabled for a disclosed testnet
+    // pilot when Vercel's protected production secrets cannot be injected into
+    // a local operator process. Both paths use the same constant-time bearer
+    // comparison and neither token is returned to the browser or logs.
+    const authorized = [process.env.EVIDENCE_ISSUER_ADMIN_TOKEN, process.env.EVIDENCE_ISSUER_DEMO_TOKEN]
+      .some((secret) => matchesBearerSecret(request.headers.get("authorization"), secret));
+    if (!authorized) {
       return NextResponse.json({ error: "Evidence issuer authorization required" }, { status: 401 });
     }
     const privateKey = process.env.EVIDENCE_ISSUER_PRIVATE_KEY;

@@ -18,3 +18,5 @@ The observation facts retain the deployed terms requirements:
 - `contracted_penalty_micro_usdc` is the one-USDC testnet accounting amount in the signed agreement.
 
 The issuer will retrieve the observation over an immutable raw GitHub HTTPS URL, publish an `OBSERVED_PUBLIC` COVRA evidence envelope, and bind it to the claim. The issuer remains COVRA-operated; its signature proves issuer identity and envelope integrity, not the truth or independence of the underlying task outcome.
+
+For the live pilot, `EVIDENCE_ISSUER_DEMO_TOKEN` is a separately generated Vercel Secret used only by the controlled execution process. It is not the issuer signing key, quote signer, deployer key or an attestor key. The existing administrator token remains unchanged.
