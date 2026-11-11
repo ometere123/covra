@@ -3,7 +3,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 const root = resolve(process.cwd());
-const agreementPath = resolve(root, process.argv[process.argv.indexOf("--agreement") + 1] || "testbed/class0/task-agreement.json");
+const argument = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  return index >= 0 && process.argv[index + 1] ? process.argv[index + 1] : fallback;
+};
+const agreementPath = resolve(root, argument("--agreement", "testbed/class0/task-agreement.json"));
 const agreement = JSON.parse(readFileSync(agreementPath, "utf8"));
 const canonical = (value) => Array.isArray(value)
   ? `[${value.map(canonical).join(",")}]`
@@ -46,7 +50,7 @@ const observation = {
     penalty_status: "TESTNET_ACCOUNTING_ONLY_NO_COMMERCIAL_PENALTY",
   },
 };
-const outputPath = resolve(root, process.argv[process.argv.indexOf("--output") + 1] || `testbed/class0/observations/${observationId}.json`);
+const outputPath = resolve(root, argument("--output", `testbed/class0/observations/${observationId}.json`));
 mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, `${JSON.stringify(observation, null, 2)}\n`, "utf8");
 console.log(JSON.stringify({ outputPath: outputPath.replace(`${root}\\`, ""), observationId, eventTime: task.deadline, observedAt, missedDeadline: !deliverableExists }, null, 2));
