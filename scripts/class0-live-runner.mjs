@@ -124,7 +124,10 @@ async function lockBase(claim, evidence) {
   const locked = await publicClient.readContract({ address: pool, abi: poolsAbi, functionName: "claimLockOf", args: [policyId] });
   if (locked[0] !== `0x${"0".repeat(64)}`) throw new Error("Base policy is already locked; recover its existing receipt before proceeding");
   const simulation = await publicClient.simulateContract({ address: pool, abi: poolsAbi, functionName: "openClaim", args: [policyId, claimId, evidence.evidenceDigest], account: owner.address });
-  const hash = await wallet.writeContract({ ...simulation.request, chain: baseSepolia });
+  // simulateContract returns an address-shaped account. Re-supply the local
+  // account object here so viem signs in memory instead of asking the public
+  // RPC for eth_sendTransaction (which Base public endpoints reject).
+  const hash = await wallet.writeContract({ ...simulation.request, account: owner, chain: baseSepolia });
   const receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 12 });
   if (receipt.status !== "success") throw new Error(`Base claim lock reverted: ${hash}`);
   const after = await publicClient.readContract({ address: pool, abi: poolsAbi, functionName: "claimLockOf", args: [policyId] });

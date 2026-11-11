@@ -19,7 +19,10 @@ if (policy[0].toLowerCase() !== owner.address.toLowerCase() || policy[3] !== 1) 
 const existing = await client.readContract({ address: pool, abi: poolsAbi, functionName: "claimLockOf", args: [policyId] });
 if (existing[0] !== `0x${"0".repeat(64)}`) throw new Error("Policy already has a claim lock; recover the existing receipt instead of resubmitting");
 const simulation = await client.simulateContract({ address: pool, abi: poolsAbi, functionName: "openClaim", args: [policyId, claimId, evidenceDigest], account: owner.address });
-const hash = await wallet.writeContract({ ...simulation.request, chain: baseSepolia });
+// Keep the local private-key account on the request. The simulation request
+// contains only an address, which would make viem call eth_sendTransaction on
+// a public RPC instead of signing locally.
+const hash = await wallet.writeContract({ ...simulation.request, account: owner, chain: baseSepolia });
 const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 12 });
 if (receipt.status !== "success") throw new Error(`Claim lock reverted: ${hash}`);
 const lock = await client.readContract({ address: pool, abi: poolsAbi, functionName: "claimLockOf", args: [policyId] });
