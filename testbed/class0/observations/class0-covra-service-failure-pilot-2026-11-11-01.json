@@ -1,0 +1,19 @@
+{
+  "observation_id": "class0-covra-service-failure-pilot-2026-11-11-01",
+  "coverage_class": 0,
+  "event_time": "2026-11-11T09:25:00.000Z",
+  "facts": {
+    "task_id": "covra-service-failure-pilot-2026-11-11-01",
+    "task_spec_hash": "0x97ea456fd40203a4ac6424955312ec10aa200ceba0a855bf01022c7d408b0f74",
+    "missed_deadline": true,
+    "contracted_penalty_micro_usdc": 1000000,
+    "deliverable_path": "testbed/class0/deliverables/covra-service-failure-pilot-2026-11-11-01.json",
+    "deliverable_present_at_deadline": false,
+    "observed_at": "2026-11-11T09:26:21.261Z",
+    "observation_mode": "CONTROLLED_COVRA_TESTNET_TESTBED",
+    "source_provenance": "Public GitHub Actions workflow in the COVRA repository; COVRA controls the repository, workflow and task observer.",
+    "operator_independence": "NOT_VERIFIED",
+    "external_counterparty": false,
+    "penalty_status": "TESTNET_ACCOUNTING_ONLY_NO_COMMERCIAL_PENALTY"
+  }
+}
