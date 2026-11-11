@@ -63,7 +63,7 @@ async function waitForObserver() {
 }
 async function observationCommit() {
   for (let attempt = 0; attempt < 20; attempt += 1) {
-    const commits = JSON.parse(runCli("gh", ["api", `repos/${repo}/commits?path=${encodeURIComponent(observationFile)}&per_page=5`]));
+    const commits = JSON.parse(runCli("gh", ["api", `repos/${repo}/commits`, "-f", `path=${observationFile}`, "-f", "per_page=5"]));
     if (commits[0]?.sha) return commits[0].sha;
     await sleep(10_000);
   }
