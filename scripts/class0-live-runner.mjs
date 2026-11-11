@@ -1,14 +1,13 @@
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
-import { createPublicClient, createWalletClient, http } from "viem";
+import { createPublicClient, createWalletClient, http, sha256, stringToHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
 import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 import { assertExactBradburyReceipt } from "../src/lib/bradbury-receipt.ts";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "../src/lib/bradbury-final-state.ts";
-import { canonicalJson, claimIdFromUuid } from "../src/lib/claim-protocol.ts";
 import { poolsAbi } from "../src/lib/chain.ts";
 
 const observerRun = process.argv[2];
@@ -37,6 +36,12 @@ function runCli(name, args, input) {
   return result.stdout || "";
 }
 const json = (value) => JSON.stringify(value, (_, entry) => typeof entry === "bigint" ? entry.toString() : entry);
+const canonicalJson = (input) => Array.isArray(input)
+  ? `[${input.map(canonicalJson).join(",")}]`
+  : input && typeof input === "object"
+    ? `{${Object.keys(input).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(input[key])}`).join(",")}}`
+    : JSON.stringify(input);
+const claimIdFromUuid = (uuid, insured) => sha256(stringToHex(`COVRA-CLAIM:${insured.toLowerCase()}:${uuid.toLowerCase()}`));
 const cookies = new Map();
 async function hosted(path, options = {}) {
   const response = await fetch(origin + path, { ...options, headers: { "Content-Type": "application/json", Origin: origin, Cookie: [...cookies].map(([key, value]) => `${key}=${value}`).join("; "), ...(options.headers || {}) } });
