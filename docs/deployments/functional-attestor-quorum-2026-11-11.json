@@ -1,0 +1,36 @@
+{
+  "verifiedAt": "2026-11-11T07:57:42.965Z",
+  "status": "FUNCTIONAL_QUORUM_VERIFIED",
+  "operatorIndependence": "NOT_VERIFIED",
+  "writesSubmitted": 0,
+  "network": {
+    "chainId": 84532,
+    "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+    "rosterVersion": 1,
+    "quorum": 3,
+    "rosterSize": 5
+  },
+  "derivedAndRegisteredAddresses": [
+    { "slot": 1, "address": "0xD1fcB05420B51b2dF3fa3036d491BBA656CB8a1b", "registered": true },
+    { "slot": 2, "address": "0xA1afCA241Ad6a84acEcb3e7cC43c57df65cF7826", "registered": true },
+    { "slot": 3, "address": "0x9a69739ebEbfE1d57D71F0a4668a9FcE181C4A99", "registered": true },
+    { "slot": 4, "address": "0xe37B7fb260aB56C803ce5aCe5f0f2011eaC48720", "registered": true },
+    { "slot": 5, "address": "0xe59e5423E14bdb46d2EEefd3A39049a168De4591", "registered": true }
+  ],
+  "functionalChecks": {
+    "fiveUniqueSignaturesRecovered": true,
+    "threeSignatureBundleSortedAndAcceptedByLocalSettlementSimulation": true,
+    "insufficientQuorumRejected": true,
+    "duplicateSignerRejected": true,
+    "modifiedDecisionRejected": true,
+    "wrongChainDomainRejected": true,
+    "forgedSignatureRejected": true,
+    "signingMode": "Synthetic EIP-712 decision only; no claim exists and no settlement was attempted"
+  },
+  "liveFundingRead": {
+    "fundingWallet": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "baseSepoliaGasEth": "0.139954357647299992",
+    "circleUsdcMicro": "0",
+    "allFivePoolAssetsMicro": "0"
+  }
+}
