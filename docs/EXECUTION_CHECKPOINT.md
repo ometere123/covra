@@ -1,5 +1,13 @@
 # Execution checkpoint
 
+## 2026-11-12 production finality correction release
+
+Commit `ad8d2f85e6427aba5be0f4bfca8d06f8a6ae7bdf` is pushed to `main` and deployed to the existing Vercel Hobby project as `dpl_6MYxXVwx5t1M27zhTqXG24HPPuM5`. The deployment reached `READY` and remains aliased to [https://covra-lyart.vercel.app](https://covra-lyart.vercel.app). Protected-runtime `/api/health` returned HTTP 200 with `status: available`, `mode: testnet`, Base `84532`, Bradbury `4221`, and all five required configuration flags true.
+
+Production checks confirmed `/demo` presents the first pilot as `INSUFFICIENT EVIDENCE` with no payout and identifies the deployed Base/Bradbury records; `/case-study/first-pilot` identifies the Base/Bradbury writes as `TRANSACTIONS FINALIZED`, keeps the case `DECIDED / WINDOW OPEN`, states the appeal-window end as `Nov 14, 2026, 9:41 AM UTC`, and renders the recorded Base snapshot at block `57599154` with the `2027-01-10` reserve deadline. The exact receipt links remain mapped to pool deposit, purchase, claim lock, Bradbury submission and Bradbury adjudication. No release, finalization or settlement transaction was broadcast.
+
+The live read-only procedure `npm run genlayer:finalize-class0` continues to return `APPEAL_WINDOW_OPEN` for case `0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223`; the explicit broadcast mode remains gated and unused. GitHub Actions quality gate run [`43194003717`](https://github.com/ometere123/covra/actions/runs/43194003717) passed for this commit. The release verification included local typecheck, lint, Vitest/TAP, Solidity compilation/tests, production build, 24 browser smoke tests and the Chromium/WebKit eight-width responsive matrices.
+
 ## 2026-11-12 public demo and independent-operations readiness
 
 Added wallet-optional, receipt-backed public routes `/demo` and `/case-study/first-pilot`, plus [the public operations runbook](PUBLIC_DEMO_OPERATIONS.md). The pages show the five existing classes, verified Base/Bradbury deployments, the first class-0 pilot receipts, signed evidence provenance, the finalized `INSUFFICIENT_EVIDENCE` decision and the fact that no payout was authorized. They do not render fixtures, simulated balances or expected activity.
