@@ -9,7 +9,7 @@ export const bradbury = defineChain({
   name: "GenLayer Bradbury Phase 2",
   nativeCurrency: { name: "GEN", symbol: "GEN", decimals: 18 },
   rpcUrls: { default: { http: ["https://rpc.testnet-chain.genlayer.com"] } },
-  blockExplorers: { default: { name: "GenLayer", url: "https://scan.testnet-chain.genlayer.com" } },
+  blockExplorers: { default: { name: "GenLayer", url: "https://scan.bradbury.genlayer.com" } },
   testnet: true,
 });
 

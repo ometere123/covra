@@ -26,7 +26,7 @@ Historical failure details below predate the successful deployment above. They d
 - GenLayer Chain RPC: `https://rpc.testnet-chain.genlayer.com/`
 - CLI verified: `genlayer 0.40.0-rc.5` (the earlier `0.40.0-rc.3` profile used stale Phase 2 fee-manager data)
 - Current FeeManager: `0x7678587A847712f2A96082AC07883A88D0fc7245`
-- Explorer: `https://scan.testnet-chain.genlayer.com/`
+- Explorer: `https://scan.bradbury.genlayer.com/` (Bradbury Phase 2; transaction links use `/tx/<transaction-id>`)
 - Expected genesis: `0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4`
 - AddressManager: `0x3F71AE080BD6270A91dBcc7960d88797828538E0`
 

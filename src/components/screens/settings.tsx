@@ -29,7 +29,7 @@ export default function SettingsScreen() {
     </div>
     <div className="panel" style={{padding:28,marginTop:19}}>
       <div className="detail-label">NETWORKS / NO MAINNET FUNDS</div>
-      <div className="setting-line"><div><strong>GenLayer Bradbury Phase 2</strong><span>Chain 4221 · Intelligent Contract decisions</span></div><a className="secondary-action" href="https://scan.testnet-chain.genlayer.com" target="_blank" rel="noreferrer">Explorer <ExternalLink size={13}/></a></div>
+      <div className="setting-line"><div><strong>GenLayer Bradbury Phase 2</strong><span>Chain 4221 · Intelligent Contract decisions</span></div><a className="secondary-action" href="https://scan.bradbury.genlayer.com" target="_blank" rel="noreferrer">Explorer <ExternalLink size={13}/></a></div>
       <div className="setting-line"><div><strong>Base Sepolia</strong><span>Chain 84532 · Circle USDC (6 decimals)</span></div><a className="secondary-action" href="https://sepolia.basescan.org" target="_blank" rel="noreferrer">Explorer <ExternalLink size={13}/></a></div>
       <div className="setting-line"><div><strong>Current release posture</strong><span>No legal underwriting license, capital solvency or audit assumed</span></div><StatusTag variant="pending">Testnet only</StatusTag></div>
       <div className="feedback"><Info size={15}/> Configured services and onchain deployments are separate release gates. Read the included SECURITY.md and LIVE_GATES.md documents before operating with real funds.</div>

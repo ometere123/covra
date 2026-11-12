@@ -5,7 +5,7 @@ import { publicCoverageClasses, publicPilot } from "@/lib/public-demo";
 import type { ProtocolStatus } from "@/lib/protocol-status";
 
 const baseExplorer = "https://sepolia.basescan.org";
-const bradburyExplorer = "https://scan.testnet-chain.genlayer.com";
+const bradburyExplorer = "https://scan.bradbury.genlayer.com";
 
 function shortHash(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
@@ -67,7 +67,7 @@ function LiveStatus({ status }: { status: ProtocolStatus | null }) {
 }
 
 function RecordLink({ hash, chain }: { hash: string; chain: "base" | "bradbury" }) {
-  const href = chain === "base" ? `${baseExplorer}/tx/${hash}` : bradburyExplorer;
+  const href = `${chain === "base" ? baseExplorer : bradburyExplorer}/tx/${hash}`;
   return <a className="public-record-link" href={href} target="_blank" rel="noreferrer"><code>{shortHash(hash)}</code><ExternalLink size={12} /></a>;
 }
 
@@ -149,7 +149,7 @@ export function PublicDemo({ status }: { status: ProtocolStatus | null }) {
           </div>
           <div className="public-deployment-proof">
             <span>BASE CREATION</span><code>{shortHash(publicPilot.deployment.baseTransaction)}</code><span>BLOCK {publicPilot.deployment.baseBlock}</span><a href="https://repo.sourcify.dev/84532/0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4" target="_blank" rel="noreferrer">Exact source match <ExternalLink size={12} /></a>
-            <span>BRADBURY CREATION</span><code>{shortHash(publicPilot.deployment.bradburyTransaction)}</code><span>DEPLOYMENT TX / FINISHED WITH RETURN</span><a href={bradburyExplorer} target="_blank" rel="noreferrer">Open explorer <ExternalLink size={12} /></a>
+            <span>BRADBURY CREATION</span><code>{shortHash(publicPilot.deployment.bradburyTransaction)}</code><span>DEPLOYMENT TX / FINISHED WITH RETURN</span><a href={`${bradburyExplorer}/tx/${publicPilot.deployment.bradburyTransaction}`} target="_blank" rel="noreferrer">Open transaction <ExternalLink size={12} /></a>
           </div>
         </section>
 
