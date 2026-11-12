@@ -29,14 +29,16 @@
   },
   "gasPreflight": {
     "development": {
-      "serializedDeploymentBytes": 98338,
+      "serializedDeploymentHexChars": 98338,
+      "serializedDeploymentBytes": 49168,
       "outerCalldataBytes": 49988,
       "estimateGas": null,
       "estimateError": "Execution reverted for an unknown reason.",
       "simulationGasFloor": "39888326"
     },
     "artifact": {
-      "serializedDeploymentBytes": 85346,
+      "serializedDeploymentHexChars": 85346,
+      "serializedDeploymentBytes": 42672,
       "outerCalldataBytes": 43492,
       "estimateGas": null,
       "estimateError": "Execution reverted for an unknown reason.",

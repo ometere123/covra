@@ -1,0 +1,37 @@
+{
+  "network": {
+    "name": "testnet-bradbury",
+    "chainId": 4221,
+    "genesis": "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4",
+    "rpc": "https://rpc.testnet-chain.genlayer.com"
+  },
+  "source": {
+    "path": "contracts/genlayer/CovraAdjudicatorV1.py",
+    "bytes": 25703,
+    "sha256": "4f424277b2aa1c23d599f8936452c7d16989ab7bd4e4265fbb28aab57092d0f2"
+  },
+  "historicalEnvelope": {
+    "outerTransaction": "0x2fc4701edec82882a108982728c3b8f18d9311c810c7eeb9cb8891f127e37b1d",
+    "serializedDeploymentBytes": 25711,
+    "outerCalldataBytes": 26532,
+    "feeValue": "100000000000010352",
+    "gasUsed": "21162162"
+  },
+  "currentReadOnlyControl": {
+    "method": "eth_estimateGas plus bounded eth_call on the exact historical outer calldata",
+    "estimateGas": "21955287",
+    "successBoundaryWithin1024": "21873062",
+    "probes": {
+      "16777216": false,
+      "20000000": false,
+      "21162162": false,
+      "21934205": true,
+      "25000000": true
+    },
+    "observedReleaseGate": "16777216",
+    "withinObservedReleaseGate": false,
+    "transactionSubmitted": false
+  },
+  "verifiedAt": "2026-11-12",
+  "interpretation": "The historical V1 envelope remains byte-correct, but current Bradbury read-only execution is above the observed post-sequencer gate. This is a network/runtime-condition control, not a new deployment attempt."
+}

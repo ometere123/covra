@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { createPublicClient, encodeFunctionData, http } from "viem";
+import { createPublicClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { abi, createClient } from "genlayer-js";
+import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 import { assertBradburyNodeIdentity } from "../src/lib/bradbury-final-state.ts";
+import { makeDeploymentEnvelope } from "./bradbury-deployment-envelope.mjs";
 
 // This script is deliberately a testnet-only, resumable deployment gate. It
 // loads the private key through the normal protected environment mechanism but
@@ -46,11 +47,12 @@ if (estimate.feeValue <= 0n) throw new Error("Bradbury returned a zero deploymen
 // fallback (200,000) is below the EVM calldata intrinsic cost. Derive the
 // override from the exact serialized GenLayer deployment envelope rather than
 // guessing a protocol fee or bypassing FeeManager.
-const constructorData = abi.calldata.encode(abi.calldata.makeCalldataObject(undefined, [], undefined));
-const serializedDeployment = abi.transactions.serialize([source, constructorData, false]);
+const distribution = { ...estimate.distribution, executionConsumed: estimate.distribution.executionConsumed ?? 0n };
+const envelope = makeDeploymentEnvelope({ source, sender: account.address, distribution, feeValue: estimate.feeValue });
+const { serializedDeployment } = envelope;
 let zeroBytes = 0n;
 let nonZeroBytes = 0n;
-for (const byte of serializedDeployment) {
+for (const byte of Buffer.from(serializedDeployment.slice(2), "hex")) {
   if (byte === 0) zeroBytes += 1n;
   else nonZeroBytes += 1n;
 }
@@ -58,25 +60,7 @@ const intrinsicGas = 21000n + zeroBytes * 4n + nonZeroBytes * 16n;
 const evm = createPublicClient({ transport: http(chainRpc) });
 const balance = await evm.getBalance({ address: account.address });
 if (balance <= estimate.feeValue) throw new Error("Bradbury deployer balance is not greater than the protocol-fee deposit");
-const addTransaction = testnetBradbury.consensusMainContract.abi.find((item) => item.type === "function" && item.name === "addTransaction");
-if (!addTransaction) throw new Error("Bradbury consensus ABI has no addTransaction method");
-const distribution = { ...estimate.distribution, executionConsumed: estimate.distribution.executionConsumed ?? 0n };
-const simulationData = encodeFunctionData({
-  abi: [addTransaction],
-  functionName: "addTransaction",
-  args: [{
-    sender: account.address,
-    recipient: "0x0000000000000000000000000000000000000000",
-    numOfInitialValidators: 5n,
-    maxRotations: 3n,
-    validUntil: 0n,
-    saltNonce: 0n,
-    userValue: 0n,
-    feesDistribution: distribution,
-    txCalldata: serializedDeployment,
-    messageAllocations: [],
-  }],
-});
+const simulationData = envelope.outerCalldata;
 const maxBradburyTransactionGas = 1n << 24n;
 let estimatedOuterGas = null;
 let gasPreflightMethod = "eth_estimateGas";
@@ -138,7 +122,8 @@ const baseRecord = {
   schemaMethodNames: methodNames,
   protocolFeeEstimate: estimate.feeValue.toString(),
   feeDistribution: distribution,
-  serializedDeploymentBytes: serializedDeployment.length,
+  serializedDeploymentHexChars: envelope.serializedDeploymentHexChars,
+  serializedDeploymentBytes: envelope.serializedDeploymentBytes,
   intrinsicGas: intrinsicGas.toString(),
   gasLimit: estimatedOuterGas.toString(),
   gasPreflightMethod,

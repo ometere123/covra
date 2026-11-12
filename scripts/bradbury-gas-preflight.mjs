@@ -1,46 +1,19 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { encodeFunctionData, http, createPublicClient } from "viem";
-import { abi } from "genlayer-js";
+import { http, createPublicClient } from "viem";
 import { testnetBradbury } from "genlayer-js/chains";
+import {
+  BRADBURY_FEE_DEPOSIT,
+  makeDeploymentEnvelope,
+} from "./bradbury-deployment-envelope.mjs";
 
 const sourcePath = process.argv[2] || "contracts/genlayer/CovraAdjudicator.py";
 const sender = process.env.BRADBURY_DEPLOYER_ADDRESS || "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7";
 const rpcUrl = process.env.BRADBURY_CHAIN_RPC_URL || "https://rpc.testnet-chain.genlayer.com";
 const sourceBytes = readFileSync(sourcePath);
 const source = sourceBytes.toString("utf8");
-const constructorData = abi.calldata.encode(abi.calldata.makeCalldataObject(undefined, [], undefined));
-const serialized = abi.transactions.serialize([source, constructorData, false]);
-const distribution = {
-  leaderTimeunitsAllocation: 100n,
-  validatorTimeunitsAllocation: 200n,
-  appealRounds: 0n,
-  executionBudgetPerRound: 25_000_000_000_000_000n,
-  executionConsumed: 0n,
-  totalMessageFees: 0n,
-  rotations: [3n],
-  maxPriceGenPerTimeUnit: 2n,
-  storageFeeMaxGasPrice: 300_000_000n,
-  receiptFeeMaxGasPrice: 300_000_000n,
-};
-const functionAbi = testnetBradbury.consensusMainContract.abi.find((item) => item.type === "function" && item.name === "addTransaction");
-if (!functionAbi) throw new Error("Bradbury consensus ABI has no addTransaction");
-const data = encodeFunctionData({
-  abi: [functionAbi],
-  functionName: "addTransaction",
-  args: [{
-    sender,
-    recipient: "0x0000000000000000000000000000000000000000",
-    numOfInitialValidators: 5n,
-    maxRotations: 3n,
-    validUntil: 0n,
-    saltNonce: 0n,
-    userValue: 0n,
-    feesDistribution: distribution,
-    txCalldata: serialized,
-    messageAllocations: [],
-  }],
-});
+const envelope = makeDeploymentEnvelope({ source, sender });
+const { outerCalldata: data, serializedDeployment: serialized } = envelope;
 const client = createPublicClient({ transport: http(rpcUrl) });
 let estimate = null;
 let estimateError = null;
@@ -53,7 +26,7 @@ try {
     account: sender,
     to: testnetBradbury.consensusMainContract.address,
     data,
-    value: 100000000000010352n,
+    value: BRADBURY_FEE_DEPOSIT,
   });
 } catch (error) {
   const value = error && typeof error === "object" ? error : {};
@@ -64,7 +37,7 @@ try {
       : error instanceof Error ? error.message : String(error);
 }
 if (estimate === null) {
-  const simulationCall = { account: sender, to: testnetBradbury.consensusMainContract.address, data, value: 100000000000010352n };
+  const simulationCall = { account: sender, to: testnetBradbury.consensusMainContract.address, data, value: BRADBURY_FEE_DEPOSIT };
   const succeeds = async (gas) => {
     try {
       await client.call({ ...simulationCall, gas });
@@ -93,8 +66,9 @@ console.log(JSON.stringify({
   sourcePath,
   sourceBytes: sourceBytes.byteLength,
   sourceSha256: sha,
-  serializedDeploymentBytes: serialized.length,
-  outerCalldataBytes: (data.length - 2) / 2,
+  serializedDeploymentHexChars: envelope.serializedDeploymentHexChars,
+  serializedDeploymentBytes: envelope.serializedDeploymentBytes,
+  outerCalldataBytes: envelope.outerCalldataBytes,
   estimateGas: estimate?.toString() || null,
   estimateError,
   simulationGasUpperBound: simulationGasUpperBound.toString(),

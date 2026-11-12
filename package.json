@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --incremental false",
-    "test": "vitest run && node --experimental-strip-types --test scripts/claim-window.test.mjs scripts/preflight-io.test.mjs scripts/aggregate-attestations.test.mjs scripts/functional-attestor-quorum.test.mjs",
+    "test": "vitest run && node --experimental-strip-types --test scripts/claim-window.test.mjs scripts/preflight-io.test.mjs scripts/aggregate-attestations.test.mjs scripts/functional-attestor-quorum.test.mjs scripts/bradbury-deployment-envelope.test.mjs",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:solidity": "node scripts/compile-solidity.mjs",

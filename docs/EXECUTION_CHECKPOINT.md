@@ -1,5 +1,11 @@
 # Execution checkpoint
 
+## 2026-11-12 exact V1 reconstruction and current-network control
+
+The successful November 3 V1 deployment has now been reconstructed byte-for-byte from `contracts/genlayer/CovraAdjudicatorV1.py`, the pinned `genlayer-js@2.0.0-rc.2` ABI, the public Bradbury receipts and the recorded FeeManager settlement. Outer EVM transaction `0x2fc4701edec82882a108982728c3b8f18d9311c810c7eeb9cb8891f127e37b1d` used gas limit `43908642`, consumed `21162162`, and carried `26532` calldata bytes. Its `txCalldata` is the exact `25711`-byte serialized payload for the `25703`-byte V1 source; the rebuilt outer input hash is `172ff2c53593d77a72d8cc3f3ccd4e4379659789b26157d837afdad703818c0c`. The `NewTransaction` event created GenLayer transaction `0xd19bcbd6d2c6d3d2718312bb7114eec69d95facbf26a67cd00c2f7ee26432b28`, which finalized `FinishedWithReturn` at `0xaefc8672272392310a2ea102787e28bb1f34e1d3`; the later `0xab44...` transaction is only the fee refund. See [`V1_EXACT_DEPLOYMENT_RECONSTRUCTION.md`](deployments/V1_EXACT_DEPLOYMENT_RECONSTRUCTION.md).
+
+The same exact V1 outer envelope now estimates `21955287` gas on the current Bradbury RPC and has a bounded read-only success floor of approximately `21873062`; `eth_call` at the observed `16777216` gate fails. This proves the historical V1 procedure remains encoding-correct but the current network/runtime admission condition changed after the successful November 3 transaction. The corrected preflight scripts now report serialized payload bytes separately from hexadecimal-character length, and the offline regression test passes. V2 remains safely gated with no new transaction submitted.
+
 ## 2026-11-12 V2 deployment-gas investigation and safe compaction
 
 The failed V2 broadcast `0xe80b56e339a7ac4ae095769751e9e39567d7ec2b5ccdc443fce5e7209c466924` was investigated from its original receipt and calldata. It was an outer Bradbury consensus transaction from Praest with a `45000000` gas limit, `29238269` gas used, `status=0x0`, no logs and no GenLayer transaction ID. The containing block had a `0x4000000000000` gas limit and only two transactions, so the EVM block gas limit was not the cause. Praest had sufficient balance, the protocol-fee value was nonzero, and the calldata decoded to the expected deployment envelope.
