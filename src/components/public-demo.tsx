@@ -75,6 +75,14 @@ function AddressRecord({ label, value, href }: { label: string; value: string; h
   return <div className="public-address-record"><span>{label}</span>{href ? <a href={href} target="_blank" rel="noreferrer"><code>{shortHash(value)}</code><ExternalLink size={12} /></a> : <code>{shortHash(value)}</code>}</div>;
 }
 
+const pilotReceiptRows = [
+  { label: "Base pool deposit", hash: publicPilot.receipts.poolDeposit, chain: "base" as const },
+  { label: "Policy purchase", hash: publicPilot.receipts.policyPurchase, chain: "base" as const },
+  { label: "Base claim lock", hash: publicPilot.receipts.baseClaimLock, chain: "base" as const },
+  { label: "Bradbury submit_case", hash: publicPilot.receipts.bradburySubmit, chain: "bradbury" as const },
+  { label: "Bradbury adjudicate", hash: publicPilot.receipts.bradburyAdjudicate, chain: "bradbury" as const },
+] as const;
+
 export function PublicDemo({ status }: { status: ProtocolStatus | null }) {
   return (
     <div className="public-demo-page">
@@ -199,9 +207,7 @@ export function FirstPilotCaseStudy({ status }: { status: ProtocolStatus | null 
         <section className="public-demo-section container">
           <div className="public-demo-section-label"><span>03 / THE ACTUAL RECORD</span><span>OPEN RECEIPTS</span></div>
           <div className="public-record-table" role="table" aria-label="First pilot transaction receipts">
-            {["Base pool deposit", "Policy purchase", "Base claim lock", "Bradbury submit_case", "Bradbury adjudicate"].map((label, index) => {
-              const hash = Object.values(publicPilot.receipts)[index];
-              const chain: "base" | "bradbury" = index < 3 ? "base" : "bradbury";
+            {pilotReceiptRows.map(({ label, hash, chain }) => {
               return <div className="public-record-row" role="row" key={label}><span role="cell">{label}</span><span role="cell"><RecordLink hash={hash} chain={chain} /></span><span role="cell">{chain === "base" ? "BASE SEPOLIA" : "BRADBURY PHASE 2"}</span></div>;
             })}
           </div>
