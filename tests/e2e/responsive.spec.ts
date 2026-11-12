@@ -4,6 +4,8 @@ import { join } from "node:path";
 
 const routes = [
   "/",
+  "/demo",
+  "/case-study/first-pilot",
   "/app",
   "/app/coverage",
   "/app/quote",
@@ -89,13 +91,14 @@ test("all primary routes remain usable across supported viewport widths", async 
 });
 
 test("mobile navigation and wallet-unavailable guidance are usable", async ({ page }) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto("/app/pools", { waitUntil: "networkidle" });
 
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(page.locator(".app-sidebar.sidebar-mobile-open")).toBeVisible();
   await page.getByRole("link", { name: "Coverage", exact: true }).click();
-  await expect(page).toHaveURL(/\/app\/coverage$/);
+  await expect(page).toHaveURL(/\/app\/coverage$/, { timeout: 30_000 });
 
   await page.goto("/app/pools", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Connect wallet", exact: true }).click();

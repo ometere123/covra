@@ -11,8 +11,8 @@
 - [Source verification](https://repo.sourcify.dev/84532/0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4), [transaction](https://sepolia.basescan.org/tx/0xfe01a9b68ac5a54df1173231c49838a0d67ba37be35e85624cd7d912461f93f2).
 - Live readback verifies owner, permanent deployment authority, separate quote/issuer identities, bound adjudicator, Circle USDC and all five configured attestors.
 - Role rotations cannot merge administration, quoting, issuer or attestation authority. Retired attestors remain barred from owner/quote roles because old claims retain roster snapshots.
-- All five pools still have zero assets/reserves/premiums/payouts. Funding remains unverified; the deployer held zero Circle USDC at the last balance check.
-- Vercel now uses this address and block. The indexer has a separate deployment-bound cursor.
+- At the current pilot read, class 0 has `100 USDC` assets, `100 USDC` reserved, `1 USDC` premium and `0 USDC` paid against the live class-0 policy; classes 1–4 remain unfunded. The current class-0 reserve and lawful release path are documented in [the public operations runbook](PUBLIC_DEMO_OPERATIONS.md).
+- The first class-0 pilot produced no payout. Vercel uses this address and block, and the indexer has a separate deployment-bound cursor.
 
 Full public receipt/configuration/code-hash record: `docs/deployments/base-84532-0xfe01a9b68ac5a54df1173231c49838a0d67ba37be35e85624cd7d912461f93f2.json`.
 

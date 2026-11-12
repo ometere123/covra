@@ -4,9 +4,9 @@
 
 COVRA is a unified source repository for an agentic insurance experience: a branded website, owner and underwriter workspaces, agent credential management, wallet authentication, five coverage classes, signed policy quotes, USDC purchases, evidence-based claims intake, private storage, segregated underwriting pools, and GenLayer Intelligent Contract adjudication logic.
 
-> **TESTNET / RESEARCH ONLY.** Provides no real insurance coverage. Not audited, licensed, actuarially validated or a promise of payout. Contracts are deployed on both specified testnets, but the funded Bradbury-to-Base lifecycle remains unverified. Do not collect customer premiums or advertise commercial coverage.
+> **TESTNET / RESEARCH ONLY.** Provides no real insurance coverage. Not audited, licensed, actuarially validated or a promise of payout. The first funded Bradbury-to-Base pilot completed with a finalized `INSUFFICIENT_EVIDENCE` result and no payout; a genuine positive payout remains unverified. Do not collect customer premiums or advertise commercial coverage.
 
-Current hosted product: [covra-lyart.vercel.app](https://covra-lyart.vercel.app). Full Bradbury adjudicator: `0xaefc8672272392310a2ea102787e28bb1f34e1d3`, independently Finalized / FinishedWithReturn. Current Base Sepolia five-class pool: `0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4`, source exact-matched on Sourcify. Actual balances are zero; no paid lifecycle is claimed. Supabase Cron job 1 runs every five minutes and has verified HTTP 200 scheduled executions. See [current checkpoint](docs/EXECUTION_CHECKPOINT.md) and [test report](docs/TEST_REPORT.md).
+Current hosted product: [covra-lyart.vercel.app](https://covra-lyart.vercel.app). The wallet-optional [public protocol tour](https://covra-lyart.vercel.app/demo) and [first-pilot case study](https://covra-lyart.vercel.app/case-study/first-pilot) show only receipt-backed testnet state. Full Bradbury adjudicator: `0xaefc8672272392310a2ea102787e28bb1f34e1d3`, independently Finalized / FinishedWithReturn. Current Base Sepolia five-class pool: `0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4`, source exact-matched on Sourcify. The first class-0 pilot has 100 USDC reserved, 0 USDC paid and a finalized `INSUFFICIENT_EVIDENCE` decision; no payout is claimed. Supabase Cron job 1 runs every five minutes and has verified HTTP 200 scheduled executions. See [current checkpoint](docs/EXECUTION_CHECKPOINT.md), [public operations runbook](docs/PUBLIC_DEMO_OPERATIONS.md) and [test report](docs/TEST_REPORT.md).
 
 ## All five coverages in one build
 
@@ -74,6 +74,7 @@ Read the [claim and settlement protocol](docs/CLAIM_PROTOCOL.md) and [reviewer r
 ## Application routes
 
 - `/` — marketing; `/developers` — agent documentation; `/underwrite` — LP entry.
+- `/demo` — wallet-optional protocol tour backed by verified deployment records and fresh chain status; `/case-study/first-pilot` — first pilot receipt timeline and reserve-release analysis.
 - `/app`, `/app/coverage`, `/app/quote`, `/app/policies`, `/app/claims`, `/app/agents`, `/app/pools`, `/app/activity`, `/app/settings` — workspace.
 - `GET /api/catalog`, `GET /api/pools`, `GET /api/health` — public.
 - `POST /api/auth/nonce`, `POST /api/auth/verify` — wallet sign-in.
@@ -102,7 +103,7 @@ npm run genlayer:smoke
 npm run genlayer:preflight
 ```
 
-The production build script uses the verified Next.js Webpack compiler. A reused Turbopack cache in the build environment failed with `Failed to open database`; the browser and chain lifecycles still require their own live verification. The Python logic checks use an isolated GenLayer shim; they are **not** GenVM consensus tests. `test:genlayer-direct` uses the installed `gltest` Direct Mode runner against the actual contract; it is a local execution check, not a live Bradbury validator run. The Bradbury preflight is a live node-side schema check and currently fails closed because the public runtime returns `invalid_contract runner malformed`; see the [Bradbury deployment record](docs/BRADBURY_DEPLOYMENT.md).
+The production build script uses the verified Next.js Webpack compiler. A reused Turbopack cache in the build environment failed with `Failed to open database`; the browser and chain lifecycles still require their own live verification. The Python logic checks use an isolated GenLayer shim; they are **not** GenVM consensus tests. `test:genlayer-direct` uses the installed `gltest` Direct Mode runner against the actual contract; it is a local execution check, not a live Bradbury validator run. The full adjudicator has a finalized Bradbury deployment and a recorded negative pilot result; see the [Bradbury deployment record](docs/BRADBURY_DEPLOYMENT.md) and [public operations runbook](docs/PUBLIC_DEMO_OPERATIONS.md).
 
 Playwright requires an installed Chromium and a running local server; use `npx playwright install chromium` if needed. The Bradbury script checks the EVM chain ID but cannot certify GenLayer-specific execution unless a working node RPC is supplied. See the [evidence issuer protocol](docs/EVIDENCE_ISSUER.md), [indexer operations](docs/INDEXER_OPERATIONS.md), [Bradbury deployment record](docs/BRADBURY_DEPLOYMENT.md), [Vercel deployment record](docs/VERCEL_DEPLOYMENT.md), and [Head of Growth demo script](docs/DEMO_SCRIPT.md). [Test record](docs/TEST_REPORT.md).
 

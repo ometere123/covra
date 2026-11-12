@@ -34,7 +34,7 @@ Adversarial Direct Mode scenarios include HTTP 400/404/500/503; empty, replaced,
 
 Migration 010 adds durable one-use authentication challenges. Live replay was reproduced as HTTP 200 before repair and rejected after deployment, including concurrent requests. Original cookies and keys were never logged.
 
-Current live deployments, evidence identity and Cron execution are recorded in BASE_DEPLOYMENT.md, BRADBURY_DEPLOYMENT.md and EXECUTION_CHECKPOINT.md. Pool funding, policy purchase, policy-bound public issuance, live adjudication/appeal and authorized payout remain unverified. These need genuine test USDC, authentic attributable observations and participation by three configured attestors.
+Current live deployments, evidence identity and Cron execution are recorded in BASE_DEPLOYMENT.md, BRADBURY_DEPLOYMENT.md and EXECUTION_CHECKPOINT.md. The first class-0 pilot now has genuine Base funding, policy purchase, claim lock, policy-bound signed observation, finalized Bradbury adjudication and reconciliation; its decision was `INSUFFICIENT_EVIDENCE`, so no payout was authorized. A genuine positive claim, appeal and authorized payout still require authentic attributable evidence and participation by three independently controlled attestors. See [the public case study](https://covra-lyart.vercel.app/case-study/first-pilot).
 
 ## Historical verification — retained for investigation
 

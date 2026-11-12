@@ -20,7 +20,7 @@ export default function Home() {
       <header className="marketing-nav container">
         <Brand/>
         <nav aria-label="Site navigation">
-          <a href="#coverage">Coverage</a><a href="#how-it-works">How it works</a>
+          <a href="#coverage">Coverage</a><Link href="/demo">Live demo</Link><a href="#how-it-works">How it works</a>
           <Link href="/underwrite">Underwriters</Link><Link href="/developers">Developers</Link>
         </nav>
         <div className="marketing-nav-actions"><WalletButton/><Link className="nav-cta" href="/app">Open app <ArrowUpRight size={15}/></Link></div>
@@ -82,7 +82,7 @@ export default function Home() {
         </section>
         <section className="cta-section container"><div><span>IT'S TIME TO BUILD TRUST INTO THE STACK.</span><h2>The agent economy<br/>needs <em>accountability.</em></h2><p>Explore the COVRA testnet experience. Real-money coverage is not yet available.</p><Link href="/app" className="button-light">Enter the workspace <ArrowUpRight size={18}/></Link></div><div className="cta-symbol" aria-hidden="true"><span className="cta-symbol-ring"><span className="cta-symbol-center">C</span></span></div></section>
       </main>
-      <footer className="marketing-footer container"><Brand/><p>Agent-native coverage infrastructure.<br/>Built for accountable autonomy.</p><div><Link href="/developers">Developers</Link><Link href="/underwrite">Underwriters</Link><Link href="/app">Workspace</Link></div><span>© 2026 COVRA. TESTNET / NO REAL-MONEY INSURANCE.</span></footer>
+      <footer className="marketing-footer container"><Brand/><p>Agent-native coverage infrastructure.<br/>Built for accountable autonomy.</p><div><Link href="/developers">Developers</Link><Link href="/demo">Public demo</Link><Link href="/case-study/first-pilot">First pilot</Link><Link href="/underwrite">Underwriters</Link><Link href="/app">Workspace</Link></div><span>© 2026 COVRA. TESTNET / NO REAL-MONEY INSURANCE.</span></footer>
     </div>
   );
 }

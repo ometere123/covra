@@ -1,5 +1,15 @@
 # Execution checkpoint
 
+## 2026-11-12 public demo and independent-operations readiness
+
+Added wallet-optional, receipt-backed public routes `/demo` and `/case-study/first-pilot`, plus [the public operations runbook](PUBLIC_DEMO_OPERATIONS.md). The pages show the five existing classes, verified Base/Bradbury deployments, the first class-0 pilot receipts, signed evidence provenance, the finalized `INSUFFICIENT_EVIDENCE` decision and the fact that no payout was authorized. They do not render fixtures, simulated balances or expected activity.
+
+A fresh Base Sepolia read at block `57599154` confirms the first policy remains `ACTIVE / 1`, its claim lock is revision `0` with roster version `1`, class 0 holds `100 USDC` assets and `100 USDC` reserved, and `0 USDC` has been paid. The lock's claim-resolution deadline is `2027-01-10T09:16:31Z`; `releaseExpired(policyId)` is the permissionless reserve-accounting path after that deadline and does not transfer USDC. No release transaction was attempted. Existing claims retain their original attestor roster snapshots.
+
+The public evidence-source review covers UptimeRobot and Better Stack free-tier monitoring APIs/status pages. Neither provider has been configured as a settlement source or used to fabricate an incident. The current first-pilot source and issuer remain COVRA-controlled, so the public trust label is `FUNCTIONAL_QUORUM_VERIFIED / OPERATOR_INDEPENDENCE_NOT_VERIFIED`. Independent operator onboarding and evidence-source requirements are recorded in [PUBLIC_DEMO_OPERATIONS.md](PUBLIC_DEMO_OPERATIONS.md).
+
+This release includes the Next viewport declaration and responsive fixes for the public case-study reserve section and marketing footer. Local typecheck, lint, unit/TAP tests and production build passed; the initial dev-mode browser sweep exposed timing/layout defects that were fixed, and the production-build browser rerun/deployment verification remains the next recorded gate.
+
 ## 2026-11-11 focused product verification
 
 The current production pool and Bradbury deployment were verified before this product change; no contract was redeployed. The landing schematic now verifies Base bytecode/pool reads on chain `84532` and a finalized `get_case_count` read through the Bradbury Phase 2 node before displaying `DEPLOYED`. It distinguishes `DEPLOYED / UNFUNDED`, unavailable verification, and claim-specific settlement prerequisites; environment-variable presence alone is not used as deployment proof.
