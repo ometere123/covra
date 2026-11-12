@@ -244,9 +244,9 @@ def _expected_findings(risk: int):
 def _valid_flag_list(value) -> bool:
     if not isinstance(value, list) or len(value) > 6:
         return False
-    if len(set(value)) != len(value):
-        return False
     if any(not isinstance(item, str) or item not in MATERIAL_FLAGS for item in value):
+        return False
+    if len(set(value)) != len(value):
         return False
     return "NONE" not in value or len(value) == 1
 

@@ -68,7 +68,8 @@ class AdjudicatorLogicTests(unittest.TestCase):
         for mutation in ({"severity": True}, {"severity": 1.5}, {"severity": "50"},
                          {"confidence": 101}, {"reason": {}}, {"evidence_refs": []},
                          {"reason": "x" * 1201}, {"verdict": "covered"},
-                         {"provenance": "COVRA"}, {"extra": "instruction"}):
+                         {"provenance": "COVRA"}, {"uncertainty": [{}]},
+                         {"extra": "instruction"}):
             with self.assertRaises(UserError):
                 module.parse_result({**valid, **mutation})
 
