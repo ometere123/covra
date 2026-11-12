@@ -12,7 +12,7 @@
 
 This is an application release only. V2 remains opt-in and inactive because the Bradbury Phase 2 deployment gate rejected the current full V2 deployment at the observed post-sequencer transaction-gas ceiling. No V2 contract, Base V2 pool, policy, or settlement transaction is claimed by this deployment.
 
-## Current production — 2026-11-03
+## Historical production record — 2026-11-03 (superseded)
 
 Deployment `dpl_7CvirQmqhDGsr6GUtkJ7aVdDhUZk` is READY at https://covra-lyart.vercel.app, using the hardened Base contract and deployment-specific indexer cursor. Real hosted database reads/writes, wallet authentication, scoped agent credential creation/revocation, MCP scope enforcement and prospective quote issuance passed. Authentication replay is rejected using durable atomic nonce consumption (migration 010).
 
