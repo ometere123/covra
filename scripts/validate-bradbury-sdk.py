@@ -7,13 +7,17 @@ It does not emulate VM execution, web requests, storage types or consensus.
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import sys
 from gltest.direct import sdk_loader
 from genvm_linter.lint import lint_contract
 
 root = Path(__file__).resolve().parents[1]
-contract = root / "contracts/genlayer/CovraAdjudicator.py"
+contract = Path(os.environ.get(
+    "COVRA_GENLAYER_CONTRACT_PATH",
+    root / "contracts/genlayer/CovraAdjudicator.py",
+))
 archive = root / ".runtime/genvm-universal.tar.xz"
 with archive.open("rb") as stream:
     if hashlib.file_digest(stream, "sha256").hexdigest() != "d3c6ba368dbd5cad01e484e19573906b4ffed41f46a48191bdc579c81cf801af":

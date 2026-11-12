@@ -3,6 +3,7 @@
 import importlib.util
 import hashlib
 import json
+import os
 import pathlib
 import sys
 import time
@@ -37,7 +38,10 @@ def load_contract():
     fake.u256 = int
     sys.modules["genlayer"] = fake
     sys.modules["genlayer.types"] = fake_types
-    source = pathlib.Path(__file__).resolve().parents[2] / "contracts/genlayer/CovraAdjudicator.py"
+    source = pathlib.Path(os.environ.get(
+        "COVRA_GENLAYER_CONTRACT_PATH",
+        pathlib.Path(__file__).resolve().parents[2] / "contracts/genlayer/CovraAdjudicator.py",
+    ))
     spec = importlib.util.spec_from_file_location("covra_contract_logic", source)
     contract = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(contract)

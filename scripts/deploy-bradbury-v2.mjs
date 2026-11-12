@@ -77,10 +77,49 @@ const simulationData = encodeFunctionData({
     messageAllocations: [],
   }],
 });
-const estimatedOuterGas = await evm.estimateGas({ account: account.address, to: testnetBradbury.consensusMainContract.address, data: simulationData, value: estimate.feeValue });
 const maxBradburyTransactionGas = 1n << 24n;
+let estimatedOuterGas = null;
+let gasPreflightMethod = "eth_estimateGas";
+let gasPreflightError = null;
+try {
+  estimatedOuterGas = await evm.estimateGas({ account: account.address, to: testnetBradbury.consensusMainContract.address, data: simulationData, value: estimate.feeValue });
+} catch (error) {
+  gasPreflightError = error instanceof Error ? error.message : String(error);
+}
+// The public Bradbury endpoint can reject eth_estimateGas for a large IC
+// envelope even when a sufficiently provisioned read-only call succeeds. Use
+// a bounded call-only binary search to measure the execution floor; this never
+// signs or broadcasts a transaction. The measured floor still has to be below
+// the verified runtime gate before deployment can proceed.
+if (estimatedOuterGas === null) {
+  gasPreflightMethod = "bounded-eth_call";
+  const upper = BigInt(process.env.BRADBURY_GAS_SIMULATION_UPPER || "60000000");
+  let succeeds = false;
+  try {
+    await evm.call({ account: account.address, to: testnetBradbury.consensusMainContract.address, data: simulationData, value: estimate.feeValue, gas: upper });
+    succeeds = true;
+  } catch {
+    // Keep the detailed estimate error private to the local diagnostic; the
+    // final message below contains no credentials or transaction payload.
+  }
+  if (!succeeds) {
+    throw new Error(`Bradbury outer gas preflight failed: eth_estimateGas reverted (${gasPreflightError || "unknown error"}) and eth_call did not succeed at ${upper} gas; no deployment submitted`);
+  }
+  let low = 21000n;
+  let high = upper;
+  while (high - low > 1024n) {
+    const middle = (low + high) / 2n;
+    try {
+      await evm.call({ account: account.address, to: testnetBradbury.consensusMainContract.address, data: simulationData, value: estimate.feeValue, gas: middle });
+      high = middle;
+    } catch {
+      low = middle;
+    }
+  }
+  estimatedOuterGas = high;
+}
 if (estimatedOuterGas >= maxBradburyTransactionGas) {
-  throw new Error(`Bradbury outer transaction gas estimate ${estimatedOuterGas} exceeds the 2^24 transaction cap; no deployment submitted`);
+  throw new Error(`Bradbury outer transaction gas preflight ${estimatedOuterGas} (${gasPreflightMethod}) exceeds the verified 2^24 transaction/runtime gate; no deployment submitted`);
 }
 
 const json = (value) => JSON.stringify(value, (_, entry) => typeof entry === "bigint" ? entry.toString() : entry, 2);
@@ -102,6 +141,7 @@ const baseRecord = {
   serializedDeploymentBytes: serializedDeployment.length,
   intrinsicGas: intrinsicGas.toString(),
   gasLimit: estimatedOuterGas.toString(),
+  gasPreflightMethod,
   status: "preflight-passed",
 };
 

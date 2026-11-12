@@ -1,0 +1,63 @@
+{
+  "network": {
+    "name": "testnet-bradbury",
+    "chainId": 4221,
+    "genesis": "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4",
+    "nodeRpc": "https://rpc-bradbury.genlayer.com",
+    "chainRpc": "https://rpc.testnet-chain.genlayer.com",
+    "feeManager": "0x7678587A847712f2A96082AC07883A88D0fc7245"
+  },
+  "developmentSource": {
+    "path": "contracts/genlayer/CovraAdjudicator.py",
+    "bytes": 49160,
+    "sha256": "a21c8be4f51942fe3c0b7d87e15d737c9ac369b94eadb4a9be7969e86821e308"
+  },
+  "deploymentArtifact": {
+    "path": "contracts/genlayer/generated/CovraAdjudicator.py",
+    "bytes": 42664,
+    "sha256": "3009c8f48fa380c73879a2c65652931ed0438a2e8e55eda27be59c1df05203ed"
+  },
+  "transformation": "Parse Python after the two-line GenVM header, remove comments and module/class/function docstrings, emit deterministic ast.unparse output, and retain the pinned header verbatim. Imports, expressions, identifiers, public methods, storage declarations and string literal values are not rewritten.",
+  "equivalence": {
+    "schemaMethods": 11,
+    "compactSchemaValidation": "pass",
+    "compactAstLint": "3/3 pass",
+    "compactDirectMode": "25/25 pass",
+    "compactHostLogic": "10/10 pass",
+    "canonicalSourceSchemaValidation": "pass",
+    "canonicalDirectMode": "25/25 pass"
+  },
+  "gasPreflight": {
+    "development": {
+      "serializedDeploymentBytes": 98338,
+      "outerCalldataBytes": 49988,
+      "estimateGas": null,
+      "estimateError": "Execution reverted for an unknown reason.",
+      "simulationGasFloor": "39888326"
+    },
+    "artifact": {
+      "serializedDeploymentBytes": 85346,
+      "outerCalldataBytes": 43492,
+      "estimateGas": null,
+      "estimateError": "Execution reverted for an unknown reason.",
+      "simulationGasFloor": "34802522"
+    },
+    "releaseGateGas": "16777216",
+    "withinReleaseGate": false,
+    "method": "eth_estimateGas followed by bounded eth_call binary search when estimation reverts (binary-search boundary within 1024 gas); no transaction was signed or broadcast"
+  },
+  "failedBroadcastControl": {
+    "transactionHash": "0xe80b56e339a7ac4ae095769751e9e39567d7ec2b5ccdc443fce5e7209c466924",
+    "status": "0x0",
+    "gasLimit": "45000000",
+    "gasUsed": "29238269",
+    "logs": 0,
+    "genlayerTransactionId": null,
+    "block": "0x597ef",
+    "blockGasLimit": "0x4000000000000"
+  },
+  "deployment": "not-submitted",
+  "verdict": "NETWORK_LIMIT_CONFIRMED_ESCALATION_REQUIRED",
+  "verifiedAt": "2026-11-12",
+  "officialReference": "https://github.com/genlayerlabs/genlayer-cli/issues/419"
+}

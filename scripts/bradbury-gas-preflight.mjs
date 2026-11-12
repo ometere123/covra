@@ -44,6 +44,10 @@ const data = encodeFunctionData({
 const client = createPublicClient({ transport: http(rpcUrl) });
 let estimate = null;
 let estimateError = null;
+const simulationGasUpperBound = BigInt(process.env.BRADBURY_GAS_SIMULATION_UPPER || "60000000");
+const simulationGasLowerBound = 21000n;
+let simulationGasFloor = null;
+let simulationError = null;
 try {
   estimate = await client.estimateGas({
     account: sender,
@@ -59,8 +63,32 @@ try {
       ? value.details
       : error instanceof Error ? error.message : String(error);
 }
+if (estimate === null) {
+  const simulationCall = { account: sender, to: testnetBradbury.consensusMainContract.address, data, value: 100000000000010352n };
+  const succeeds = async (gas) => {
+    try {
+      await client.call({ ...simulationCall, gas });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  if (await succeeds(simulationGasUpperBound)) {
+    let low = simulationGasLowerBound;
+    let high = simulationGasUpperBound;
+    while (high - low > 1024n) {
+      const middle = (low + high) / 2n;
+      if (await succeeds(middle)) high = middle;
+      else low = middle;
+    }
+    simulationGasFloor = high;
+  } else {
+    simulationError = `eth_call did not succeed at the ${simulationGasUpperBound} gas probe`;
+  }
+}
 const sha = createHash("sha256").update(sourceBytes).digest("hex");
 const cap = 1n << 24n;
+const effectiveGas = estimate ?? simulationGasFloor;
 console.log(JSON.stringify({
   sourcePath,
   sourceBytes: sourceBytes.byteLength,
@@ -69,8 +97,11 @@ console.log(JSON.stringify({
   outerCalldataBytes: (data.length - 2) / 2,
   estimateGas: estimate?.toString() || null,
   estimateError,
+  simulationGasUpperBound: simulationGasUpperBound.toString(),
+  simulationGasFloor: simulationGasFloor?.toString() || null,
+  simulationError,
   BradburyMaxTransactionGas: cap.toString(),
-  withinBradburyGasCap: estimate !== null && estimate < cap,
+  withinBradburyGasCap: effectiveGas !== null && effectiveGas < cap,
   sender,
   rpcUrl,
 }, null, 2));

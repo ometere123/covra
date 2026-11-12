@@ -15,6 +15,11 @@ from datetime import datetime, timezone
 from gltest.direct import loader
 from gltest.direct import sdk_loader
 
+CONTRACT_PATH = os.environ.get(
+    "COVRA_GENLAYER_CONTRACT_PATH",
+    "contracts/genlayer/CovraAdjudicator.py",
+)
+
 
 def _verified_manager_sdk(contract_path=None, version=None):
     root = Path(__file__).resolve().parents[2] / ".runtime"
@@ -290,7 +295,7 @@ def _deploy(direct_deploy, direct_vm):
     loader._inject_message_to_fd0 = windows_safe_inject
     loader._allocate_contract = v03_allocate
     try:
-        contract = direct_deploy("contracts/genlayer/CovraAdjudicator.py")
+        contract = direct_deploy(CONTRACT_PATH)
         # The installed helper patches genlayer.gl.vm, while the v0.3 SDK
         # exposes the supported operation at genlayer.vm.run_nondet. Invoke
         # the validator in-process so Direct Mode still exercises both sides.
