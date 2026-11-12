@@ -10,6 +10,8 @@ The live read-only procedure `npm run genlayer:finalize-class0` continues to ret
 
 The external-review pass also corrected Bradbury receipt provenance: public-demo receipt rows and the deployment receipt now use the verified Bradbury Phase 2 explorer `https://scan.bradbury.genlayer.com/tx/<transaction-id>` instead of a generic legacy explorer root. The wallet chain metadata, Settings link and deployment documentation use the same current explorer host. The real pilot transaction route was checked with the Bradbury submit hash and returned HTTP 200 containing the hash.
 
+That correction is in commit `2bae01ea75b92db14db01ee8a0f3bc705850a1f3` and was deployed to the existing project as `dpl_8Rg2KtZ22dYvSCXeGETP4gcW2Nsj`, `READY`, aliased to the stable URL. Protected production checks confirmed the exact Bradbury submit/adjudicate links, absence of the legacy host, the still-open case state and the recorded snapshot. GitHub Actions quality gate run [`43196348758`](https://github.com/ometere123/covra/actions/runs/43196348758) passed for the code commit.
+
 ## 2026-11-12 public demo and independent-operations readiness
 
 Added wallet-optional, receipt-backed public routes `/demo` and `/case-study/first-pilot`, plus [the public operations runbook](PUBLIC_DEMO_OPERATIONS.md). The pages show the five existing classes, verified Base/Bradbury deployments, the first class-0 pilot receipts, signed evidence provenance, the finalized `INSUFFICIENT_EVIDENCE` decision and the fact that no payout was authorized. They do not render fixtures, simulated balances or expected activity.
