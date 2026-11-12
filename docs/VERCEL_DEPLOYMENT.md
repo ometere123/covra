@@ -1,5 +1,17 @@
 # Vercel deployment record
 
+## Current V2-gate release — 2026-11-12
+
+- Project: `covra` (linked project id `prj_MEfQ5bR0bq4XEUNg0XzbNtUbfmqi`)
+- Target: Vercel production on the authenticated Hobby team
+- Deployment ID: `dpl_5PX1EPBB4E8YsaXu7PCwQrpVrx5m`
+- Stable alias: [https://covra-lyart.vercel.app](https://covra-lyart.vercel.app)
+- Inspection: [Vercel deployment](https://vercel.com/delealufejoel-4184s-projects/covra/5PX1EPBB4E8YsaXu7PCwQrpVrx5m)
+- Status: `READY`
+- Runtime verification: `/api/health` reported `available` / `testnet`; `/api/protocol-status` reported active `V1`; `/demo`, `/case-study/first-pilot`, and `/app/pools` returned captured HTML responses containing the expected COVRA route content.
+
+This is an application release only. V2 remains opt-in and inactive because the Bradbury Phase 2 deployment gate rejected the current full V2 deployment at the observed post-sequencer transaction-gas ceiling. No V2 contract, Base V2 pool, policy, or settlement transaction is claimed by this deployment.
+
 ## Current production — 2026-11-03
 
 Deployment `dpl_7CvirQmqhDGsr6GUtkJ7aVdDhUZk` is READY at https://covra-lyart.vercel.app, using the hardened Base contract and deployment-specific indexer cursor. Real hosted database reads/writes, wallet authentication, scoped agent credential creation/revocation, MCP scope enforcement and prospective quote issuance passed. Authentication replay is rejected using durable atomic nonce consumption (migration 010).

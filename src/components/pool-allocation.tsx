@@ -49,6 +49,7 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
   const poolAddress = configuredPoolAddress();
   const [items, setItems] = useState<PoolRow[]>([]);
   const [state, setState] = useState("LOADING");
+  const [clientHydrated, setClientHydrated] = useState(false);
   const [message, setMessage] = useState("");
   const [risk, setRisk] = useState(0);
   const [amount, setAmount] = useState(250);
@@ -72,7 +73,7 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
     setTransactionPhase("AWAITING_SIGNATURE");
   };
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     void fetch("/api/pools", { cache: "no-store" }).then(r => r.json()).then(r => {
       setItems(Array.isArray(r.items) ? r.items : []);
       setState(String(r.state || "SYNCHRONIZATION_ERROR"));
@@ -82,9 +83,12 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
       setState("SYNCHRONIZATION_ERROR");
       setMessage("Base Sepolia pool state could not be read.");
     });
-  };
+  }, []);
 
-  useEffect(refresh, []);
+  useEffect(() => {
+    setClientHydrated(true);
+    refresh();
+  }, [refresh]);
 
   const refreshWithdrawal = useCallback(async () => {
     if (!poolAddress || !wallet.address || wallet.chainId !== 84532) {
@@ -279,7 +283,7 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
         const ratio = assets > 0 ? Math.min(100, Math.round(reserved / assets * 100)) : 0;
         return <div className="pool-card" key={p.classId}><span className="pool-card-number">POOL / 0{p.classId + 1}</span><h3>{p.name}</h3><strong>{formatUsdc(assets)}</strong><div className="pool-utilization"><span style={{ width: ratio + "%" }} /></div><small><span>{ratio}% reserved</span><span>{formatUsdc(assets - reserved)} free</span></small></div>;
       }) : <div className="pool-empty"><EmptyState title="No verified pool balances" text={emptyPoolMessage} /></div>}</div>
-      <div className="form-layout pool-form-layout">
+      <div className="form-layout pool-form-layout" data-client-hydrated={clientHydrated ? "true" : "false"}>
         <div className="panel form-panel">
           <div className="form-block-title"><span>01</span> Capital allocation</div>
           <div className="field"><label htmlFor="pool-risk">RISK POOL</label><select id="pool-risk" value={risk} onChange={e => setRisk(Number(e.target.value))}>{coverages.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>

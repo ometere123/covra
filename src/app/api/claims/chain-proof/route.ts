@@ -8,6 +8,7 @@ import { walletSession } from "@/lib/auth";
 import { authenticateAgent } from "@/lib/agent-auth";
 import { database } from "@/lib/db";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
+import { configuredAdjudicator } from "@/lib/bradbury-client";
 import { canonicalJson, claimIdFromUuid, finalizedResultDigest } from "@/lib/claim-protocol";
 import { assertExactBradburyReceipt } from "@/lib/bradbury-receipt";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "@/lib/bradbury-final-state";
@@ -106,7 +107,7 @@ export async function POST(request:NextRequest) {
       }
     } else {
       const endpoint=process.env.BRADBURY_NODE_RPC_URL;
-      const adjudicator=process.env.BRADBURY_ADJUDICATOR_ADDRESS;
+      const adjudicator=configuredAdjudicator();
       if (!endpoint?.startsWith("https://")||!adjudicator) throw new Error("Bradbury execution node not configured");
       await assertBradburyNodeIdentity(endpoint);
       const client=createClient({chain:testnetBradbury,endpoint});

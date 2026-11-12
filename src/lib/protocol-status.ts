@@ -3,6 +3,7 @@ import { configuredAdjudicator, publicBradburyEndpoint } from "@/lib/bradbury-cl
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "@/lib/bradbury-final-state";
 import { coverages } from "@/lib/catalog";
 import { verifyPoolIdentity } from "@/lib/pool-contract-verification";
+import { activeContractVersion } from "@/lib/deployment-config.mjs";
 
 export type DeploymentState = "LOADING" | "DEPLOYED" | "DEPLOYED_UNFUNDED" | "UNAVAILABLE";
 
@@ -23,6 +24,7 @@ export type AdjudicatorDeploymentStatus = {
 
 export type ProtocolStatus = {
   checkedAt: string;
+  contractVersion: "V1" | "V2";
   pool: PoolDeploymentStatus;
   adjudicator: AdjudicatorDeploymentStatus;
   settlement: {
@@ -104,5 +106,5 @@ export async function readProtocolStatus(): Promise<ProtocolStatus> {
     : pool.state === "DEPLOYED_UNFUNDED"
       ? { state: "NOT_READY" as const, message: "Deployments verify, but no pool capital is available for a policy or payout." }
       : { state: "CLAIM_SPECIFIC_PREREQUISITES" as const, message: "Capital is detected; each settlement still requires a frozen policy, finalized decision and valid attestor quorum." };
-  return { checkedAt: new Date().toISOString(), pool, adjudicator, settlement };
+  return { checkedAt: new Date().toISOString(), contractVersion: activeContractVersion(), pool, adjudicator, settlement };
 }

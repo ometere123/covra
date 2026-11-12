@@ -10,6 +10,9 @@ import { testnetBradbury } from "genlayer-js/chains";
 import type { EIP1193Provider } from "viem";
 import { assertExactBradburyReceipt } from "./bradbury-receipt";
 import { BRADBURY_PHASE_2_GENESIS, readFinalizedBradburyView } from "./bradbury-final-state";
+import { activeDeployment, configuredDeployment } from "./deployment-config.mjs";
+
+type ContractVersion = "V1" | "V2";
 
 type BradburySubmission = { txHash: string; feeDeposit: string };
 
@@ -92,7 +95,6 @@ export async function readBradburyCase(adjudicator: `0x${string}`, caseId: strin
   };
 }
 
-export function configuredAdjudicator(): `0x${string}` | null {
-  const value = process.env.NEXT_PUBLIC_BRADBURY_ADJUDICATOR_ADDRESS;
-  return value && /^0x[a-fA-F0-9]{40}$/.test(value) ? value as `0x${string}` : null;
+export function configuredAdjudicator(version?: ContractVersion): `0x${string}` | null {
+  return (version ? configuredDeployment(version) : activeDeployment()).adjudicatorAddress;
 }

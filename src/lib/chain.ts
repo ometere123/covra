@@ -1,5 +1,8 @@
 import { createPublicClient, defineChain, http, parseAbi } from "viem";
 import { baseSepolia } from "viem/chains";
+import { activeDeployment, configuredDeployment } from "./deployment-config.mjs";
+
+export type ContractVersion = "V1" | "V2";
 
 export const BASE_CHAIN_ID = 84532;
 export const BRADBURY_CHAIN_ID = 4221;
@@ -124,7 +127,6 @@ export function quoteToAbi(q: SignedQuote) {
   };
 }
 
-export function configuredPoolAddress(): `0x${string}` | null {
-  const addr = process.env.NEXT_PUBLIC_COVRA_POOLS_ADDRESS;
-  return addr && /^0x[0-9a-fA-F]{40}$/.test(addr) ? addr as `0x${string}` : null;
+export function configuredPoolAddress(version?: ContractVersion): `0x${string}` | null {
+  return (version ? configuredDeployment(version) : activeDeployment()).poolAddress;
 }

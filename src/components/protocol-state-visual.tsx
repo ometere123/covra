@@ -32,6 +32,7 @@ export function ProtocolStateVisual() {
       .then(value => { if (active) setStatus(value); })
       .catch(() => { if (active) setStatus({
         checkedAt: new Date().toISOString(),
+        contractVersion: "V1",
         pool: { state: "UNAVAILABLE", address: null, assetsMicroUsdc: null, reservedMicroUsdc: null, message: "Protocol status unavailable." },
         adjudicator: { state: "UNAVAILABLE", address: null, finalizedCaseCount: null, message: "Protocol status unavailable." },
         settlement: { state: "UNAVAILABLE", message: "Settlement readiness is unavailable." },
@@ -45,7 +46,7 @@ export function ProtocolStateVisual() {
   const poolLive = status?.pool.state === "DEPLOYED";
   const barClass = status && poolLive ? "visual-bar-live" : "";
   return <>
-    <div className="visual-topline"><span>COVRA / PROTOCOL STATE</span><span className="visual-top-dot"/> <span>{status ? "VERIFIED READ" : "CHECKING NETWORK"}</span></div>
+    <div className="visual-topline"><span>COVRA / PROTOCOL STATE</span><span className="visual-top-dot"/> <span>{status ? `VERIFIED READ · ${status.contractVersion}` : "CHECKING NETWORK"}</span></div>
     <div className="visual-core">
       <div className="visual-circle-outer"><div className="visual-orbit-dot"/><div className="visual-circle-inner" aria-live="polite"><span>DEPLOYMENT STATE</span><strong>{mainLabel(status)}</strong><Network size={33} strokeWidth={1.2}/></div></div>
       <div className="visual-meta visual-meta-left"><span className="visual-label">DEFINED CLASSES</span><strong>05</strong><span>PROTOCOL CONFIG</span></div>

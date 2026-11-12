@@ -27,9 +27,9 @@ function slug(route: string) {
 
 test("all primary routes remain usable across supported viewport widths", async ({ page }, testInfo) => {
   // The production matrix covers eight widths and every primary route. WebKit
-  // can require several minutes when it cold-starts the hosted app; retain
-  // the same assertions while giving the external runtime a bounded budget.
-  test.setTimeout(420_000);
+  // can require several minutes when it cold-starts the app, so keep the
+  // matrix bounded without making individual network-idle waits unbounded.
+  test.setTimeout(900_000);
   mkdirSync(testInfo.outputDir, { recursive: true });
 
   for (const width of widths) {
@@ -65,9 +65,11 @@ test("all primary routes remain usable across supported viewport widths", async 
 
       if (route === "/app/pools") {
         // The pool screen performs a verified API read on mount. Wait for the
-        // client hydration/read cycle before editing controlled inputs, or a
-        // dev-server hydration pass can legitimately restore the SSR value.
-        await page.waitForLoadState("networkidle");
+        // form itself rather than global network idle: RPC/indexer requests
+        // are intentionally allowed to remain pending and must not make a
+        // responsive-layout test hang.
+        await expect(page.locator(".pool-form-layout")).toBeVisible();
+        await expect(page.locator(".pool-form-layout")).toHaveAttribute("data-client-hydrated", "true");
         const risk = page.locator("#pool-risk");
         const amount = page.locator("#pool-amount");
         const withdrawal = page.locator("#withdraw-amount");

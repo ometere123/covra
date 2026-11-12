@@ -1,0 +1,55 @@
+{
+  "network": "testnet-bradbury",
+  "chainId": 4221,
+  "nodeRpc": "https://rpc-bradbury.genlayer.com",
+  "chainRpc": "https://rpc.testnet-chain.genlayer.com",
+  "source": "contracts/genlayer/CovraAdjudicator.py",
+  "sourceSha256": "a21c8be4f51942fe3c0b7d87e15d737c9ac369b94eadb4a9be7969e86821e308",
+  "protocolFeeDeposit": "100000000000010352",
+  "results": [
+    {
+      "transactionHash": "0xbbb44eb6f8d46c343f476eb48350de9567d7b3eee486bd06aeac479d7a407d14",
+      "from": "0xa5840e65a15021d8b1648db10176c04811f07873",
+      "status": "0x0",
+      "gasUsed": "0x45aed4",
+      "logs": 0,
+      "classification": "WRONG_BRADBURY_SIGNER_PREVENTED_SUCCESS",
+      "note": "The Base Sepolia deployer identity was used in the first local SDK attempt; no GenLayer transaction or contract was created."
+    },
+    {
+      "transactionHash": "0x75d028f83756611c1f9443bb3c0b4500707baf1dfd7a97292d3c1ea762d2ca3a",
+      "from": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+      "value": "0",
+      "gas": "0x4a8318",
+      "status": "0x0",
+      "logs": 0,
+      "classification": "ZERO_PROTOCOL_FEE_REJECTED",
+      "note": "The CLI path did not attach the required v0.6 fee distribution."
+    },
+    {
+      "transactionHash": "0xa2c26cd875b6ff09d9fdb257c89672ccf1d8d90515b5ad9e92898da642364ac",
+      "from": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+      "value": "100000000000010352",
+      "gas": "0x4a8318",
+      "status": "0x0",
+      "gasUsed": "0x45aed4",
+      "logs": 0,
+      "classification": "OUTER_GAS_INSUFFICIENT",
+      "note": "The fee was correct, but the explicit gas limit was below the deployment execution requirement."
+    },
+    {
+      "transactionHash": "0xe80b56e339a7ac4ae095769751e9e39567d7ec2b5ccdc443fce5e7209c466924",
+      "from": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+      "value": "100000000000010352",
+      "gas": "0x2aea540",
+      "status": "0x0",
+      "gasUsed": "0x1be23fd",
+      "logs": 0,
+      "classification": "BRADBURY_TRANSACTION_GAS_CAP_BLOCKED",
+      "note": "The outer call consumed 29238269 gas and reverted before creating a GenLayer transaction. Bradbury's current 2^24 maximum transaction gas ceiling is below this source's deployment requirement."
+    }
+  ],
+  "contractCreated": false,
+  "genlayerTransactionIds": [],
+  "verifiedOn": "2026-11-12"
+}

@@ -1,5 +1,23 @@
 # Execution checkpoint
 
+## 2026-11-12 V2-gate application release
+
+The V2-safe routing, deployment guards, reproducible SDK patch, and responsive pool interaction changes were deployed to the existing Vercel Hobby project after the local release gates passed. Vercel deployment `dpl_5PX1EPBB4E8YsaXu7PCwQrpVrx5m` reached `READY` and is aliased to [https://covra-lyart.vercel.app](https://covra-lyart.vercel.app); inspection is [available in Vercel](https://vercel.com/delealufejoel-4184s-projects/covra/5PX1EPBB4E8YsaXu7PCwQrpVrx5m). The authenticated Vercel CLI confirmed the linked `covra` project and Hobby team before deployment. Protected production checks captured `/api/health` as `available` in `testnet` mode, `/api/protocol-status` as active `V1`, and successful HTML responses for `/demo`, `/case-study/first-pilot`, and `/app/pools`. No V2 address was configured or exposed to production.
+
+The release was built from the working tree before commit; the source and documentation changes are being committed and pushed together below. This deployment record does not claim V2 deployment, live V2 consensus, or any new Base transaction.
+
+## 2026-11-12 V2 deployment gate and application routing
+
+The V2 source work is preserved in `contracts/genlayer/CovraAdjudicator.py` at SHA-256 `a21c8be4f51942fe3c0b7d87e15d737c9ac369b94eadb4a9be7969e86821e308`. Bradbury Phase 2 schema extraction returns the expected 11 methods, and the V2 host logic/Direct Mode suite remains green. V2 is not deployed.
+
+Four real outer Bradbury submissions were investigated and recorded in [`bradbury-v2-failed-submissions-2026-11-12.json`](deployments/bradbury-v2-failed-submissions-2026-11-12.json). The final Praest submission used the correct disposable Bradbury address and nonzero v0.6 protocol fee, but reverted with `status=0x0`, `gasUsed=29238269`, no logs and no GenLayer transaction ID. The current safe read-only preflight returns the node's `execution reverted` response for the 49,160-byte / 98,338-byte-serialized V2 deployment; the real broadcast already consumed above Bradbury's observed `2^24` transaction-gas ceiling. No V2 contract address exists and no Base V2 pool was deployed. Do not retry until an official cap-compatible deployment path or a source that passes the cap gate is available.
+
+The deployment script now uses only `BRADBURY_DEPLOYER_PRIVATE_KEY`, checks the optional matching public address, preserves account-aware FeeManager estimation and refuses to sign if the outer gas estimate is at or above the Bradbury cap. The Base `DEPLOYER_PRIVATE_KEY` is no longer accepted by that Bradbury script. The versioned Base deploy script also accepts an explicit V2 opt-in and binds only `BRADBURY_ADJUDICATOR_V2_ADDRESS`; it cannot silently deploy a V2 pool against the V1 adjudicator.
+
+Version-aware routing was added in `src/lib/deployment-config.mjs` with TypeScript declarations: V1 remains the default and active deployment; V2 requires explicit `NEXT_PUBLIC_COVRA_DEPLOYMENT_VERSION=V2` plus both valid V2 public addresses. All application chain-proof, quote, claims, pool and Bradbury reads use the active pair, while a partial V2 configuration falls back to V1. No `.env.local` was read or modified.
+
+The reproducibility patch for `genlayer-js@2.0.0-rc.2` was regenerated against the pristine npm tarball and verified with `patch-package --check` and `npm run postinstall`. It supplies the funded caller to the FeeManager simulation and carries an explicit gas override through deployment/write actions. `npm run typecheck`, ESLint, `npm test` (123 Vitest + 12 TAP), Solidity compilation, GenLayer validation, host logic (10/10), Direct Mode (25/25) and the Webpack production build pass. The responsive Playwright primary-route matrix passes in Chromium, Pixel 7 and WebKit iPhone profiles across all eight widths; the prior parallel run's controlled-input race is covered by an explicit client-hydrated form marker.
+
 ## 2026-11-12 current review and live-state gate
 
 The repository began this review at remote `main` commit `a87e48a777c2955ebe3cbf0b51c48be3cf19c971`; the worktree was clean and `.env.local` was not read, changed or exposed. V1 was retained. No Base or Bradbury deployment, policy, claim, finalization, reserve-release or settlement transaction was submitted during this review.

@@ -84,11 +84,31 @@ def _case_inputs(
         facts.pop("missed_deadline")
     origin_path = "1" if complete_facts else "2"
     origin_url = "https://status.example.com/observations/" + origin_path
+    source_records = []
+    for _host in ("observer-a.example.net", "observer-b.example.net"):
+        source_records.append(_canonical({
+            "schema": "covra-independent-observation-v1",
+            "observation_id": "obs-001",
+            "coverage_class": 0,
+            "event_time": "2026-10-31T00:00:00.000Z",
+            "subject": "task-123",
+            "reference_hash": reference_hash,
+            "facts": facts,
+            "captured_at": "2026-10-31T00:00:00.000Z",
+        }))
     origin_body = _canonical({
-        "task_id": facts["task_id"],
-        "task_spec_hash": facts["task_spec_hash"],
-        "observed_at": "2026-10-31T00:00:00.000Z",
-        "source": "public-testbed-status",
+        "schema": "covra-origin-manifest-v1",
+        "observation_id": "obs-001",
+        "coverage_class": 0,
+        "event_time": "2026-10-31T00:00:00.000Z",
+        "subject": "task-123",
+        "reference_hash": reference_hash,
+        "facts": facts,
+        "captured_at": "2026-10-31T00:00:00.000Z",
+        "sources": [
+            {"url": "https://observer-a.example.net/observations/1", "payload_digest": _digest(source_records[0])},
+            {"url": "https://observer-b.example.net/observations/1", "payload_digest": _digest(source_records[1])},
+        ],
     })
     now = int(datetime.now(timezone.utc).timestamp())
     envelope = {
@@ -134,6 +154,11 @@ def _case_inputs(
         "event_time": envelope["event_time"],
         "body": body,
         "origin_body": origin_body,
+        "source_records": source_records,
+        "source_urls": [
+            "https://observer-a.example.net/observations/1",
+            "https://observer-b.example.net/observations/1",
+        ],
         "insured": insured,
         "nonce": nonce,
     }
@@ -284,7 +309,11 @@ def _deploy(direct_deploy, direct_vm):
             return Response(status=int(mock.get("status", 200)), headers={}, body=body)
 
         def direct_prompt(prompt, **_config):
-            return json.loads(direct_vm._match_llm_mock(prompt))
+            value = direct_vm._match_llm_mock(prompt)
+            try:
+                return json.loads(value)
+            except (TypeError, ValueError):
+                return value
 
         # gltest's WASI bridge still decodes gl_call requests with its removed
         # genlayer.py package. Adapt only the external nondeterministic inputs;
@@ -347,6 +376,10 @@ def test_covra_adjudicator_direct_positive_and_negative_adjudication(
     direct_vm.mock_web("status\\.example\\.com/observations/1", {
         "method": "GET", "status": 200, "body": positive["origin_body"]
     })
+    for url, source_body in zip(positive["source_urls"], positive["source_records"]):
+        direct_vm.mock_web(url.replace(".", "\\."), {
+            "method": "GET", "status": 200, "body": source_body
+        })
     direct_vm.mock_llm("COVRA", json.dumps(_decision(positive)))
     contract.adjudicate(positive["case_id"])
     assert json.loads(contract.get_case(positive["case_id"]))["verdict"] == "COVERED"
@@ -446,6 +479,8 @@ def test_malicious_leader_and_disagreement_rejected(direct_deploy, direct_vm, di
     contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
     direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": 200, "body": case["body"]})
     direct_vm.mock_web("status\\.example\\.com", {"method": "GET", "status": 200, "body": case["origin_body"]})
+    for url, source_body in zip(case["source_urls"], case["source_records"]):
+        direct_vm.mock_web(url.replace(".", "\\."), {"method": "GET", "status": 200, "body": source_body})
     direct_vm.mock_llm("COVRA", json.dumps(_decision(case)))
     def manipulate(value):
         value = dict(value)
@@ -461,7 +496,7 @@ def test_malicious_leader_and_disagreement_rejected(direct_deploy, direct_vm, di
     direct_vm._covra_candidate_transform = manipulate
     with pytest.raises(AssertionError, match="validator rejected"):
         contract.adjudicate(case["case_id"])
-    assert direct_vm._covra_web_reads == 4  # Leader and validator each fetch issuer and origin bytes.
+    assert direct_vm._covra_web_reads == 8  # Leader and validator each fetch issuer, origin and two source records.
     assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"
 
 
@@ -476,10 +511,17 @@ def test_malicious_leader_and_disagreement_rejected(direct_deploy, direct_vm, di
 def test_malformed_model_output_cannot_create_a_decision(direct_deploy, direct_vm, direct_owner, payload):
     contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
     direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": 200, "body": case["body"]})
+    direct_vm.mock_web("status\\.example\\.com", {"method": "GET", "status": 200, "body": case["origin_body"]})
+    for url, source_body in zip(case["source_urls"], case["source_records"]):
+        direct_vm.mock_web(url.replace(".", "\\."), {"method": "GET", "status": 200, "body": source_body})
     direct_vm.mock_llm("COVRA", payload)
-    with pytest.raises(Exception):
-        contract.adjudicate(case["case_id"])
-    assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"
+    # A malformed model response is normalized to a durable, fail-closed
+    # INSUFFICIENT_EVIDENCE decision; it can never create COVERED state.
+    contract.adjudicate(case["case_id"])
+    decided = json.loads(contract.get_case(case["case_id"]))
+    assert decided["state"] == "DECIDED"
+    assert decided["verdict"] == "INSUFFICIENT_EVIDENCE"
+    assert contract.get_decision_digest(case["case_id"]) == ""
 
 
 def test_exact_sdk_delegation_revocation_duplicate_and_unknown_cases(direct_deploy, direct_vm, direct_owner, direct_alice):

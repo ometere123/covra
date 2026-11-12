@@ -1,8 +1,88 @@
-diff --git a/node_modules/genlayer-js/dist/index.js b/node_modules/genlayer-js/dist/index.js
-index a7b64c6..edbd772 100644
---- a/node_modules/genlayer-js/dist/index.js
-+++ b/node_modules/genlayer-js/dist/index.js
-@@ -2457,7 +2457,7 @@ var readCurrentFeePolicy = async (client, publicClient) => {
+diff --git a/node_modules/genlayer-js/dist/index-ZghtttqM.d.ts b/node_modules/genlayer-js/dist/index-ZghtttqM.d.ts
+index bd5293b..fd2767c 100644
+--- a/node_modules/genlayer-js/dist/index-ZghtttqM.d.ts
++++ b/node_modules/genlayer-js/dist/index-ZghtttqM.d.ts
+@@ -4899,6 +4899,7 @@ type GenLayerClient<TGenLayerChain extends GenLayerChain> = Omit<Client<Transpor
+             [key: string]: CalldataEncodable;
+         };
+         value?: bigint;
++        gas?: bigint;
+         leaderOnly?: boolean;
+         consensusMaxRotations?: number;
+         validUntil?: BigNumberish;
+@@ -4915,6 +4916,7 @@ type GenLayerClient<TGenLayerChain extends GenLayerChain> = Omit<Client<Transpor
+         rawReturn?: RawReturn;
+         includeReceipt?: IncludeReceipt;
+         value?: BigNumberish;
++        gas?: bigint;
+         leaderOnly?: boolean;
+         fees?: TransactionFeeOptions;
+         transactionHashVariant?: TransactionHashVariant;
+diff --git a/node_modules/genlayer-js/dist/index-zqxXIu6R.d.cts b/node_modules/genlayer-js/dist/index-zqxXIu6R.d.cts
+index 0d3ffb1..9304a8a 100644
+--- a/node_modules/genlayer-js/dist/index-zqxXIu6R.d.cts
++++ b/node_modules/genlayer-js/dist/index-zqxXIu6R.d.cts
+@@ -4899,6 +4899,7 @@ type GenLayerClient<TGenLayerChain extends GenLayerChain> = Omit<Client<Transpor
+             [key: string]: CalldataEncodable;
+         };
+         value?: bigint;
++        gas?: bigint;
+         leaderOnly?: boolean;
+         consensusMaxRotations?: number;
+         validUntil?: BigNumberish;
+@@ -4915,6 +4916,7 @@ type GenLayerClient<TGenLayerChain extends GenLayerChain> = Omit<Client<Transpor
+         rawReturn?: RawReturn;
+         includeReceipt?: IncludeReceipt;
+         value?: BigNumberish;
++        gas?: bigint;
+         leaderOnly?: boolean;
+         fees?: TransactionFeeOptions;
+         transactionHashVariant?: TransactionHashVariant;
+diff --git a/node_modules/genlayer-js/dist/index.cjs b/node_modules/genlayer-js/dist/index.cjs
+index bdaa551..dc0b55d 100644
+--- a/node_modules/genlayer-js/dist/index.cjs
++++ b/node_modules/genlayer-js/dist/index.cjs
+@@ -1427,7 +1427,8 @@ var contractActions = (client, publicClient) => {
+         leaderOnly = false,
+         consensusMaxRotations = client.chain.defaultConsensusMaxRotations,
+         validUntil,
+-        fees
++        fees,
++        gas
+       } = args;
+       const data = [encode(makeCalldataObject(functionName, callArgs, kwargs)), leaderOnly];
+       const serializedData = serialize(data);
+@@ -1452,7 +1453,8 @@ var contractActions = (client, publicClient) => {
+         client,
+         publicClient,
+         transactionVariants,
+-        senderAccount
++        senderAccount,
++        gas
+       });
+     },
+     /** Deploys a new intelligent contract to GenLayer. Returns the transaction hash. */
+@@ -1465,7 +1467,8 @@ var contractActions = (client, publicClient) => {
+         leaderOnly = false,
+         consensusMaxRotations = client.chain.defaultConsensusMaxRotations,
+         validUntil,
+-        fees
++        fees,
++        gas
+       } = args;
+       const data = [
+         code,
+@@ -1494,7 +1497,8 @@ var contractActions = (client, publicClient) => {
+         client,
+         publicClient,
+         transactionVariants,
+-        senderAccount
++        senderAccount,
++        gas
+       });
+     },
+     /** Returns the active fee price policy used to build user-side caps. */
+@@ -2457,7 +2461,7 @@ var readCurrentFeePolicy = async (client, publicClient) => {
        functionName: "estimateProposeReceiptGas",
        args: [receiptWrapperBytes + MIN_TERMINAL_OUTPUT_BYTES]
      });
@@ -11,3 +91,148 @@ index a7b64c6..edbd772 100644
      if (!result.data) {
        throw new Error("FeeManager.estimateProposeReceiptGas returned no data.");
      }
+@@ -3243,7 +3247,8 @@ var _sendTransaction = async ({
+   client,
+   publicClient,
+   transactionVariants,
+-  senderAccount
++  senderAccount,
++  gas
+ }) => {
+   if (!_optionalChain([client, 'access', _87 => _87.chain, 'access', _88 => _88.consensusMainContract, 'optionalAccess', _89 => _89.address])) {
+     throw new Error(`Consensus main contract address not found in chain config for "${client.chain.name}".`);
+@@ -3288,20 +3293,22 @@ var _sendTransaction = async ({
+     return selectorName && !text.includes(selectorName) ? `${text} (${selectorName})` : text;
+   };
+   const sendWithEncodedData = async (transactionVariant) => {
+-    let estimatedGas;
++    let estimatedGas = gas;
+     let gasEstimationError;
+-    try {
+-      estimatedGas = await client.estimateTransactionGas({
+-        from: validatedSenderAccount.address,
+-        to: _optionalChain([client, 'access', _95 => _95.chain, 'access', _96 => _96.consensusMainContract, 'optionalAccess', _97 => _97.address]),
+-        data: transactionVariant.encodedData,
+-        value: transactionVariant.value
+-      });
+-      estimatedGas = withTransactionGasHeadroom(estimatedGas);
+-    } catch (err) {
+-      gasEstimationError = stringifyRpcError(err);
+-      console.error("Gas estimation failed, using default 200_000:", err);
+-      estimatedGas = 200000n;
++    if (estimatedGas === undefined) {
++      try {
++        estimatedGas = await client.estimateTransactionGas({
++          from: validatedSenderAccount.address,
++          to: _optionalChain([client, 'access', _95 => _95.chain, 'access', _96 => _96.consensusMainContract, 'optionalAccess', _97 => _97.address]),
++          data: transactionVariant.encodedData,
++          value: transactionVariant.value
++        });
++        estimatedGas = withTransactionGasHeadroom(estimatedGas);
++      } catch (err) {
++        gasEstimationError = stringifyRpcError(err);
++        console.error("Gas estimation failed, using default 200_000:", err);
++        estimatedGas = 200000n;
++      }
+     }
+     if (_optionalChain([validatedSenderAccount, 'optionalAccess', _98 => _98.type]) === "local") {
+       if (!_optionalChain([validatedSenderAccount, 'optionalAccess', _99 => _99.signTransaction])) {
+diff --git a/node_modules/genlayer-js/dist/index.js b/node_modules/genlayer-js/dist/index.js
+index a7b64c6..beba79d 100644
+--- a/node_modules/genlayer-js/dist/index.js
++++ b/node_modules/genlayer-js/dist/index.js
+@@ -1427,7 +1427,8 @@ var contractActions = (client, publicClient) => {
+         leaderOnly = false,
+         consensusMaxRotations = client.chain.defaultConsensusMaxRotations,
+         validUntil,
+-        fees
++        fees,
++        gas
+       } = args;
+       const data = [encode(makeCalldataObject(functionName, callArgs, kwargs)), leaderOnly];
+       const serializedData = serialize(data);
+@@ -1452,7 +1453,8 @@ var contractActions = (client, publicClient) => {
+         client,
+         publicClient,
+         transactionVariants,
+-        senderAccount
++        senderAccount,
++        gas
+       });
+     },
+     /** Deploys a new intelligent contract to GenLayer. Returns the transaction hash. */
+@@ -1465,7 +1467,8 @@ var contractActions = (client, publicClient) => {
+         leaderOnly = false,
+         consensusMaxRotations = client.chain.defaultConsensusMaxRotations,
+         validUntil,
+-        fees
++        fees,
++        gas
+       } = args;
+       const data = [
+         code,
+@@ -1494,7 +1497,8 @@ var contractActions = (client, publicClient) => {
+         client,
+         publicClient,
+         transactionVariants,
+-        senderAccount
++        senderAccount,
++        gas
+       });
+     },
+     /** Returns the active fee price policy used to build user-side caps. */
+@@ -2457,7 +2461,7 @@ var readCurrentFeePolicy = async (client, publicClient) => {
+       functionName: "estimateProposeReceiptGas",
+       args: [receiptWrapperBytes + MIN_TERMINAL_OUTPUT_BYTES]
+     });
+-    const result = await publicClient.call({ to: address, data, gasPrice: receiptGasPrice, batch: false });
++    const result = await publicClient.call({ to: address, data, account: client.account, gasPrice: receiptGasPrice, batch: false });
+     if (!result.data) {
+       throw new Error("FeeManager.estimateProposeReceiptGas returned no data.");
+     }
+@@ -3243,7 +3247,8 @@ var _sendTransaction = async ({
+   client,
+   publicClient,
+   transactionVariants,
+-  senderAccount
++  senderAccount,
++  gas
+ }) => {
+   if (!client.chain.consensusMainContract?.address) {
+     throw new Error(`Consensus main contract address not found in chain config for "${client.chain.name}".`);
+@@ -3288,20 +3293,22 @@ var _sendTransaction = async ({
+     return selectorName && !text.includes(selectorName) ? `${text} (${selectorName})` : text;
+   };
+   const sendWithEncodedData = async (transactionVariant) => {
+-    let estimatedGas;
++    let estimatedGas = gas;
+     let gasEstimationError;
+-    try {
+-      estimatedGas = await client.estimateTransactionGas({
+-        from: validatedSenderAccount.address,
+-        to: client.chain.consensusMainContract?.address,
+-        data: transactionVariant.encodedData,
+-        value: transactionVariant.value
+-      });
+-      estimatedGas = withTransactionGasHeadroom(estimatedGas);
+-    } catch (err) {
+-      gasEstimationError = stringifyRpcError(err);
+-      console.error("Gas estimation failed, using default 200_000:", err);
+-      estimatedGas = 200000n;
++    if (estimatedGas === undefined) {
++      try {
++        estimatedGas = await client.estimateTransactionGas({
++          from: validatedSenderAccount.address,
++          to: client.chain.consensusMainContract?.address,
++          data: transactionVariant.encodedData,
++          value: transactionVariant.value
++        });
++        estimatedGas = withTransactionGasHeadroom(estimatedGas);
++      } catch (err) {
++        gasEstimationError = stringifyRpcError(err);
++        console.error("Gas estimation failed, using default 200_000:", err);
++        estimatedGas = 200000n;
++      }
+     }
+     if (validatedSenderAccount?.type === "local") {
+       if (!validatedSenderAccount?.signTransaction) {

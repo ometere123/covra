@@ -12,7 +12,13 @@ if (process.env.COVRA_ENV !== "testnet" || process.env.COVRA_DEPLOY_CONFIRM !== 
 }
 const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
 const quoteKey = process.env.QUOTE_SIGNER_PRIVATE_KEY;
-const adjudicator = process.env.BRADBURY_ADJUDICATOR_ADDRESS;
+const deploymentVersion = process.env.COVRA_DEPLOYMENT_VERSION === "V2" ? "V2" : "V1";
+if (deploymentVersion === "V2" && process.env.NEXT_PUBLIC_COVRA_DEPLOYMENT_VERSION !== "V2") {
+  throw new Error("V2 Base deployment requires explicit NEXT_PUBLIC_COVRA_DEPLOYMENT_VERSION=V2 opt-in");
+}
+const adjudicator = deploymentVersion === "V2"
+  ? process.env.BRADBURY_ADJUDICATOR_V2_ADDRESS
+  : process.env.BRADBURY_ADJUDICATOR_ADDRESS;
 const evidenceIssuer = process.env.EVIDENCE_ISSUER_WALLET;
 const usdc = process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS;
 const attestors = [1, 2, 3, 4, 5].map((n) => process.env[`ATTESTOR_ADDRESS_${n}`]);
@@ -59,7 +65,7 @@ const hash = await wallet.deployContract({
 mkdirSync(join(process.cwd(), "docs/deployments"), { recursive: true });
 const recordPath = join(process.cwd(), "docs/deployments", `base-84532-${hash}.json`);
 const record = { chainId: 84532, transactionHash: hash, status: "submitted",
-  sourceSha256: createHash("sha256").update(source).digest("hex"), compiler: solc.version(),
+  deploymentVersion, sourceSha256: createHash("sha256").update(source).digest("hex"), compiler: solc.version(),
   owner: owner.address, quoteSigner: signer.address, evidenceIssuer, adjudicator, usdc, attestors };
 writeFileSync(recordPath, JSON.stringify(record, null, 2) + "\n");
 process.stdout.write(`SUBMITTED ${hash}; durable record ${recordPath}\n`);
@@ -68,4 +74,5 @@ writeFileSync(recordPath, JSON.stringify({ ...record, status: receipt.status,
   contractAddress: receipt.contractAddress, blockNumber: String(receipt.blockNumber),
   blockHash: receipt.blockHash, gasUsed: String(receipt.gasUsed) }, null, 2) + "\n");
 if (receipt.status !== "success" || !receipt.contractAddress) throw new Error(`Deployment reverted: ${hash}`);
-process.stdout.write(`CONFIRMED TESTNET DEPLOYMENT\ncontract=${receipt.contractAddress}\ntransaction=${hash}\nblock=${receipt.blockNumber}\nSet NEXT_PUBLIC_COVRA_POOLS_ADDRESS and BASE_DEPLOYMENT_START_BLOCK in .env.local.\n`);
+const poolVariable = deploymentVersion === "V2" ? "NEXT_PUBLIC_COVRA_POOLS_V2_ADDRESS" : "NEXT_PUBLIC_COVRA_POOLS_ADDRESS";
+process.stdout.write(`CONFIRMED TESTNET DEPLOYMENT\nversion=${deploymentVersion}\ncontract=${receipt.contractAddress}\ntransaction=${hash}\nblock=${receipt.blockNumber}\nSet ${poolVariable} and BASE_DEPLOYMENT_START_BLOCK in .env.local.\n`);
