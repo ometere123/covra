@@ -189,6 +189,26 @@ contract CovraPoolsTest {
         pools.withdraw(0,100000000);
     }
 
+    function testFuzzWithdrawalAccountingNeverExceedsUnreservedCapital(uint256 requestedShares) public {
+        // The initial fixture has a 1:1 USDC/share price and no reserved
+        // liability. Fuzzing the share input exercises the same arithmetic
+        // path used after a live pool read without introducing an arbitrary
+        // test-only accounting rule.
+        uint256 shares = requestedShares % 100000001;
+        if (shares == 0) return;
+        CovraPools.Pool memory beforePool = pools.pool(0);
+        uint256 beforeBalance = usdc.balanceOf(address(pools));
+        vm.prank(underwriter);
+        pools.withdraw(0, shares);
+        CovraPools.Pool memory afterPool = pools.pool(0);
+        uint256 redeemed = beforePool.assets - afterPool.assets;
+        _assert(redeemed <= beforePool.assets - beforePool.reserved);
+        _assert(usdc.balanceOf(address(pools)) == beforeBalance - redeemed);
+        _assert(afterPool.reserved <= afterPool.assets);
+        _assert(afterPool.totalShares == beforePool.totalShares - shares);
+        _assert(pools.sharesOf(0, underwriter) == afterPool.totalShares);
+    }
+
     function testSigningIdentitiesAreSeparatedAtConstruction() public {
         vm.expectRevert(CovraPools.InvalidInput.selector);
         new CovraPools(address(usdc), vm.addr(QUOTE_KEY), BRADBURY_ADJUDICATOR,

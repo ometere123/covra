@@ -83,7 +83,9 @@ export default function Dashboard() {
     <PageHeading eyebrow="Overview / verified state" title="A precise view of risk." subtitle="Only reconciled Base Sepolia state and your authenticated account records appear here. Empty means no verified activity exists yet." action={{ label: "Get coverage", href: "/app/quote" }} />
     {!authenticated && <SyncNotice text="Connect your wallet and sign in to view owned policies, claims and activity. No account data is shown before authentication." />}
     {authenticated && accountState !== "CONFIRMED" && accountState !== "LOADING" && <SyncNotice text={accountState === "DATABASE_UNAVAILABLE" ? "The reconciled account index is not configured yet." : "Account state is waiting for synchronization."} />}
-    {poolState !== "CONFIRMED" && <SyncNotice text={poolMessage || "Base Sepolia pool state is awaiting deployment or synchronization."} />}
+    {poolState !== "CONFIRMED" && <SyncNotice text={poolState === "LOADING"
+      ? "Verifying the Base Sepolia pool and its chain bindings… no balances are shown yet."
+      : poolMessage || "Base Sepolia pool state could not be verified; no balances are shown."} />}
     <div className="stat-grid">
       {[
         { label: "Pool capital", value: assets === null ? "—" : formatUsdc(assets), foot: "Verified Base Sepolia USDC", icon: Banknote },

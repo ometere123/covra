@@ -1,7 +1,7 @@
 import baseDeployment from "../../docs/deployments/base-84532-0xfe01a9b68ac5a54df1173231c49838a0d67ba37be35e85624cd7d912461f93f2.json";
 import lifecycle from "../../docs/deployments/class0-live-lifecycle.json";
 import purchase from "../../docs/deployments/class0-base-funding-purchase-2026-11-11.json";
-import reserveRead from "../../docs/deployments/class0-reserve-read-2026-11-12.json";
+import reserveRead from "../../docs/deployments/class0-reserve-read-2026-11-12-review.json";
 import { coverages } from "@/lib/catalog";
 import { readProtocolStatus, type ProtocolStatus } from "@/lib/protocol-status";
 
@@ -44,16 +44,16 @@ export const publicPilot = {
   claimDeadline: new Date(claimDeadlineSeconds * 1000).toISOString(),
   claimResolutionDeadline: new Date((claimDeadlineSeconds + CLAIM_SETTLEMENT_GRACE_SECONDS) * 1000).toISOString(),
   reserveSnapshot: {
-    blockNumber: reserveRead.block.number,
-    blockHash: reserveRead.block.hash,
-    blockTimestamp: reserveRead.block.iso,
-    assetsMicroUsdc: reserveRead.poolRead.assets,
-    reservedMicroUsdc: reserveRead.poolRead.reserved,
-    paidMicroUsdc: reserveRead.poolRead.paid,
-    totalShares: reserveRead.poolRead.totalShares,
-    policyState: reserveRead.policyRead.state,
-    claimRevision: reserveRead.claimLockRead.revision,
-    rosterVersion: reserveRead.claimLockRead.attestorRosterVersion,
+    blockNumber: reserveRead.headBlock,
+    blockHash: reserveRead.headHash,
+    blockTimestamp: reserveRead.headTimestamp,
+    assetsMicroUsdc: reserveRead.classes[0].assets,
+    reservedMicroUsdc: reserveRead.classes[0].reserved,
+    paidMicroUsdc: reserveRead.classes[0].paid,
+    totalShares: reserveRead.classes[0].totalShares,
+    policyState: reserveRead.policy.state,
+    claimRevision: reserveRead.claimLock.revision,
+    rosterVersion: reserveRead.claimLock.attestorRosterVersion,
   },
   receipts: {
     poolDeposit: purchase.receipts.deposit.hash,

@@ -26,7 +26,10 @@ function slug(route: string) {
 }
 
 test("all primary routes remain usable across supported viewport widths", async ({ page }, testInfo) => {
-  test.setTimeout(240_000);
+  // The production matrix covers eight widths and every primary route. WebKit
+  // can require several minutes when it cold-starts the hosted app; retain
+  // the same assertions while giving the external runtime a bounded budget.
+  test.setTimeout(420_000);
   mkdirSync(testInfo.outputDir, { recursive: true });
 
   for (const width of widths) {

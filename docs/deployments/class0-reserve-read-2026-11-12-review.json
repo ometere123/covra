@@ -1,0 +1,67 @@
+{
+  "readOnly": true,
+  "observedAt": "2026-11-12T10:37:00.000Z",
+  "chainId": 84532,
+  "headBlock": "57789758",
+  "headHash": "0x8a045abbc636c3fb75855d3908b914c1ba9cabced734c85341f7f7b557ba5c7c",
+  "headTimestamp": "2026-11-12T10:37:00.000Z",
+  "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "owner": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+  "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+  "claimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+  "tokenBinding": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "poolUsdcBalance": "100000000",
+  "paused": false,
+  "attestorCount": 5,
+  "attestorRosterVersion": "1",
+  "bradburyAdjudicator": "0xaeFC8672272392310A2eA102787e28bB1f34e1D3",
+  "evidenceIssuer": "0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5",
+  "quoteSigner": "0x870d04144Ef72B02B1740D7c6a893036F29fb3A4",
+  "classes": [
+    { "classId": 0, "assets": "100000000", "reserved": "100000000", "premiumsWritten": "1000000", "paid": "0", "totalShares": "99000000", "availableCapital": "0", "ownerShares": "99000000", "epoch": "0" },
+    { "classId": 1, "assets": "0", "reserved": "0", "premiumsWritten": "0", "paid": "0", "totalShares": "0", "availableCapital": "0", "ownerShares": "0", "epoch": "0" },
+    { "classId": 2, "assets": "0", "reserved": "0", "premiumsWritten": "0", "paid": "0", "totalShares": "0", "availableCapital": "0", "ownerShares": "0", "epoch": "0" },
+    { "classId": 3, "assets": "0", "reserved": "0", "premiumsWritten": "0", "paid": "0", "totalShares": "0", "availableCapital": "0", "ownerShares": "0", "epoch": "0" },
+    { "classId": 4, "assets": "0", "reserved": "0", "premiumsWritten": "0", "paid": "0", "totalShares": "0", "availableCapital": "0", "ownerShares": "0", "epoch": "0" }
+  ],
+  "policy": {
+    "insured": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "beneficiary": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "coverageClass": 0,
+    "state": 1,
+    "limit": "100000000",
+    "startsAt": "1794388591",
+    "endsAt": "1794474991",
+    "claimDeadline": "1795684591",
+    "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+    "riskSpecHash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae"
+  },
+  "claimLock": {
+    "claimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+    "evidenceDigest": "0xd8a2318604d39bd6bd39391cf020455e283e6ec00bea797a51d6a3de7b517fff",
+    "openedAt": "1794389872",
+    "revision": 0,
+    "attestorRosterVersion": "1"
+  },
+  "claimResolutionDeadline": "1799572591",
+  "claimExtendedUntil": "0",
+  "claimPolicy": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+  "usedClaim": false,
+  "usedPolicy": true,
+  "assertions": {
+    "chainIsBaseSepolia": true,
+    "tokenMatches": true,
+    "lockMatches": true,
+    "claimPolicyMatches": true,
+    "poolBalanceCoversAssets": true,
+    "noExtension": true
+  },
+  "recovery": {
+    "releaseExpired": "Permissionless only when policy is active, block.timestamp is strictly after claimDeadline, and a locked claim is strictly after claimResolutionDeadline. It releases reserve accounting and transfers no USDC.",
+    "earliestRecordedResolutionDeadline": "2027-01-10T09:16:31Z",
+    "withdraw": "After a successful releaseExpired readback, re-read sharesOf, pool and availableCapital, then redeem only current-epoch shares whose pro-rata amount is <= availableCapital.",
+    "currentAvailableCapital": "0",
+    "noTransactionBroadcast": true
+  }
+}

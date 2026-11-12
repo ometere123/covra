@@ -2,6 +2,7 @@ import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
 import { configuredAdjudicator, publicBradburyEndpoint } from "@/lib/bradbury-client";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "@/lib/bradbury-final-state";
 import { coverages } from "@/lib/catalog";
+import { verifyPoolIdentity } from "@/lib/pool-contract-verification";
 
 export type DeploymentState = "LOADING" | "DEPLOYED" | "DEPLOYED_UNFUNDED" | "UNAVAILABLE";
 
@@ -42,15 +43,21 @@ async function readPoolStatus(): Promise<PoolDeploymentStatus> {
   const address = configuredPoolAddress();
   if (!address) return unavailablePool("Base Sepolia pool address is not configured.");
   try {
-    const [chainId, bytecode, pools] = await Promise.all([
+    const [chainId, bytecode, usdc, bradburyAdjudicator, sourceBradburyChainId, pools] = await Promise.all([
       baseClient.getChainId(),
       baseClient.getBytecode({ address }),
+      baseClient.readContract({ address, abi: poolsAbi, functionName: "usdc" }),
+      baseClient.readContract({ address, abi: poolsAbi, functionName: "bradburyAdjudicator" }),
+      baseClient.readContract({ address, abi: poolsAbi, functionName: "SOURCE_BRADBURY_CHAIN_ID" }),
       Promise.all(coverages.map(risk => baseClient.readContract({
         address, abi: poolsAbi, functionName: "pool", args: [risk.id],
       }))),
     ]);
-    if (chainId !== 84532 || !bytecode || bytecode === "0x") {
-      return unavailablePool("The configured pool could not be verified on Base Sepolia.");
+    const identity = verifyPoolIdentity({
+      chainId, bytecode, usdc, bradburyAdjudicator, sourceBradburyChainId,
+    }, configuredAdjudicator());
+    if (!identity.ok) {
+      return unavailablePool(identity.reason);
     }
     const assets = pools.reduce((total, value) => total + value.assets, 0n);
     const reserved = pools.reduce((total, value) => total + value.reserved, 0n);

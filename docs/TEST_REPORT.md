@@ -1,5 +1,21 @@
 # COVRA verification report
 
+## Current release gate — 2026-11-12
+
+This section supersedes numerical counts in older dated sections below; those sections remain historical evidence.
+
+| Check | Current result |
+| --- | --- |
+| Bradbury schema / semantic validation | `npm run genlayer:validate` passed with the checksum-pinned GenVM Manager v0.6.0-rc10 bundle, runner `py-genlayer:babwp9t...`, AST lint 3/3, and all 10 COVRA methods in the v0.3 schema. `npm run genlayer:preflight -- contracts/genlayer/CovraAdjudicator.py` passed against `https://rpc-bradbury.genlayer.com`, chain 4221, source SHA-256 `4f424277…` matching the deployed source. |
+| GenVM Direct Mode | `npm run test:genlayer-direct`: 24 passed. This is actual pinned SDK/Direct Mode execution with controlled external web/model inputs; it is not a full public validator-consensus claim. |
+| JavaScript/Node tests | `npm test`: 119 Vitest tests and 12 TAP tests passed. |
+| TypeScript / lint / build | TypeScript passed; ESLint passed with two pre-existing hook warnings and zero errors; `npm run build` passed with the existing `ox` dynamic-dependency warning. |
+| Solidity | Compilation passed; `forge test --root contracts/base -vvv`: 21 behavioral tests passed; new withdrawal accounting fuzz test passed 256 runs. |
+| Live contract state | Base Sepolia pool identity and current class-0 reserve read are receipt/RPC-backed. Bradbury case read is `DECIDED / INSUFFICIENT_EVIDENCE`, appeal window open until `2026-11-14T09:41:17Z`; no finalization or settlement was broadcast. |
+| Production browser verification | The full production WebKit suite passed `11/11` after the matrix received a bounded 420-second budget for cold hosted SSR/API startup; the eight-width primary-route matrix completed in 3.2 minutes. The existing Chromium/mobile checks also passed in the preceding production run. |
+
+The application-only hardening in this release verifies the configured pool’s Base chain, bytecode, Circle USDC immutable, Bradbury chain constant and exact adjudicator binding before `/api/pools` or protocol status reports verified state. It also replaces loading-time “awaiting deployment” language with an explicit verification state and updates the public reserve snapshot to block `57789758`. No contract source or deployment was changed.
+
 ## 2026-11-06 regression and hosted checks
 
 `npm run typecheck` and `npm test` passed with 95 Vitest and 7 TAP checks. New regressions exercise atomic first issuance and replay with controlled database and HTTPS interfaces, receipt recovery, exact finalized Bradbury RPC parameters, terminal-outcome reconciliation and malformed authorization. The live adjudicator returned an empty case register via explicit finalized reads. Hosted checks covered 24 desktop/mobile route combinations, signed wallet login, a prospective signed quote, agent and MCP scope boundaries, issuer HTTPS retrieval and schema rejection, and denial of a claim intake without a policy. See the [execution checkpoint](EXECUTION_CHECKPOINT.md) for CI, production deployment, and scheduled indexing evidence.

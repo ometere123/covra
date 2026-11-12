@@ -208,6 +208,16 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
   };
 
   const ready = state === "CONFIRMED" && items.length === 5;
+  const synchronizationNotice = state === "LOADING"
+    ? "Verifying the Base Sepolia pool and its chain bindings… no balances are shown until the read completes."
+    : (message || state === "AWAITING_DEPLOYMENT")
+      ? message || "The Base Sepolia pool is not configured; no balances are shown."
+      : "Base Sepolia pool state could not be verified; no balances are shown.";
+  const emptyPoolMessage = state === "LOADING"
+    ? "Waiting for a verified Base Sepolia pool read."
+    : state === "AWAITING_DEPLOYMENT"
+      ? "The Base Sepolia pool contract is not configured yet."
+      : "The Base Sepolia pool could not be verified or synchronized.";
   const withdrawalDisabled = busy || !ready || !wallet.address || wallet.chainId !== 84532 || withdrawalState !== "CONFIRMED" || !withdrawalQuote?.ok;
   const withdrawalStatus = !poolAddress
     ? "Withdrawal data will appear after the Base Sepolia pool is configured."
@@ -225,14 +235,14 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
 
   return (
     <>
-      {state !== "CONFIRMED" && <SyncNotice text={message || "Base Sepolia pool state is awaiting deployment or synchronization. No balances are shown."} />}
+      {state !== "CONFIRMED" && <SyncNotice text={synchronizationNotice} />}
       {showIntro && <div className="panel pool-intro"><div className="detail-label">Capital accounting</div><h3>A reserve for every risk</h3><p>Five independent underwriting ledgers; active policy limits reduce freely withdrawable capital until claims settle or the claim window expires.</p></div>}
       <div className="pool-grid">{items.length ? items.map(p => {
         const assets = Number(p.assetsMicroUsdc) / 1e6;
         const reserved = Number(p.reservedMicroUsdc) / 1e6;
         const ratio = assets > 0 ? Math.min(100, Math.round(reserved / assets * 100)) : 0;
         return <div className="pool-card" key={p.classId}><span className="pool-card-number">POOL / 0{p.classId + 1}</span><h3>{p.name}</h3><strong>{formatUsdc(assets)}</strong><div className="pool-utilization"><span style={{ width: ratio + "%" }} /></div><small><span>{ratio}% reserved</span><span>{formatUsdc(assets - reserved)} free</span></small></div>;
-      }) : <div className="pool-empty"><EmptyState title="No verified pool balances" text="Deploy the Base Sepolia pool contract and run the reconciler before allocating capital." /></div>}</div>
+      }) : <div className="pool-empty"><EmptyState title="No verified pool balances" text={emptyPoolMessage} /></div>}</div>
       <div className="form-layout pool-form-layout">
         <div className="panel form-panel">
           <div className="form-block-title"><span>01</span> Capital allocation</div>

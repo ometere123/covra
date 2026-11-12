@@ -78,7 +78,7 @@ Neither provider has been configured as a settlement source for the first pilot.
 
 ## Current reserve and lawful release path
 
-At Base Sepolia block `57599154`, mined at `2026-11-12T00:01:39.000Z` with block hash `0xb0be77e229b86ee661c78751869afba7b5579666116ae40c190b9349b8c5138d`, a verified historical read returned:
+At Base Sepolia head block `57789758`, observed at `2026-11-12T10:37:00.000Z` with block hash `0x8a045abbc636c3fb75855d3908b914c1ba9cabced734c85341f7f7b557ba5c7c`, a fresh verified read returned:
 
 - Policy `0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd` state `ACTIVE / 1`.
 - Claim lock `0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223`, revision `0`, roster version `1`.
@@ -87,7 +87,7 @@ At Base Sepolia block `57599154`, mined at `2026-11-12T00:01:39.000Z` with block
 - Claim deadline: `2026-11-26T09:16:31Z`.
 - Claim-resolution deadline: `2027-01-10T09:16:31Z` (`claimDeadline + 45 days`); no extension is recorded.
 
-The deployed `CovraPools.releaseExpired(policyId)` path is permissionless but fail-closed: it requires an active policy, a passed claim deadline and, when a claim lock exists, a time strictly after `claimResolutionDeadline`. It transitions the policy to expired and reduces pool `reserved` by the policy limit. It does not send USDC to the claimant and is not a payout. No release transaction was attempted. After a successful release, the LP must separately re-read `sharesOf`, `pool` and `availableCapital`, then call `withdraw(coverageClass, shares)`; withdrawal remains pro-rata and cannot exceed available capital. The recovery artifact is [`class0-reserve-read-2026-11-12.json`](deployments/class0-reserve-read-2026-11-12.json).
+The deployed `CovraPools.releaseExpired(policyId)` path is permissionless but fail-closed: it requires an active policy, a passed claim deadline and, when a claim lock exists, a time strictly after `claimResolutionDeadline`. It transitions the policy to expired and reduces pool `reserved` by the policy limit. It does not send USDC to the claimant and is not a payout. No release transaction was attempted. After a successful release, the LP must separately re-read `sharesOf`, `pool` and `availableCapital`, then call `withdraw(coverageClass, shares)`; withdrawal remains pro-rata and cannot exceed available capital. The latest recovery artifact is [`class0-reserve-read-2026-11-12-review.json`](deployments/class0-reserve-read-2026-11-12-review.json); the earlier snapshot remains retained for audit.
 
 Because the finalized Bradbury result is `INSUFFICIENT_EVIDENCE`, the current claim is not eligible for either covered or not-covered settlement. A later appeal cannot be invented to change that result. The earliest lawful reserve-accounting release for this locked policy is after `2027-01-10T09:16:31Z`, subject to the chain timestamp and the contract's exact state checks. If a valid, properly evidenced appeal produces a new final verdict before then, the claim must follow that verdict and its exact settlement rules; a timer must never convert a challenged claim into a covered payout.
 
