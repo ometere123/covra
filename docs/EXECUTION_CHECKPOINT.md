@@ -273,3 +273,23 @@ Observed local gates so far:
 - Remaining gates for this release record: production build, browser/mobile verification, hosted Vercel promotion, GitHub CI, and final source/deployment decision.
 
 No `.env.local` was read or changed. No V1 release/finalization/settlement transaction was broadcast.
+
+# 2026-11-12 release-gate closure — commit 5ac76ad
+
+The substantive quality pass was committed and pushed as `5ac76ad7ccf7b80459ae364a50c36f08b218c178` on `main`. The staged audit checked 23 files and found zero credential-pattern findings. The only `git diff --check` warning is the intentional trailing blank line in the byte-preserving V1 snapshot; removing it would change the documented deployed-source hash.
+
+Verified local gates:
+
+- `npm run verify:offline`: passed typecheck, ESLint, Vitest/TAP (`120` Vitest tests and `12` TAP tests), Solidity compilation, GenLayer logic tests, actual Bradbury schema/AST validation, Direct Mode (`25` tests), and production build.
+- Foundry: `23/23` tests passed, including the withdrawal fuzz run (`256` runs) and the new duplicate-signature and frozen-beneficiary regression tests.
+- Browser: local `33/33` and hosted production `33/33` across Chromium, Pixel 7 and iPhone 13. Coverage includes truthful public states, wallet-unavailable/wrong-network handling, mobile navigation, all primary routes and pool deposit/withdrawal form usability.
+
+Verified production deployment:
+
+- Vercel deployment `dpl_JAbpUx9tPbNHJFFBCPxpMmiLMkP3`, status Ready, target production, created from the tested application commit, aliased to `https://covra-lyart.vercel.app`.
+- Production page/API smoke checks returned HTTP 200 for `/`, `/demo`, `/case-study/first-pilot`, `/api/health`, `/api/protocol-status` and `/api/pools`.
+- Live `/api/protocol-status` read: V1 pool `DEPLOYED` at `0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4`, `100000000` micro-USDC assets, `100000000` micro-USDC reserved; V1 adjudicator `DEPLOYED` at `0xaefc8672272392310a2ea102787e28bb1f34e1d3`; settlement remains claim-specific. No contract or reserve write was made.
+
+GitHub Actions run `43226186049` for `5ac76ad7ccf7b80459ae364a50c36f08b218c178` completed successfully (`COVRA quality gate`).
+
+Release boundary: V1 remains the only live adjudicator/pool pair. The V2 source candidate is schema-valid and locally tested but has no live Bradbury deployment or matching Base V2 pool; production traffic was not switched. Functional test quorum remains common-custody (`FUNCTIONAL_QUORUM_VERIFIED / OPERATOR_INDEPENDENCE_NOT_VERIFIED`). No new policy, settlement or V1 finalization transaction was broadcast. No `.env.local` access or modification occurred.
