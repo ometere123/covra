@@ -10,7 +10,7 @@ The public, wallet-optional pages are:
 - Production first-pilot case study: [covra-lyart.vercel.app/case-study/first-pilot](https://covra-lyart.vercel.app/case-study/first-pilot)
 - Existing workspace: [covra-lyart.vercel.app/app](https://covra-lyart.vercel.app/app)
 
-The pages are receipt-backed. Their source of truth is the committed deployment and lifecycle records under `docs/deployments/`, plus a fresh read of the Base and Bradbury status endpoints. They do not read or render the fixture data removed from the operational workspace. If a live RPC status read fails, the status panel says `UNAVAILABLE`; it does not infer deployment from an environment variable.
+The pages are receipt-backed. Their source of truth is the committed deployment and lifecycle records under `docs/deployments/`, plus a fresh read of the Base and Bradbury status endpoints. They do not read or render the fixture data removed from the operational workspace. If a live RPC status read fails, the status panel says `UNAVAILABLE`; it does not infer deployment from an environment variable. The reserve panel is deliberately labelled as a historical Base snapshot, with its block number, block hash and block timestamp; the live status panel is the separate fresh verification signal.
 
 The case study records the first class-0 Service Failure pilot:
 
@@ -21,6 +21,8 @@ The case study records the first class-0 Service Failure pilot:
 - Decision: `INSUFFICIENT_EVIDENCE`; no payout was authorized or broadcast.
 - Evidence envelope: `https://covra-lyart.vercel.app/api/evidence-issuer/observations/class0-covra-service-failure-pilot-2026-11-11-01`.
 
+The Bradbury `submit_case` and `adjudicate` transactions both reached `Finalized / FinishedWithReturn`. That is transaction finality, not case finality. The case record remains `DECIDED`, revision `0`, with `appeal_used=false`; the earliest permitted `finalize_case` time is `2026-11-14T09:41:17Z`. The public case study uses `TRANSACTIONS FINALIZED` and `DECIDED / WINDOW OPEN` so these states are not conflated.
+
 The record deliberately states that the observation workflow, issuer and test attestors were under common COVRA test custody. A valid signature establishes envelope integrity and issuer identity; it does not establish that the underlying event is independently true.
 
 ## Attestor independence and delayed rotation
@@ -29,7 +31,7 @@ The deployed pool uses a five-member roster, threshold three, and claim roster s
 
 `FUNCTIONAL_QUORUM_VERIFIED / OPERATOR_INDEPENDENCE_NOT_VERIFIED`
 
-No rotation is being performed for the public demo. Existing claims retain their recorded roster version and signer set. A future owner-authorized rotation must use the deployed delayed rotation mechanism and this checklist:
+No rotation is being performed for the public demo. Existing claims retain their recorded roster version and signer set. The detailed volunteer package is [ATTESTOR_ONBOARDING.md](ATTESTOR_ONBOARDING.md). A future owner-authorized rotation must use the deployed delayed rotation mechanism and this checklist:
 
 1. Recruit at least three volunteers who operate independently and can attest to their own custody and availability. The owner must record the operational independence limitation rather than infer it from distinct addresses.
 2. Each volunteer generates a fresh key locally, retains the private key locally, and sends only the checksummed public address through the onboarding channel. COVRA must never request, receive or export the key.
@@ -76,16 +78,16 @@ Neither provider has been configured as a settlement source for the first pilot.
 
 ## Current reserve and lawful release path
 
-At Base Sepolia block `57599154`, a fresh read returned:
+At Base Sepolia block `57599154`, mined at `2026-11-12T00:01:39.000Z` with block hash `0xb0be77e229b86ee661c78751869afba7b5579666116ae40c190b9349b8c5138d`, a verified historical read returned:
 
 - Policy `0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd` state `ACTIVE / 1`.
 - Claim lock `0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223`, revision `0`, roster version `1`.
-- Class-0 pool assets `100 USDC`, reserved `100 USDC`, premium `1 USDC`, paid `0 USDC`, shares `99 USDC`.
+- Class-0 pool assets `100 USDC`, reserved `100 USDC`, premium `1 USDC`, paid `0 USDC`, total shares `99,000,000` (99 USDC at the pool's six-decimal share scale).
 - `usedClaim` is false and no payout transfer exists.
 - Claim deadline: `2026-11-26T09:16:31Z`.
 - Claim-resolution deadline: `2027-01-10T09:16:31Z` (`claimDeadline + 45 days`); no extension is recorded.
 
-The deployed `CovraPools.releaseExpired(policyId)` path is permissionless but fail-closed: it requires an active policy, a passed claim deadline and, when a claim lock exists, a time strictly after `claimResolutionDeadline`. It transitions the policy to expired and reduces pool `reserved` by the policy limit. It does not send USDC to the claimant and is not a payout. No release transaction was attempted.
+The deployed `CovraPools.releaseExpired(policyId)` path is permissionless but fail-closed: it requires an active policy, a passed claim deadline and, when a claim lock exists, a time strictly after `claimResolutionDeadline`. It transitions the policy to expired and reduces pool `reserved` by the policy limit. It does not send USDC to the claimant and is not a payout. No release transaction was attempted. After a successful release, the LP must separately re-read `sharesOf`, `pool` and `availableCapital`, then call `withdraw(coverageClass, shares)`; withdrawal remains pro-rata and cannot exceed available capital. The recovery artifact is [`class0-reserve-read-2026-11-12.json`](deployments/class0-reserve-read-2026-11-12.json).
 
 Because the finalized Bradbury result is `INSUFFICIENT_EVIDENCE`, the current claim is not eligible for either covered or not-covered settlement. A later appeal cannot be invented to change that result. The earliest lawful reserve-accounting release for this locked policy is after `2027-01-10T09:16:31Z`, subject to the chain timestamp and the contract's exact state checks. If a valid, properly evidenced appeal produces a new final verdict before then, the claim must follow that verdict and its exact settlement rules; a timer must never convert a challenged claim into a covered payout.
 
@@ -101,3 +103,21 @@ All of the following remain mandatory:
 6. The Base settlement simulation, receipt and event logs must verify exact provenance, reserve bounds and one-time payout. The recipient balance, pool accounting, Supabase indexer and frontend must reconcile to the same receipt.
 
 Until those gates are evidenced, the correct public result is `INSUFFICIENT_EVIDENCE`, pending, denied or unavailable—not a simulated payout.
+
+## First-pilot finalization procedure
+
+The procedure is read-only by default and is implemented in [`scripts/finalize-class0-case.mjs`](../scripts/finalize-class0-case.mjs). It checks the Bradbury Phase 2 chain ID `4221`, the expected genesis, the deployed adjudicator, the exact case/policy binding, the current finalized case read, the original revision and no-appeal state, and the 72-hour decision timestamp gate.
+
+Run the safe read-only check with the existing protected environment:
+
+```text
+npm run genlayer:finalize-class0
+```
+
+Before `2026-11-14T09:41:17Z`, the expected result is `APPEAL_WINDOW_OPEN`; no transaction is submitted. After that time, re-run the read-only command immediately before the operation. Only if the case is still revision `0`, `DECIDED`, `INSUFFICIENT_EVIDENCE` and `appeal_used=false`, and no valid appeal has changed it, the explicitly gated command may be used:
+
+```text
+npm run genlayer:finalize-class0 -- --broadcast --confirm-case 0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223
+```
+
+The broadcast path obtains a fresh nonzero v0.6 fee estimate, submits exactly `finalize_case(caseId)` to the existing adjudicator, waits for `Finalized / FinishedWithReturn`, checks the post-write case state and `finalized_at`, and reads `get_decision_digest`. It never retries a submitted hash. The resulting hash must then be recorded through the existing chain-proof/reconciliation path and independently checked before any attestation. `INSUFFICIENT_EVIDENCE` remains non-settleable; finalizing the negative case does not create a payout authorization.

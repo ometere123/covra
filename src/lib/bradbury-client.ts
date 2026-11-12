@@ -86,7 +86,7 @@ export async function readBradburyCase(adjudicator: `0x${string}`, caseId: strin
   const raw=await readFinalizedBradburyView(endpoint,adjudicator,"get_case",[caseId]);
   if (typeof raw!=="string"||!raw) throw new Error("Bradbury case does not exist");
   return JSON.parse(raw) as {
-    id:string;state:string;verdict:string;revision:number;reason:string;citations:string;
+    id:string;state:string;verdict:string;revision:number;reason:string;citations:string;finalized_at:number;
     insured_wallet:string;risk_spec_hash:string;claim_id:string;evidence_hash:string;
     decided_at:number;appeal_used:boolean;risk_spec:{evidenceIssuerHost:string};
   };

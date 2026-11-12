@@ -149,7 +149,7 @@ export function PublicDemo({ status }: { status: ProtocolStatus | null }) {
           </div>
           <div className="public-deployment-proof">
             <span>BASE CREATION</span><code>{shortHash(publicPilot.deployment.baseTransaction)}</code><span>BLOCK {publicPilot.deployment.baseBlock}</span><a href="https://repo.sourcify.dev/84532/0xD8619d3948c08c8364fD3a7a35Dc8a65B254A8e4" target="_blank" rel="noreferrer">Exact source match <ExternalLink size={12} /></a>
-            <span>BRADBURY CREATION</span><code>{shortHash(publicPilot.deployment.bradburyTransaction)}</code><span>FINALIZED / FINISHED WITH RETURN</span><a href={bradburyExplorer} target="_blank" rel="noreferrer">Open explorer <ExternalLink size={12} /></a>
+            <span>BRADBURY CREATION</span><code>{shortHash(publicPilot.deployment.bradburyTransaction)}</code><span>DEPLOYMENT TX / FINISHED WITH RETURN</span><a href={bradburyExplorer} target="_blank" rel="noreferrer">Open explorer <ExternalLink size={12} /></a>
           </div>
         </section>
 
@@ -167,7 +167,7 @@ export function FirstPilotCaseStudy({ status }: { status: ProtocolStatus | null 
     { label: "Policy purchased", detail: `${moneyFromMicro(publicPilot.poolDepositUsd)} entered the class-0 pool for $${publicPilot.coverageUsd.toFixed(2)} coverage and a $${publicPilot.premiumUsd.toFixed(2)} premium.`, state: "BASE / CONFIRMED" },
     { label: "Claim locked", detail: `Claim ${shortHash(publicPilot.claimId)} locked the evidence digest on Base before adjudication.`, state: "BASE / CONFIRMED" },
     { label: "Evidence published", detail: `The ${publicPilot.evidenceMode} envelope is retrievable over HTTPS and recovers to the dedicated issuer wallet.`, state: "SIGNATURE VERIFIED" },
-    { label: "Bradbury decided", detail: `Both writes finalized with FinishedWithReturn. The result was ${publicPilot.decision.replaceAll("_", " ")}.`, state: "BRADBURY / FINALIZED" },
+    { label: "Bradbury decision recorded", detail: `The submit_case and adjudicate transactions each finalized with FinishedWithReturn. The case is ${publicPilot.caseState}; the full appeal window remains separate from transaction finality and ends at ${dateLabel(publicPilot.earliestCaseFinalizationAt)}.`, state: "TRANSACTIONS FINALIZED" },
     { label: "Settlement withheld", detail: "No eligible COVERED or NOT_COVERED decision exists. Base correctly rejected unsupported settlement paths.", state: "NO PAYOUT" },
   ];
 
@@ -190,7 +190,7 @@ export function FirstPilotCaseStudy({ status }: { status: ProtocolStatus | null 
           <div className="public-case-summary">
             <div><span>POLICY ID</span><code>{shortHash(publicPilot.policyId)}</code><small>{publicPilot.coverageUsd} USDC limit · {publicPilot.premiumUsd} USDC premium · one day</small></div>
             <div><span>CLAIM ID</span><code>{shortHash(publicPilot.claimId)}</code><small>Roster version 1 · revision 0</small></div>
-            <div><span>DECISION</span><strong>{publicPilot.decision.replaceAll("_", " ")}</strong><small>{publicPilot.decisionReason}</small></div>
+            <div><span>DECISION / CASE STATE</span><strong>{publicPilot.decision.replaceAll("_", " ")}</strong><small>{publicPilot.decisionReason} Case state: {publicPilot.caseState}; decision recorded {dateLabel(publicPilot.decisionAt)}.</small></div>
           </div>
           <div className="public-case-terms"><span>FROZEN SUBJECT</span><code>{publicPilot.taskId}</code><span>TASK HASH</span><code>{shortHash(publicPilot.taskHash)}</code><span>TERMS HASH</span><code>{shortHash(publicPilot.termsHash)}</code><span>RISK HASH</span><code>{shortHash(publicPilot.riskSpecHash)}</code></div>
         </section>
@@ -218,14 +218,14 @@ export function FirstPilotCaseStudy({ status }: { status: ProtocolStatus | null 
         </section>
 
         <section className="public-reserve-section container">
-          <div><div className="public-demo-section-label"><span>04 / RESERVED CAPITAL</span><span>LIVE BASE READBACK</span></div><h2>The reserve is<br /><em>still locked.</em></h2><p>At the latest read, class 0 holds 100 USDC assets and 100 USDC reserved against this active policy. The lock remains visible on Base; no payout or release transaction has been made.</p></div>
-          <div className="public-reserve-panel"><div><span>POLICY STATE</span><strong>ACTIVE / 1</strong></div><div><span>RESERVED</span><strong>$100.00</strong></div><div><span>PAID</span><strong>$0.00</strong></div><div><span>EARLIEST RELEASE</span><strong>{dateLabel(publicPilot.claimResolutionDeadline)}</strong></div><p><LockKeyhole size={15} /> The contract’s permissionless <code>releaseExpired(policyId)</code> path becomes eligible only after the claim-resolution deadline, unless a valid settlement occurs first. It releases reserve accounting; it is not a payout.</p></div>
+          <div><div className="public-demo-section-label"><span>04 / RESERVED CAPITAL</span><span>RECORDED BASE SNAPSHOT</span></div><h2>At this block,<br /><em>still locked.</em></h2><p>This is a verified historical Base read, not a live balance claim: block {publicPilot.reserveSnapshot.blockNumber} was mined at {dateLabel(publicPilot.reserveSnapshot.blockTimestamp)}. The fresh chain-status panel above is separate. Re-read the policy, lock and pool before any operational action.</p><div className="public-snapshot-note"><span>BLOCK HASH</span><code>{shortHash(publicPilot.reserveSnapshot.blockHash)}</code><span>READ TIME</span><code>{dateLabel(publicPilot.reserveSnapshot.blockTimestamp)}</code></div></div>
+          <div className="public-reserve-panel"><div><span>POLICY STATE / SNAPSHOT</span><strong>{publicPilot.reserveSnapshot.policyState === 1 ? "ACTIVE / 1" : `STATE ${publicPilot.reserveSnapshot.policyState}`}</strong></div><div><span>CASE STATE / SNAPSHOT</span><strong>{publicPilot.caseState} / {publicPilot.appealUsed ? "APPEAL USED" : "WINDOW OPEN"}</strong></div><div><span>ASSETS</span><strong>{moneyFromMicro(publicPilot.reserveSnapshot.assetsMicroUsdc)}</strong></div><div><span>RESERVED</span><strong>{moneyFromMicro(publicPilot.reserveSnapshot.reservedMicroUsdc)}</strong></div><div><span>PAID</span><strong>{moneyFromMicro(publicPilot.reserveSnapshot.paidMicroUsdc)}</strong></div><div><span>EARLIEST RELEASE</span><strong>{dateLabel(publicPilot.claimResolutionDeadline)}</strong></div><p><LockKeyhole size={15} /> The permissionless <code>releaseExpired(policyId)</code> call is eligible only strictly after the claim-resolution deadline for this locked claim. It releases reserve accounting; it does not transfer USDC. A successful release would still require a separate, fresh share/available-capital read before an LP calls <code>withdraw(classId, shares)</code>.</p></div>
         </section>
 
         <section className="public-demo-section container">
           <div className="public-demo-section-label"><span>05 / WHAT THE RESULT MEANS</span><span>BOUNDARIES MATTER</span></div>
           <div className="public-two-column">
-            <div><h2>Proven by the record.</h2><ul className="public-check-list"><li><Check size={16} /> Base USDC entered the correct ring-fenced pool.</li><li><Check size={16} /> The policy and claim were bound to exact hashes.</li><li><Check size={16} /> The issuer envelope was signed and independently recovered.</li><li><Check size={16} /> Bradbury submitted and adjudicated with finalized execution results.</li><li><Check size={16} /> Supabase reconciliation found zero policy/claim mismatches.</li></ul></div>
+            <div><h2>Proven by the record.</h2><ul className="public-check-list"><li><Check size={16} /> Base USDC entered the correct ring-fenced pool.</li><li><Check size={16} /> The policy and claim were bound to exact hashes.</li><li><Check size={16} /> The issuer envelope was signed and independently recovered.</li><li><Check size={16} /> Bradbury writes reached Finalized / FinishedWithReturn; the case remains separately governed by its appeal window.</li><li><Check size={16} /> Supabase reconciliation found zero policy/claim mismatches.</li></ul></div>
             <div><h2>Not proven by it.</h2><ul className="public-limit-list"><li>It is not independent real-world evidence: the source workflow was controlled by COVRA.</li><li>It is not independently operated attestation: functional test keys share custody.</li><li>It is not a payout: <code>INSUFFICIENT_EVIDENCE</code> is fail-closed and not settleable.</li><li>It is not commercial insurance or underwriting approval.</li></ul></div>
           </div>
         </section>

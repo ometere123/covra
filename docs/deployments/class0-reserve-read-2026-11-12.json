@@ -1,0 +1,54 @@
+{
+  "status": "VERIFIED_HISTORICAL_SNAPSHOT",
+  "chainId": 84532,
+  "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+  "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+  "claimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+  "block": {
+    "number": "57599154",
+    "hash": "0xb0be77e229b86ee661c78751869afba7b5579666116ae40c190b9349b8c5138d",
+    "timestamp": "1794441699",
+    "iso": "2026-11-12T00:01:39.000Z"
+  },
+  "poolRead": {
+    "assets": "100000000",
+    "reserved": "100000000",
+    "premiumsWritten": "1000000",
+    "paid": "0",
+    "totalShares": "99000000"
+  },
+  "policyRead": {
+    "state": 1,
+    "coverageClass": 0,
+    "limit": "100000000",
+    "startsAt": "1794388591",
+    "endsAt": "1794474991",
+    "claimDeadline": "1795684591",
+    "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+    "riskSpecHash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae"
+  },
+  "claimLockRead": {
+    "claimId": "0xc9ba090e3706d89d43faa1cde6afe0cb2d1b0cb961cf0d9105073addea127223",
+    "evidenceDigest": "0xd8a2318604d39bd6bd39391cf020455e283e6ec00bea797a51d6a3de7b517fff",
+    "openedAt": "1794389872",
+    "revision": 0,
+    "attestorRosterVersion": "1"
+  },
+  "claimResolutionDeadline": {
+    "timestamp": "1799572591",
+    "iso": "2027-01-10T09:16:31.000Z"
+  },
+  "usedClaim": false,
+  "releaseExpired": {
+    "eligibleAtOrAfter": "2027-01-10T09:16:31.000Z",
+    "condition": "block.timestamp > claimResolutionDeadline(policyId) for this locked claim",
+    "transfersUsdc": false,
+    "effect": "Transitions the active policy to expired and reduces pool reserved by the policy limit."
+  },
+  "postReleaseWithdrawal": {
+    "method": "withdraw(uint8 classId,uint256 shares)",
+    "classId": 0,
+    "requiredPreflight": "Re-read sharesOf, pool assets/reserved/totalShares and availableCapital after releaseExpired succeeds.",
+    "accounting": "Withdrawal is pro-rata and can transfer no more than availableCapital; it is not automatic."
+  }
+}

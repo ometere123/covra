@@ -21,6 +21,7 @@
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "deploy:base": "node --env-file=.env.local scripts/deploy-base.mjs",
     "genlayer:smoke": "node scripts/check-bradbury.mjs",
+    "genlayer:finalize-class0": "node --experimental-strip-types --env-file=.env.local scripts/finalize-class0-case.mjs",
     "attestor:preflight": "node --experimental-strip-types --env-file=.env.local scripts/attestor-preflight.mjs",
     "attestor:functional-test": "node --experimental-strip-types scripts/functional-attestor-quorum.mjs",
     "issuer:sign": "node --env-file=.env.local scripts/issuer-sign.mjs",

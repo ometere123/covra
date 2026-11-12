@@ -1,6 +1,7 @@
 import baseDeployment from "../../docs/deployments/base-84532-0xfe01a9b68ac5a54df1173231c49838a0d67ba37be35e85624cd7d912461f93f2.json";
 import lifecycle from "../../docs/deployments/class0-live-lifecycle.json";
 import purchase from "../../docs/deployments/class0-base-funding-purchase-2026-11-11.json";
+import reserveRead from "../../docs/deployments/class0-reserve-read-2026-11-12.json";
 import { coverages } from "@/lib/catalog";
 import { readProtocolStatus, type ProtocolStatus } from "@/lib/protocol-status";
 
@@ -23,7 +24,10 @@ export const publicPilot = {
   decision: lifecycle.bradburyCase.verdict,
   decisionReason: lifecycle.bradburyCase.reason,
   decisionCitations: lifecycle.bradburyCase.citations,
-  bradburyFinalizationAt: lifecycle.earliestFinalizationAt,
+  caseState: lifecycle.bradburyCase.state,
+  appealUsed: lifecycle.bradburyCase.appeal_used,
+  decisionAt: new Date(Number(lifecycle.bradburyCase.decided_at) * 1000).toISOString(),
+  earliestCaseFinalizationAt: lifecycle.earliestFinalizationAt,
   basePool: lifecycle.pool,
   adjudicator: lifecycle.adjudicator,
   baseChainId: lifecycle.chainId,
@@ -39,6 +43,18 @@ export const publicPilot = {
   policyEndsAt: new Date(Number(purchase.postflight.policy.endsAt) * 1000).toISOString(),
   claimDeadline: new Date(claimDeadlineSeconds * 1000).toISOString(),
   claimResolutionDeadline: new Date((claimDeadlineSeconds + CLAIM_SETTLEMENT_GRACE_SECONDS) * 1000).toISOString(),
+  reserveSnapshot: {
+    blockNumber: reserveRead.block.number,
+    blockHash: reserveRead.block.hash,
+    blockTimestamp: reserveRead.block.iso,
+    assetsMicroUsdc: reserveRead.poolRead.assets,
+    reservedMicroUsdc: reserveRead.poolRead.reserved,
+    paidMicroUsdc: reserveRead.poolRead.paid,
+    totalShares: reserveRead.poolRead.totalShares,
+    policyState: reserveRead.policyRead.state,
+    claimRevision: reserveRead.claimLockRead.revision,
+    rosterVersion: reserveRead.claimLockRead.attestorRosterVersion,
+  },
   receipts: {
     poolDeposit: purchase.receipts.deposit.hash,
     policyPurchase: purchase.receipts.purchase.hash,

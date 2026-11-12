@@ -684,6 +684,9 @@ em { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-styl
 .public-reserve-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: 80px; align-items: end; padding-top: 20px; padding-bottom: 96px; }
 .public-reserve-section h2 { margin: 45px 0 18px; }
 .public-reserve-section > div:first-child > p { color: var(--muted); font-size: 13px; line-height: 1.8; max-width: 430px; }
+.public-snapshot-note { display: grid; grid-template-columns: auto 1fr; gap: 8px 13px; margin-top: 22px; max-width: 430px; border-top: 1px solid var(--stone); padding-top: 14px; }
+.public-snapshot-note span { color: var(--faint); font-size: 9px; letter-spacing: .14em; }
+.public-snapshot-note code { color: var(--ink); font-family: Consolas, monospace; font-size: 10px; overflow-wrap: anywhere; }
 .public-reserve-panel { background: var(--ink); color: var(--ivory); padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 .public-reserve-panel > div { border-top: 1px solid #4c4d55; padding-top: 13px; }
 .public-reserve-panel span { display: block; color: #aeb0b8; }
@@ -739,6 +742,7 @@ em { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-styl
   .public-reserve-panel { min-width: 0; grid-template-columns: 1fr; gap: 16px; }
   .public-reserve-panel p { grid-column: 1; }
   .public-reserve-panel code { overflow-wrap: anywhere; }
+  .public-snapshot-note { grid-template-columns: 1fr; gap: 5px; }
   .public-demo-callout { align-items: flex-start; flex-direction: column; margin-bottom: 65px; }
   .public-demo-callout a { margin-left: 0; }
   .public-demo-footer { grid-template-columns: 1fr; gap: 15px; padding-top: 28px; padding-bottom: 28px; }

@@ -7,7 +7,9 @@ import { EmptyState, PageHeading, Panel, StatusTag, SyncNotice } from "@/compone
 import { createWalletClient, custom } from "viem";
 import { baseSepolia } from "viem/chains";
 import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
-import { configuredAdjudicator, readBradburyCase, writeBradburyAction, writeBradburyCase } from "@/lib/bradbury-client";
+import { configuredAdjudicator, publicBradburyEndpoint, readBradburyCase, writeBradburyAction, writeBradburyCase } from "@/lib/bradbury-client";
+import { assertBradburyNodeIdentity } from "@/lib/bradbury-final-state";
+import { finalizationReadiness } from "@/lib/finalization-window";
 import { canonicalJson, claimIdFromUuid } from "@/lib/claim-protocol";
 import { planAppealRecovery } from "@/lib/appeal-recovery";
 
@@ -307,11 +309,20 @@ export default function ClaimsScreen() {
     try{
       if (!wallet.address||!window.ethereum||!onchainClaimId||!created) throw new Error("Resume a decided claim first");
       const adjudicator=configuredAdjudicator();if(!adjudicator)throw new Error("Adjudicator not configured");
+      const endpoint=publicBradburyEndpoint();
+      if(!endpoint)throw new Error("A public Bradbury Phase 2 GenLayer node RPC is not configured.");
+      await assertBradburyNodeIdentity(endpoint);
+      const current=await readBradburyCase(adjudicator,onchainClaimId);
+      if(String(current.id).toLowerCase()!==onchainClaimId.toLowerCase())throw new Error("Bradbury returned a different case; finalization stopped");
+      const gate=finalizationReadiness(current,Math.floor(Date.now()/1000));
+      if(!gate.ready)throw new Error(gate.reason);
       const {txHash}=await writeBradburyAction(window.ethereum,wallet.address,adjudicator,"finalize_case",[onchainClaimId],
         (submission)=>rememberReceipt("BRADBURY_FINALIZED",submission.txHash));
-      setFinalTx(txHash);await saveReceipt("BRADBURY_FINALIZED",txHash);
       const record=await readBradburyCase(adjudicator,onchainClaimId);
-      setCaseStatus(record.verdict+": "+record.reason);
+      if(String(record.state).toUpperCase()!=="FINALIZED"||Number(record.finalized_at)<(gate.earliestFinalizationAt||0))
+        throw new Error("Bradbury finalization receipt returned without a matching finalized case state");
+      setFinalTx(txHash);await saveReceipt("BRADBURY_FINALIZED",txHash);
+      setCaseStatus(record.verdict+": "+record.reason+" (case finalized; settlement still requires exact attestation)");
     }catch(e){setError(e instanceof Error?e.message:"Finalization failed; the three-day appeal window may still be open");}
     finally{setBusy(false);}
   };
