@@ -82,6 +82,14 @@ def _case_inputs(
     }
     if not complete_facts:
         facts.pop("missed_deadline")
+    origin_path = "1" if complete_facts else "2"
+    origin_url = "https://status.example.com/observations/" + origin_path
+    origin_body = _canonical({
+        "task_id": facts["task_id"],
+        "task_spec_hash": facts["task_spec_hash"],
+        "observed_at": "2026-10-31T00:00:00.000Z",
+        "source": "public-testbed-status",
+    })
     now = int(datetime.now(timezone.utc).timestamp())
     envelope = {
         "schema": "covra-evidence",
@@ -100,8 +108,11 @@ def _case_inputs(
             "endpoint": source,
             "retrieval_method": "https_get",
             "source_payload_digest": _digest(_canonical(facts)),
-            "origin_url": source,
-            "origin_payload_digest": _digest(_canonical(facts)),
+            "origin_url": origin_url,
+            "origin_payload_digest": _digest(origin_body),
+            "provenance_class": "THIRD_PARTY_PUBLIC",
+            "independent_observer_count": 2,
+            "source_authority": "Public third-party testbed observer",
         },
         "facts": facts,
         "issuer": {
@@ -122,8 +133,42 @@ def _case_inputs(
         "evidence_commitment": _digest(body),
         "event_time": envelope["event_time"],
         "body": body,
+        "origin_body": origin_body,
         "insured": insured,
         "nonce": nonce,
+    }
+
+
+def _decision(case, verdict="COVERED", severity=80, confidence=82):
+    statuses = {
+        "source_support": "ESTABLISHED",
+        "contradictions": "NOT_ESTABLISHED",
+        "exclusions": "NOT_ESTABLISHED",
+    }
+    findings = []
+    for finding_id in (
+        "insured_subject", "signed_specification", "deadline_missed",
+        "penalty_established", "source_support", "provenance", "timestamps",
+        "contradictions", "exclusions",
+    ):
+        status = statuses.get(finding_id, "ESTABLISHED")
+        findings.append({
+            "id": finding_id,
+            "status": status,
+            "evidence_refs": [case["source"]],
+        })
+    return {
+        "schema": "covra-decision-v2",
+        "verdict": verdict,
+        "severity": severity,
+        "confidence": confidence,
+        "findings": findings,
+        "evidence_refs": [case["source"]],
+        "provenance": "THIRD_PARTY_PUBLIC",
+        "exclusions": [],
+        "contradictions": [],
+        "uncertainty": [],
+        "reason": "The structured testbed observations establish the frozen objective facts.",
     }
 
 
@@ -299,11 +344,10 @@ def test_covra_adjudicator_direct_positive_and_negative_adjudication(
     direct_vm.mock_web("issuer\\.example\\.com/observations/1", {
         "method": "GET", "status": 200, "body": positive["body"]
     })
-    direct_vm.mock_llm("COVRA", json.dumps({
-        "verdict": "COVERED", "severity": 80,
-        "reason": "The signed fixture establishes the missed deadline.",
-        "citations": "issuer.example.com/observations/1",
-    }))
+    direct_vm.mock_web("status\\.example\\.com/observations/1", {
+        "method": "GET", "status": 200, "body": positive["origin_body"]
+    })
+    direct_vm.mock_llm("COVRA", json.dumps(_decision(positive)))
     contract.adjudicate(positive["case_id"])
     assert json.loads(contract.get_case(positive["case_id"]))["verdict"] == "COVERED"
 
@@ -320,6 +364,9 @@ def test_covra_adjudicator_direct_positive_and_negative_adjudication(
     )
     direct_vm.mock_web("issuer\\.example\\.com/observations/2", {
         "method": "GET", "status": 200, "body": negative["body"]
+    })
+    direct_vm.mock_web("status\\.example\\.com/observations/2", {
+        "method": "GET", "status": 200, "body": negative["origin_body"]
     })
     contract.adjudicate(negative["case_id"])
     assert json.loads(contract.get_case(negative["case_id"]))["verdict"] == "INSUFFICIENT_EVIDENCE"
@@ -344,7 +391,11 @@ def test_covra_adjudicator_direct_positive_and_negative_adjudication(
               "claim_id": finalized["claim_id"], "terms_hash": finalized["terms_hash"],
               "risk_spec_hash": finalized["risk_spec_hash"], "verdict": finalized["verdict"],
               "revision": finalized["revision"], "evidence_hash": finalized["evidence_hash"],
-              "coverage_class": finalized["risk"], "finalized_at": finalized["finalized_at"]}
+              "coverage_class": finalized["risk"], "finalized_at": finalized["finalized_at"],
+              "decision_schema": finalized["decision_schema"], "confidence": finalized["confidence"],
+              "findings": finalized["findings"], "evidence_refs": finalized["evidence_refs"],
+              "provenance": finalized["provenance"], "exclusions": finalized["exclusions"],
+              "contradictions": finalized["contradictions"], "uncertainty": finalized["uncertainty"]}
     assert contract.get_decision_digest(positive["case_id"]) == _digest(_canonical(fields))
 
 
@@ -352,11 +403,12 @@ def test_pinned_sdk_semantics_and_schema(direct_deploy, direct_vm, direct_owner)
     contract = _deploy(direct_deploy, direct_vm)
     cls = sys.modules["_contract_CovraAdjudicator"].CovraAdjudicator
     schema = json.loads(cls.__get_schema__())
-    assert len(schema["methods"]) == 10
+    assert len(schema["methods"]) == 11
     assert schema["methods"]["submit_case"]["readonly"] is False
     assert schema["methods"]["get_case"]["readonly"] is True
     contract.authorize_case_agent("0x" + "22" * 20, 0)
     assert contract.get_case_count() == 0
+    assert contract.get_protocol_version() == "COVRA_ADJUDICATOR_V2"
 
 
 def _submitted(direct_deploy, direct_vm, direct_owner):
@@ -389,33 +441,37 @@ def test_changed_empty_and_oversized_evidence_fail_closed(direct_deploy, direct_
     assert json.loads(contract.get_case(case["case_id"]))["verdict"] == "PENDING"
 
 
-@pytest.mark.parametrize("change", ["wrong_verdict", "severity", "missing_reason", "extra_field"])
+@pytest.mark.parametrize("change", ["wrong_verdict", "finding_status", "provenance", "missing_reason", "extra_field"])
 def test_malicious_leader_and_disagreement_rejected(direct_deploy, direct_vm, direct_owner, change):
     contract, case = _submitted(direct_deploy, direct_vm, direct_owner)
     direct_vm.mock_web("issuer\\.example\\.com", {"method": "GET", "status": 200, "body": case["body"]})
-    direct_vm.mock_llm("COVRA", json.dumps({"verdict": "COVERED", "severity": 80,
-        "reason": "Objective deadline evidence", "citations": case["source"]}))
+    direct_vm.mock_web("status\\.example\\.com", {"method": "GET", "status": 200, "body": case["origin_body"]})
+    direct_vm.mock_llm("COVRA", json.dumps(_decision(case)))
     def manipulate(value):
         value = dict(value)
         if change == "wrong_verdict": value["verdict"] = "NOT_COVERED"
-        if change == "severity": value["severity"] = 1
+        if change == "finding_status": value["findings"] = [
+            {**finding, "status": "UNVERIFIED"} if finding["id"] == "deadline_missed" else finding
+            for finding in value["findings"]
+        ]
+        if change == "provenance": value["provenance"] = "COVRA_CONTROLLED"
         if change == "missing_reason": value["reason"] = ""
         if change == "extra_field": value["transfer"] = "attacker"
         return value
     direct_vm._covra_candidate_transform = manipulate
     with pytest.raises(AssertionError, match="validator rejected"):
         contract.adjudicate(case["case_id"])
-    assert direct_vm._covra_web_reads == 2  # Both callbacks actually retrieve the evidence.
+    assert direct_vm._covra_web_reads == 4  # Leader and validator each fetch issuer and origin bytes.
     assert json.loads(contract.get_case(case["case_id"]))["state"] == "SUBMITTED"
 
 
 @pytest.mark.parametrize("payload", [
     "not-json", "[]", "{}",
-    '{"verdict":"APPROVED","severity":80,"reason":"reason","citations":"source"}',
-    '{"verdict":"COVERED","severity":true,"reason":"reason","citations":"source"}',
-    '{"verdict":"COVERED","severity":101,"reason":"reason","citations":"source"}',
-    '{"verdict":"COVERED","severity":80,"reason":7,"citations":"source"}',
-    '{"verdict":"COVERED","severity":80,"reason":"reason","citations":[]}',
+    '{"schema":"covra-decision-v2","verdict":"APPROVED","severity":80,"confidence":80,"findings":[],"evidence_refs":["source"],"provenance":"THIRD_PARTY_PUBLIC","exclusions":[],"contradictions":[],"uncertainty":[],"reason":"reason"}',
+    '{"schema":"covra-decision-v2","verdict":"COVERED","severity":true,"confidence":80,"findings":[],"evidence_refs":["source"],"provenance":"THIRD_PARTY_PUBLIC","exclusions":[],"contradictions":[],"uncertainty":[],"reason":"reason"}',
+    '{"schema":"covra-decision-v2","verdict":"COVERED","severity":101,"confidence":80,"findings":[],"evidence_refs":["source"],"provenance":"THIRD_PARTY_PUBLIC","exclusions":[],"contradictions":[],"uncertainty":[],"reason":"reason"}',
+    '{"schema":"covra-decision-v2","verdict":"COVERED","severity":80,"confidence":80,"findings":[],"evidence_refs":["source"],"provenance":"THIRD_PARTY_PUBLIC","exclusions":[],"contradictions":[],"uncertainty":[],"reason":7}',
+    '{"schema":"covra-decision-v2","verdict":"COVERED","severity":80,"confidence":80,"findings":[],"evidence_refs":[],"provenance":"THIRD_PARTY_PUBLIC","exclusions":[],"contradictions":[],"uncertainty":[],"reason":"reason"}',
 ], ids=["invalid-json", "array", "empty-object", "invalid-verdict", "boolean-severity", "excess-severity", "reason-type", "citation-type"])
 def test_malformed_model_output_cannot_create_a_decision(direct_deploy, direct_vm, direct_owner, payload):
     contract, case = _submitted(direct_deploy, direct_vm, direct_owner)

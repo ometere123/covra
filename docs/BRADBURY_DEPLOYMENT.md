@@ -1,16 +1,22 @@
 # Bradbury Phase 2 deployment record
 
-## Verified COVRA deployment — 2026-11-03
+## Verified COVRA V1 deployment — 2026-11-03
 
 Full adjudicator address: `0xaefc8672272392310a2ea102787e28bb1f34e1d3`.
 Transaction: `0xd19bcbd6d2c6d3d2718312bb7114eec69d95facbf26a67cd00c2f7ee26432b28`.
 Independent GenLayer receipt: `Finalized` / `FinishedWithReturn`.
-Deployed source SHA-256: `4f424277b2aa1c23d599f8936452c7d16989ab7bd4e4265fbb28aab57092d0f2`, identical to local source.
-Initial `get_case_count` returned zero; all ten public methods returned in deployed schema.
+Deployed source SHA-256: `4f424277b2aa1c23d599f8936452c7d16989ab7bd4e4265fbb28aab57092d0f2`. The exact byte-preserving local snapshot is `contracts/genlayer/CovraAdjudicatorV1.py`; the active `contracts/genlayer/CovraAdjudicator.py` is now a separate V2 candidate and must not be described as the deployed source.
+Initial `get_case_count` returned zero; all ten V1 public methods returned in the deployed schema.
 
 Runner: `py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0`.
 Official matching bundle is GenVM Manager v0.6.0-rc10 from `genlayerlabs/genvm-manager`, not the older `genlayerlabs/genvm` rc7 release. Bundle SHA-256: `d3c6ba368dbd5cad01e484e19573906b4ffed41f46a48191bdc579c81cf801af`.
-Twenty-four pinned-SDK Direct Mode tests passed on Python 3.12, including callback cloudpickle round trips, adversarial leader/model/HTTP cases, delegation/revocation and appeal/finalization/digest checks with controlled external inputs. `npm run genlayer:validate` verifies the checksum-pinned Manager SDK, AST safety and its actual v0.3 semantic/schema API for all ten methods. These do not prove live evidence consensus, which remains pending.
+Twenty-four pinned-SDK Direct Mode tests passed on Python 3.12 for the historical V1 source. The current V2 candidate has 25 Direct Mode tests, including structured findings, committed-origin retrieval, provenance fail-closed behavior, callback cloudpickle round trips, adversarial leader/model/HTTP cases, delegation/revocation and appeal/finalization/digest checks with controlled external inputs. `npm run genlayer:validate` verifies the checksum-pinned Manager SDK, AST safety and its actual v0.3 semantic/schema API for the selected source. These local tests do not prove live evidence consensus.
+
+## Current V2 candidate — not deployed
+
+The current `contracts/genlayer/CovraAdjudicator.py` is a versioned candidate with source SHA-256 `b3278ba6540d694c59c350b75a835eaf4c48f1410d24b548aa9c1e7866e64806`. Its decision schema is `covra-decision-v2` and its verified local ABI contains 11 methods, including `get_protocol_version`. It requires an evidence envelope to bind the exact source facts digest, a public HTTPS origin digest, explicit provenance metadata, observer count and source authority. Each independent assessment returns bounded finding IDs, statuses, evidence references, provenance, exclusions, contradictions and uncertainty; validator agreement compares that material vector while allowing natural-language reasons to differ. `COVERED` is fail-closed unless deterministic class facts, source support, public provenance and no material contradiction/exclusion are all established.
+
+`npm run genlayer:validate` currently passes the V2 candidate with Manager v0.6.0-rc10, runner `py-genlayer:babwp9t…`, AST lint 3/3 and the 11-method v0.3 schema. `npm run test:genlayer-direct` passes 25/25 and `npm run test:genlayer-logic` passes 10/10. This source is not configured as the live adjudicator: the Base V1 pool immutably binds `0xaefc8672272392310a2ea102787e28bb1f34e1d3`, so a safe V2 rollout would require a separately verified Bradbury deployment and matching Base V2 pool. No V2 transaction was submitted and V1 history/funds remain protected.
 
 Deployment fee deposit:100000000000010352wei, payable user value0. Actual mined refund:99937910750009058wei, verified in FeesRefunded at EVMtx`0xab44df92843d6c03bb929c6eb2fdfbc4d3afd5159d6dbc3490e0494f4ce3ed72`, block208720, together with UnifiedFeesDistributed and TransactionFinalized. Public JSON record is in docs/deployments. This is an actual refund event. Positive-control deployment/write refund evidence is separately preserved there.
 

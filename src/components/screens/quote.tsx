@@ -9,6 +9,7 @@ import { calculateTestnetQuote } from "@/lib/quote";
 import { canonicalTermsHash } from "@/lib/terms";
 import { referenceLabels, subjectLabels } from "@/lib/risk-spec";
 import { baseClient, BASE_USDC, configuredPoolAddress, poolsAbi, quoteToAbi, type SignedQuote, usdcAbi } from "@/lib/chain";
+import { transactionPhaseLabel, transactionPhaseTone, type TransactionPhase } from "@/lib/transaction-state";
 import { useWallet } from "@/components/wallet-provider";
 import { PageHeading, TestnetNotice } from "@/components/ui";
 
@@ -37,6 +38,10 @@ export default function QuoteScreen() {
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState("");
   const [tx,setTx]=useState("");
+  const [transactionPhase,setTransactionPhase]=useState<TransactionPhase>("IDLE");
+  const [transactionLabel,setTransactionLabel]=useState("Policy transaction");
+  const [transactionHash,setTransactionHash]=useState("");
+  const [transactionError,setTransactionError]=useState("");
   useEffect(()=>{
     const index=coverages.findIndex(x=>x.slug===params.get("risk"));
     if(index>=0) setRisk(index);
@@ -48,7 +53,12 @@ export default function QuoteScreen() {
     try{return calculateTestnetQuote({
       coverageClass:risk,coverageUsd:limit,durationDays:Math.min(days,selected.maxDurationDays),
     });}catch{return null;}
-  },[risk,limit,days,selected.maxDurationDays,wallet.address]);
+  },[risk,limit,days,selected.maxDurationDays]);
+
+  const beginTransaction=(label:string)=>{
+    setTransactionLabel(label);setTransactionHash("");setTransactionError("");
+    setTransactionPhase("AWAITING_SIGNATURE");
+  };
 
   const preview=async()=>{
     setBusy(true);setError("");setResult(null);setTx("");
@@ -72,6 +82,7 @@ export default function QuoteScreen() {
   const purchase=async()=>{
     if(!result?.executable||!result.signature||!result.quote) return;
     setBusy(true);setError("");
+    setTx("");setTransactionPhase("IDLE");setTransactionError("");
     try {
       if(!wallet.address)throw new Error("Wallet disconnected");
       const contract=configuredPoolAddress();
@@ -84,21 +95,28 @@ export default function QuoteScreen() {
         address:BASE_USDC,abi:usdcAbi,functionName:"allowance",args:[wallet.address,contract],
       });
       if(allowance<quote.premium) {
+        beginTransaction("USDC approval");
         const approval=await client.writeContract({
           address:BASE_USDC,abi:usdcAbi,functionName:"approve",
           args:[contract,quote.premium],account:wallet.address,chain:baseSepolia,
         });
+        setTransactionHash(approval);setTransactionPhase("SUBMITTED");setTransactionPhase("CONFIRMING");
         const receipt=await baseClient.waitForTransactionReceipt({hash:approval});
         if(receipt.status!=="success")throw new Error("USDC approval transaction reverted");
       }
+      beginTransaction("Policy purchase");
       const hash=await client.writeContract({
         address:contract,abi:poolsAbi,functionName:"purchase",
         args:[quote,result.signature],account:wallet.address,chain:baseSepolia,
       });
+      setTransactionHash(hash);setTransactionPhase("SUBMITTED");setTransactionPhase("CONFIRMING");
       const receipt=await baseClient.waitForTransactionReceipt({hash});
       if(receipt.status!=="success")throw new Error("Policy purchase transaction reverted");
-      setTx(hash);
-    }catch(e){setError(e instanceof Error?e.message:"Purchase failed");}
+      setTx(hash);setTransactionPhase("CONFIRMED");
+    }catch(e){
+      const message=e instanceof Error?e.message:"Purchase failed";
+      setTransactionError(message);setTransactionPhase(/revert/i.test(message)?"REVERTED":"RECOVERABLE_ERROR");setError(message);
+    }
     finally{setBusy(false);}
   };
   return (
@@ -155,7 +173,12 @@ export default function QuoteScreen() {
           </div>
           {result&&!result.executable&&<div className="feedback"><Info size={14}/> Preview: {result.reason}</div>}
           {result?.executable&&!tx&&<div className="feedback"><CheckCircle2 size={15}/> A signed quote is ready. Confirm the transaction in your wallet before it expires.</div>}
-          {tx&&<div className="feedback"><CheckCircle2 size={16}/> Policy transaction confirmed on Base Sepolia. <a href={"https://sepolia.basescan.org/tx/"+tx} target="_blank" rel="noreferrer">View receipt ↗</a><br/>It will appear in My Policies once the event indexer runs.</div>}
+          {transactionPhase!=="IDLE"&&<div className={`feedback ${transactionPhaseTone(transactionPhase)==="error"?"feedback-error":""}`} role={transactionPhaseTone(transactionPhase)==="error"?"alert":"status"} aria-live="polite">
+            {transactionPhase==="CONFIRMED"?<CheckCircle2 size={16}/>:<Info size={16}/>} <strong>{transactionLabel}: {transactionPhaseLabel[transactionPhase]}.</strong>{" "}
+            {transactionError&&<span>{transactionError}{" "}</span>}
+            {transactionHash&&<a href={"https://sepolia.basescan.org/tx/"+transactionHash} target="_blank" rel="noreferrer">View receipt ↗</a>}
+            {transactionPhase==="CONFIRMED"&&tx&&<><br/>The policy receipt is confirmed; it will appear in My Policies once the event indexer reconciles it.</>}
+          </div>}
           {error&&<div className="feedback feedback-error">{error}</div>}
         </aside>
       </div>

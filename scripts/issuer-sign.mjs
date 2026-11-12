@@ -30,6 +30,11 @@ async function main() {
       draft.source_details.retrieval_method !== "https_get" ||
       !/^https:\/\//.test(String(draft.source_details.origin_url||"")) ||
       !/^[0-9a-fA-F]{64}$/.test(String(draft.source_details.origin_payload_digest||"").replace(/^0x/,"")) ||
+      !["THIRD_PARTY_PUBLIC","COVRA_CONTROLLED","CLAIMANT_CONTROLLED","UNKNOWN"].includes(draft.source_details.provenance_class) ||
+      !Number.isInteger(draft.source_details.independent_observer_count) ||
+      draft.source_details.independent_observer_count < 0 || draft.source_details.independent_observer_count > 16 ||
+      typeof draft.source_details.source_authority !== "string" ||
+      draft.source_details.source_authority.length < 2 || draft.source_details.source_authority.length > 240 ||
       String(draft.source_details.source_payload_digest||"").toLowerCase()!==hash(canonical(draft.facts)).toLowerCase())
     throw new Error("Observed public HTTPS evidence, frozen insured-risk hash and class facts are required");
   const frozenHash=hash(JSON.stringify({

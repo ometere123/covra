@@ -32,6 +32,9 @@ export async function verifyIssuerEvidence(
   if (parsed.source_details.retrieval_method === "https_get" &&
       (!parsed.source_details.origin_url || !parsed.source_details.origin_payload_digest))
     throw new Error("Observed evidence must bind the fetched origin and response digest");
+  if (parsed.source_details.provenance_class === "THIRD_PARTY_PUBLIC" &&
+      (parsed.source_details.independent_observer_count ?? 0) < 2)
+    throw new Error("Third-party provenance requires at least two declared observers");
   if (sha256Digest(canonicalJson(parsed.facts)).toLowerCase()!==parsed.source_details.source_payload_digest.toLowerCase())
     throw new Error("Evidence source payload digest does not match the signed facts");
   if (parsed.risk_spec_hash.toLowerCase()!==riskSpecDigest(parsed.risk_spec).toLowerCase())

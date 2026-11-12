@@ -14,6 +14,7 @@ import {
   withdrawalErrorMessage,
   type PoolWithdrawalPosition,
 } from "@/lib/pool-withdrawal";
+import { transactionPhaseLabel, transactionPhaseTone, type TransactionPhase } from "@/lib/transaction-state";
 import { useWallet } from "./wallet-provider";
 import { EmptyState, SyncNotice } from "./ui";
 
@@ -59,6 +60,17 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
   const [withdrawalPosition, setWithdrawalPosition] = useState<PoolWithdrawalPosition | null>(null);
   const [withdrawalState, setWithdrawalState] = useState<"IDLE" | "LOADING" | "CONFIRMED" | "ERROR">("IDLE");
   const [withdrawalError, setWithdrawalError] = useState("");
+  const [transactionPhase, setTransactionPhase] = useState<TransactionPhase>("IDLE");
+  const [transactionLabel, setTransactionLabel] = useState("Pool transaction");
+  const [transactionHash, setTransactionHash] = useState("");
+  const [transactionError, setTransactionError] = useState("");
+
+  const beginTransaction = (label: string) => {
+    setTransactionLabel(label);
+    setTransactionHash("");
+    setTransactionError("");
+    setTransactionPhase("AWAITING_SIGNATURE");
+  };
 
   const refresh = () => {
     void fetch("/api/pools", { cache: "no-store" }).then(r => r.json()).then(r => {
@@ -113,6 +125,8 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
   const deposit = async () => {
     setError("");
     setTx("");
+    setTransactionPhase("IDLE");
+    setTransactionError("");
     setBusy(true);
     try {
       const contract = poolAddress;
@@ -125,18 +139,30 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
       if (balance < micro) throw new Error("Insufficient Base Sepolia test USDC.");
       const allowance = await baseClient.readContract({ address: BASE_USDC, abi: usdcAbi, functionName: "allowance", args: [wallet.address, contract] });
       if (allowance < micro) {
+        beginTransaction("USDC approval");
         const approve = await client.writeContract({ account: wallet.address, chain: baseSepolia, address: BASE_USDC, abi: usdcAbi, functionName: "approve", args: [contract, micro] });
+        setTransactionHash(approve);
+        setTransactionPhase("SUBMITTED");
+        setTransactionPhase("CONFIRMING");
         const receipt = await baseClient.waitForTransactionReceipt({ hash: approve });
         if (receipt.status !== "success") throw new Error("USDC approval reverted");
       }
+      beginTransaction("Pool deposit");
       const hash = await client.writeContract({ account: wallet.address, chain: baseSepolia, address: contract, abi: poolsAbi, functionName: "deposit", args: [risk, micro] });
+      setTransactionHash(hash);
+      setTransactionPhase("SUBMITTED");
+      setTransactionPhase("CONFIRMING");
       const receipt = await baseClient.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("Pool deposit reverted");
       setTx(hash);
+      setTransactionPhase("CONFIRMED");
       refresh();
       void refreshWithdrawal();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Deposit failed");
+      const message = e instanceof Error ? e.message : "Deposit failed";
+      setTransactionError(message);
+      setTransactionPhase(/revert/i.test(message) ? "REVERTED" : "RECOVERABLE_ERROR");
+      setError(message);
     } finally {
       setBusy(false);
     }
@@ -158,6 +184,8 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
   const withdraw = async () => {
     setError("");
     setTx("");
+    setTransactionPhase("IDLE");
+    setTransactionError("");
     setBusy(true);
     try {
       const contract = poolAddress;
@@ -187,6 +215,7 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
       }
 
       const client = createWalletClient({ account: wallet.address, chain: baseSepolia, transport: custom(window.ethereum) });
+      beginTransaction("Pool withdrawal");
       const hash = await client.writeContract({
         account: wallet.address,
         chain: baseSepolia,
@@ -195,13 +224,20 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
         functionName: "withdraw",
         args: [withdrawRisk, freshQuote.shares],
       });
+      setTransactionHash(hash);
+      setTransactionPhase("SUBMITTED");
+      setTransactionPhase("CONFIRMING");
       const receipt = await baseClient.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("Withdrawal reverted; active reserves may have changed.");
       setTx(hash);
+      setTransactionPhase("CONFIRMED");
       refresh();
       void refreshWithdrawal();
     } catch (e) {
-      setError(withdrawalErrorMessage(e));
+      const message = withdrawalErrorMessage(e);
+      setTransactionError(message);
+      setTransactionPhase(/revert/i.test(message) ? "REVERTED" : "RECOVERABLE_ERROR");
+      setError(message);
     } finally {
       setBusy(false);
     }
@@ -277,7 +313,13 @@ export function PoolAllocation({ showIntro = true }: { showIntro?: boolean }) {
       </div>
       {error && <div className="feedback feedback-error" role="alert">{error}</div>}
       {wallet.error && <div className="feedback feedback-error" role="alert">{wallet.error}</div>}
-      {tx && <div className="feedback"><CheckCircle2 size={15} /> Transaction confirmed. <a href={"https://sepolia.basescan.org/tx/" + tx} target="_blank" rel="noreferrer">Inspect on Base Sepolia ↗</a></div>}
+      {transactionPhase !== "IDLE" && <div className={`feedback ${transactionPhaseTone(transactionPhase) === "error" ? "feedback-error" : ""}`} role={transactionPhaseTone(transactionPhase) === "error" ? "alert" : "status"} aria-live="polite">
+        {transactionPhase === "CONFIRMED" ? <CheckCircle2 size={15} /> : <Info size={15} />}
+        <strong>{transactionLabel}: {transactionPhaseLabel[transactionPhase]}.</strong>{" "}
+        {transactionError && <span>{transactionError}{" "}</span>}
+        {transactionHash && <a href={"https://sepolia.basescan.org/tx/" + transactionHash} target="_blank" rel="noreferrer">Inspect on Base Sepolia ↗</a>}
+        {transactionPhase === "CONFIRMED" && tx && <span> The receipt is confirmed; pool state is being re-read from Base Sepolia.</span>}
+      </div>}
     </>
   );
 }

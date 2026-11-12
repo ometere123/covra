@@ -12,6 +12,9 @@ export const BASE_SETTLEMENT_CHAIN = 84532;
 export const APPEAL_WINDOW_SECONDS = 3 * 86400;
 export const SETTLEMENT_GRACE_SECONDS = 45 * 86400;
 export const EVIDENCE_SCHEMA = "covra-evidence";
+export const evidenceProvenanceClass = z.enum([
+  "THIRD_PARTY_PUBLIC", "COVRA_CONTROLLED", "CLAIMANT_CONTROLLED", "UNKNOWN",
+]);
 export const hex32 = z.string().regex(/^0x[a-fA-F0-9]{64}$/);
 export const canonicalTimestamp = z.string().regex(
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/,
@@ -57,6 +60,12 @@ export const evidenceEnvelope = z.object({
     // raw response digest.
     origin_url: z.string().url().optional(),
     origin_payload_digest: hex32.optional(),
+    // These fields are optional for historical V1 envelopes, but required by
+    // the V2 adjudicator. A label is provenance metadata, not proof that the
+    // issuer or source is actually independent.
+    provenance_class: evidenceProvenanceClass.optional(),
+    independent_observer_count: z.number().int().min(0).max(16).optional(),
+    source_authority: z.string().min(2).max(240).optional(),
   }).strict(),
   issuer: z.object({
     wallet: z.string().regex(/^0x[0-9a-fA-F]{40}$/),

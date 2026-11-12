@@ -257,3 +257,19 @@ Latest infrastructure checks: Vercel production has no environment variables. Lo
 Independent local checks launched in session 79529: sanitized database check (failed ERR_INVALID_URL), typecheck, then quiet Foundry suite. Recover final exit status. Official GenVM repository manager sources were located, but no matching babwp artifact has been loaded yet; rc7 and cached v0.6.0-rc6 indices do not establish matching runner availability.
 
 No .env.local access or modification was performed. Avoid logging secrets. Next: finish current tests, add fee regression coverage, verify write finality, push and inspect CI; then resume remaining gates.
+# 2026-11-12 substantive quality pass — V2 candidate / V1 protected
+
+Work resumed from remote `main` at `6bd9b4f4e0f9c81b74f247bafcd6c6442224e8be`. The live V1 deployments and 100-USDC class-0 reserve were not modified. `contracts/genlayer/CovraAdjudicatorV1.py` is an exact byte-preserving snapshot of the deployed V1 source, SHA-256 `4f424277b2aa1c23d599f8936452c7d16989ab7bd4e4265fbb28aab57092d0f2`. The active `contracts/genlayer/CovraAdjudicator.py` is a local V2 candidate, SHA-256 `b3278ba6540d694c59c350b75a835eaf4c48f1410d24b548aa9c1e7866e64806`; it has not been deployed or selected by the production Base pool.
+
+The V2 candidate implements a bounded `covra-decision-v2` result with class-specific finding IDs, objective statuses, evidence references, provenance class, observer count, source authority, exclusions, contradictions, uncertainty and confidence. It verifies the signed facts digest, rejects unsafe origin authorities, retrieves the committed public origin independently, treats COVRA/claimant-controlled provenance as ineligible for `COVERED`, and compares material findings/flags across independently serialized leader and validator callbacks while allowing prose to differ. A matching Base V2 pool would be required before this immutable adjudicator change could authorize settlement; no Bradbury or Base V2 transaction was submitted.
+
+Observed local gates so far:
+
+- `npm run test:genlayer-logic`: 10 passed.
+- `npm run test:genlayer-direct`: 25 passed using the exact Manager v0.6.0-rc10 bundle and pinned runner `py-genlayer:babwp9t…`; controlled web/model inputs are not live public consensus.
+- `npm run genlayer:validate`: passed AST 3/3 and the actual v0.3 SDK schema with 11 candidate methods, source SHA above.
+- `npm test`: 120 Vitest and 12 TAP passed.
+- `npm run typecheck`, `npm run lint`, Python compilation and `npm run test:solidity`: passed; Foundry executed 23/23 and the withdrawal fuzz executed 256 runs.
+- Remaining gates for this release record: production build, browser/mobile verification, hosted Vercel promotion, GitHub CI, and final source/deployment decision.
+
+No `.env.local` was read or changed. No V1 release/finalization/settlement transaction was broadcast.

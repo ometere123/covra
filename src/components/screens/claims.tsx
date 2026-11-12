@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AlertCircle, ArrowUpRight, ClipboardCheck, FilePlus2, Paperclip, ShieldCheck, UploadCloud } from "lucide-react";
 import { coverages, formatUsdc } from "@/lib/catalog";
 import { useWallet } from "@/components/wallet-provider";
@@ -48,16 +48,16 @@ export default function ClaimsScreen() {
   const [bradburyFee,setBradburyFee]=useState("");
   const [evidence,setEvidence]=useState<File|null>(null);
   const [evidenceReceipt,setEvidenceReceipt]=useState("");
-  const refresh=()=>{
+  const refresh=useCallback(()=>{
     if(!authenticated){setClaims([]);setPolicies([]);setClaimState("SIGNED_OUT");return;}
     void Promise.all([fetch("/api/claims").then(r=>r.json()),fetch("/api/policies").then(r=>r.json())]).then(([c,p])=>{
       setClaims(Array.isArray(c.items)?c.items:[]);
       setClaimState(String(c.state||"SYNCHRONIZATION_ERROR"));
       setClaimMessage(String(c.message||c.error||""));
-      if(p.items){setPolicies(p.items);if(p.items.length&&!policyId)setPolicyId(p.items[0].policy_id);}
+      if(p.items){setPolicies(p.items);if(p.items.length)setPolicyId(current=>current||p.items[0].policy_id);}
     }).catch(()=>{setClaims([]);setPolicies([]);setClaimState("SYNCHRONIZATION_ERROR");setClaimMessage("The reconciled claim index could not be reached.");});
-  };
-  useEffect(refresh,[authenticated]);
+  },[authenticated]);
+  useEffect(()=>{refresh();},[refresh]);
   const chosen=policies.find(p=>p.policy_id===policyId);
   const currentClaim=claims.find(c=>String(c.id)===created);
   const appealSynchronizationPending=currentClaim?.status==="APPEAL_SYNC_PENDING";

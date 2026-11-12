@@ -1,6 +1,7 @@
 """Host-side logic checks only; these are NOT GenVM consensus tests."""
 
 import importlib.util
+import hashlib
 import json
 import pathlib
 import sys
@@ -46,11 +47,28 @@ def load_contract():
 class AdjudicatorLogicTests(unittest.TestCase):
     def test_model_results_reject_coercion_and_unbounded_fields(self):
         module, _ = load_contract()
-        valid = {"verdict": "COVERED", "severity": 50, "reason": "Verified facts", "citations": "https://issuer.example.org/claim"}
+        finding_ids = module.EXPECTED_FINDING_IDS[1]
+        valid = {
+            "schema": "covra-decision-v2",
+            "verdict": "COVERED",
+            "severity": 50,
+            "confidence": 80,
+            "findings": [
+                {"id": finding_id, "status": "ESTABLISHED", "evidence_refs": ["https://issuer.example.org/claim"]}
+                for finding_id in finding_ids
+            ],
+            "evidence_refs": ["https://issuer.example.org/claim"],
+            "provenance": "THIRD_PARTY_PUBLIC",
+            "exclusions": [],
+            "contradictions": [],
+            "uncertainty": [],
+            "reason": "Verified facts",
+        }
         self.assertEqual(module.parse_result(valid), valid)
         for mutation in ({"severity": True}, {"severity": 1.5}, {"severity": "50"},
-                         {"reason": {}}, {"citations": ""}, {"reason": "x" * 1201},
-                         {"verdict": "covered"}, {"extra": "instruction"}):
+                         {"confidence": 101}, {"reason": {}}, {"evidence_refs": []},
+                         {"reason": "x" * 1201}, {"verdict": "covered"},
+                         {"provenance": "COVRA"}, {"extra": "instruction"}):
             with self.assertRaises(UserError):
                 module.parse_result({**valid, **mutation})
 
@@ -58,7 +76,22 @@ class AdjudicatorLogicTests(unittest.TestCase):
         record = self.record()
         record["state"] = "SUBMITTED"
         self.contract.cases[record["id"]] = self.module.canonical_json(record)
-        valid = {"verdict": "COVERED", "severity": 50, "reason": "Verified facts", "citations": record["source"]}
+        valid = {
+            "schema": "covra-decision-v2",
+            "verdict": "COVERED",
+            "severity": 50,
+            "confidence": 80,
+            "findings": [
+                {"id": finding_id, "status": "ESTABLISHED", "evidence_refs": [record["source"]]}
+                for finding_id in self.module.EXPECTED_FINDING_IDS[record["risk"]]
+            ],
+            "evidence_refs": [record["source"]],
+            "provenance": "THIRD_PARTY_PUBLIC",
+            "exclusions": [],
+            "contradictions": [],
+            "uncertainty": [],
+            "reason": "Verified facts",
+        }
         class Returned:
             def __init__(self, data):
                 self.calldata = data
@@ -71,7 +104,7 @@ class AdjudicatorLogicTests(unittest.TestCase):
             self.assertFalse(validator(Returned({**valid, "verdict": "NOT_COVERED"})))
             self.assertFalse(validator(Returned({**valid, "severity": 90})))
             self.assertFalse(validator(Returned({**valid, "reason": {"payload": "bad"}})))
-            self.assertFalse(validator(Returned({**valid, "citations": ""})))
+            self.assertFalse(validator(Returned({**valid, "evidence_refs": []})))
             self.assertFalse(validator(object()))
             return leader()
         self.gl.vm.run_nondet = consensus
@@ -195,9 +228,14 @@ class AdjudicatorLogicTests(unittest.TestCase):
             "observation_mode": "OBSERVED_PUBLIC",
             "source_details": {
                 "issuer_host": "issuer.example.org", "endpoint": record["source"],
-                "retrieval_method": "https_get", "source_payload_digest": "0x" + "f" * 64,
+                "retrieval_method": "https_get", "source_payload_digest": "0x" + hashlib.sha256(
+                    self.module.canonical_json(facts).encode("utf-8")
+                ).hexdigest(),
                 "origin_url": "https://status.example.org/incident/1",
                 "origin_payload_digest": "0x" + "a" * 64,
+                "provenance_class": "COVRA_CONTROLLED",
+                "independent_observer_count": 0,
+                "source_authority": "COVRA controlled fixture",
             },
             "issuer": {"wallet": "0x" + "1" * 40,
                        "signed_at": self.module.transaction_timestamp() - 1,
@@ -206,6 +244,16 @@ class AdjudicatorLogicTests(unittest.TestCase):
             "facts": facts,
         }
         self.assertTrue(self.module.objective_evidence(record, envelope))
+        envelope["source_details"]["source_payload_digest"] = "0x" + "f" * 64
+        self.assertFalse(self.module.objective_evidence(record, envelope))
+        envelope["source_details"]["source_payload_digest"] = "0x" + hashlib.sha256(
+            self.module.canonical_json(facts).encode("utf-8")
+        ).hexdigest()
+        envelope["source_details"]["origin_url"] = "https://127.0.0.1/private"
+        self.assertFalse(self.module.objective_evidence(record, envelope))
+        envelope["source_details"]["origin_url"] = "https://status.example.org:443/incident/1"
+        self.assertFalse(self.module.objective_evidence(record, envelope))
+        envelope["source_details"]["origin_url"] = "https://status.example.org/incident/1"
         envelope["observation_mode"] = "SIMULATED_DEMO"
         self.assertFalse(self.module.objective_evidence(record, envelope))
         envelope["observation_mode"] = "OBSERVED_PUBLIC"

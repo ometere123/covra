@@ -323,6 +323,26 @@ contract CovraPoolsTest {
         pools.settle(d,sigs);
     }
 
+    function testDuplicateAttestorSignaturesDoNotIncreaseQuorum() public {
+        _lock();
+        CovraPools.Decision memory d=_decision(1,3000000,0,EVIDENCE_ID);
+        bytes[] memory duplicate = new bytes[](3);
+        duplicate[0]=_signature(d,attestorKeys[0]);
+        duplicate[1]=duplicate[0];
+        duplicate[2]=_signature(d,attestorKeys[1]);
+        vm.expectRevert(CovraPools.InvalidAttestation.selector);
+        pools.settle(d,duplicate);
+    }
+
+    function testQuorumCannotRedirectTheFrozenBeneficiary() public {
+        _lock();
+        CovraPools.Decision memory redirected=_decision(1,3000000,0,EVIDENCE_ID);
+        redirected.recipient=insured;
+        bytes[] memory redirectedSigs=_quorum(redirected);
+        vm.expectRevert(CovraPools.InvalidInput.selector);
+        pools.settle(redirected,redirectedSigs);
+    }
+
     function testEvidenceRevisionInvalidatesStaleCertifications() public {
         _lock();
         CovraPools.Decision memory oldDecision=_decision(1,3000000,0,EVIDENCE_ID);

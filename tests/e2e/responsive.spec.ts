@@ -64,6 +64,10 @@ test("all primary routes remain usable across supported viewport widths", async 
       }
 
       if (route === "/app/pools") {
+        // The pool screen performs a verified API read on mount. Wait for the
+        // client hydration/read cycle before editing controlled inputs, or a
+        // dev-server hydration pass can legitimately restore the SSR value.
+        await page.waitForLoadState("networkidle");
         const risk = page.locator("#pool-risk");
         const amount = page.locator("#pool-amount");
         const withdrawal = page.locator("#withdraw-amount");

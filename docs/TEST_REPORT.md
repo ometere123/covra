@@ -6,15 +6,19 @@ This section supersedes numerical counts in older dated sections below; those se
 
 | Check | Current result |
 | --- | --- |
-| Bradbury schema / semantic validation | `npm run genlayer:validate` passed with the checksum-pinned GenVM Manager v0.6.0-rc10 bundle, runner `py-genlayer:babwp9t...`, AST lint 3/3, and all 10 COVRA methods in the v0.3 schema. `npm run genlayer:preflight -- contracts/genlayer/CovraAdjudicator.py` passed against `https://rpc-bradbury.genlayer.com`, chain 4221, source SHA-256 `4f424277…` matching the deployed source. |
-| GenVM Direct Mode | `npm run test:genlayer-direct`: 24 passed. This is actual pinned SDK/Direct Mode execution with controlled external web/model inputs; it is not a full public validator-consensus claim. |
-| JavaScript/Node tests | `npm test`: 119 Vitest tests and 12 TAP tests passed. |
-| TypeScript / lint / build | TypeScript passed; ESLint passed with two pre-existing hook warnings and zero errors; `npm run build` passed with the existing `ox` dynamic-dependency warning. |
-| Solidity | Compilation passed; `forge test --root contracts/base -vvv`: 21 behavioral tests passed; new withdrawal accounting fuzz test passed 256 runs. |
+| Bradbury schema / semantic validation | `npm run genlayer:validate` passed for the un-deployed V2 candidate with the checksum-pinned GenVM Manager v0.6.0-rc10 bundle, runner `py-genlayer:babwp9t...`, AST lint 3/3, and all 11 candidate methods in the v0.3 schema. The deployed V1 source remains the exact `4f424277…` snapshot in `contracts/genlayer/CovraAdjudicatorV1.py`; no V2 deployment was submitted. |
+| GenVM Direct Mode | `npm run test:genlayer-direct`: 25 passed for the V2 candidate. This is actual pinned SDK/Direct Mode execution with controlled external web/model inputs; it is not a full public validator-consensus claim. |
+| GenVM host/adversarial logic | `npm run test:genlayer-logic`: 10 passed, including source-facts digest, origin URL, provenance, structured schema and fail-closed validator checks. |
+| JavaScript/Node tests | `npm test`: 120 Vitest tests and 12 TAP tests passed. |
+| TypeScript / lint / build | TypeScript passed; ESLint passed with zero errors; the former `claims.tsx` hook warning was corrected and the quote dependency warning was removed; `npm run build` remains a required final release gate. |
+| Solidity | Compilation passed; `forge test --root contracts/base -vv`: 23 behavioral tests passed, including duplicate-attestor and frozen-beneficiary regressions; withdrawal accounting fuzz passed 256 runs. |
+| Transaction UX state | Pool funding/withdrawal and policy purchase now expose distinct wallet-signature, submitted, confirmation, confirmed, reverted and recoverable-error states; receipts are linked only after a hash is observed and confirmation succeeds. |
 | Live contract state | Base Sepolia pool identity and current class-0 reserve read are receipt/RPC-backed. Bradbury case read is `DECIDED / INSUFFICIENT_EVIDENCE`, appeal window open until `2026-11-14T09:41:17Z`; no finalization or settlement was broadcast. |
 | Production browser verification | The complete production suite passed `33/33` in `3.8m` across Chromium desktop, Pixel 7 mobile and WebKit iPhone emulation. The WebKit subset passed `11/11`; the eight-width primary-route matrix completed inside its bounded 420-second budget. |
 
 The application-only hardening in this release verifies the configured pool’s Base chain, bytecode, Circle USDC immutable, Bradbury chain constant and exact adjudicator binding before `/api/pools` or protocol status reports verified state. It also replaces loading-time “awaiting deployment” language with an explicit verification state and updates the public reserve snapshot to block `57789758`. No contract source or deployment was changed.
+
+The V2 candidate is deliberately not directed at production: V1 remains the deployed and funded adjudicator/pool pair. A matching Base V2 pool is required before any V2 decision digest can authorize settlement. This is an explicit compatibility gate, not a missing configuration disguised as live success.
 
 ## 2026-11-06 regression and hosted checks
 

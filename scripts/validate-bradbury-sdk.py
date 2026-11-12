@@ -46,7 +46,8 @@ sys.modules[spec.name] = module
 spec.loader.exec_module(module)
 schema = json.loads(module.CovraAdjudicator.__get_schema__())
 expected = {"allow_evidence_host", "authorize_case_agent", "submit_case", "adjudicate", "appeal",
-    "finalize_case", "get_case", "get_case_count", "get_case_id_at", "get_decision_digest"}
+    "finalize_case", "get_case", "get_case_count", "get_case_id_at", "get_decision_digest",
+    "get_protocol_version"}
 if set(schema["methods"]) != expected:
     raise SystemExit("Unexpected public ABI")
 print(json.dumps({"ok": True, "lint": lint.to_dict(), "semanticBackend": "actual-v0.3-sdk-__get_schema__",
