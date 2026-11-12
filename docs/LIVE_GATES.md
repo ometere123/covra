@@ -22,7 +22,7 @@ The table below is the current commercial/reviewer gate matrix, not a claim that
 | Security | Independent audit, fuzz/invariant tests, key-management reviews, bug bounty | Twenty Foundry tests plus 256 withdrawal fuzz runs, GenVM adversarial cases and hosted authorization checks passed. Independent audit and signer drills remain pending. |
 | Backend | Signed-in reads, role boundaries, secure bucket, DB migrations, rate and origin limits, finality reindex | Production authentication, scoped agent/MCP calls, database migrations and scheduled indexer runs are verified. Reconciliation has checked the empty production ledger. |
 | Data protection | Retention, consent, evidence deletion, privacy impact and breach plan | Commercial policy and operational review remain pending. |
-| UI/accessibility | Browser tests, wallet-state tests, mobile usability, full WCAG audit | Production wallet/login/wallet-state checks and the full 11-test WebKit suite passed, including the eight-width responsive matrix. Full WCAG audit remains pending. |
+| UI/accessibility | Browser tests, wallet-state tests, mobile usability, full WCAG audit | Production browser suite passed 33/33 across Chromium desktop, Pixel 7 and WebKit iPhone emulation, including the eight-width responsive matrix. Full WCAG audit remains pending. |
 | Reliability | Incident response, monitoring, backups, SLOs and rollback | No live SLO/incident drills |
 | Commercial | Underwriter/policyholder agreements, customer support, complaints/refunds, accounting | Not established |
 

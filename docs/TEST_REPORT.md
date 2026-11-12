@@ -12,7 +12,7 @@ This section supersedes numerical counts in older dated sections below; those se
 | TypeScript / lint / build | TypeScript passed; ESLint passed with two pre-existing hook warnings and zero errors; `npm run build` passed with the existing `ox` dynamic-dependency warning. |
 | Solidity | Compilation passed; `forge test --root contracts/base -vvv`: 21 behavioral tests passed; new withdrawal accounting fuzz test passed 256 runs. |
 | Live contract state | Base Sepolia pool identity and current class-0 reserve read are receipt/RPC-backed. Bradbury case read is `DECIDED / INSUFFICIENT_EVIDENCE`, appeal window open until `2026-11-14T09:41:17Z`; no finalization or settlement was broadcast. |
-| Production browser verification | The full production WebKit suite passed `11/11` after the matrix received a bounded 420-second budget for cold hosted SSR/API startup; the eight-width primary-route matrix completed in 3.2 minutes. The existing Chromium/mobile checks also passed in the preceding production run. |
+| Production browser verification | The complete production suite passed `33/33` in `3.8m` across Chromium desktop, Pixel 7 mobile and WebKit iPhone emulation. The WebKit subset passed `11/11`; the eight-width primary-route matrix completed inside its bounded 420-second budget. |
 
 The application-only hardening in this release verifies the configured pool’s Base chain, bytecode, Circle USDC immutable, Bradbury chain constant and exact adjudicator binding before `/api/pools` or protocol status reports verified state. It also replaces loading-time “awaiting deployment” language with an explicit verification state and updates the public reserve snapshot to block `57789758`. No contract source or deployment was changed.
 
