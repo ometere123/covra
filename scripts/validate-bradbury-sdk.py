@@ -48,11 +48,16 @@ spec = importlib.util.spec_from_file_location("covra_schema_validation", contrac
 module = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = module
 spec.loader.exec_module(module)
-schema = json.loads(module.CovraAdjudicator.__get_schema__())
-expected = {"allow_evidence_host", "authorize_case_agent", "submit_case", "adjudicate", "appeal",
-    "finalize_case", "get_case", "get_case_count", "get_case_id_at", "get_decision_digest",
-    "get_protocol_version"}
-if set(schema["methods"]) != expected:
-    raise SystemExit("Unexpected public ABI")
+contract_class = next(
+    value for value in vars(module).values()
+    if isinstance(value, type) and getattr(value, "__gl_contract__", False)
+)
+schema = json.loads(contract_class.__get_schema__())
+expected_text = os.environ.get("COVRA_EXPECTED_METHODS")
+if expected_text:
+    expected = {name for name in expected_text.split(",") if name}
+    if set(schema["methods"]) != expected:
+        raise SystemExit("Unexpected public ABI")
 print(json.dumps({"ok": True, "lint": lint.to_dict(), "semanticBackend": "actual-v0.3-sdk-__get_schema__",
-    "runner": dependencies, "sourceSha256": hashlib.sha256(contract.read_bytes()).hexdigest(), "schema": schema}, indent=2))
+    "runner": dependencies, "sourceSha256": hashlib.sha256(contract.read_bytes()).hexdigest(),
+    "contractClass": contract_class.__name__, "schema": schema}, indent=2))

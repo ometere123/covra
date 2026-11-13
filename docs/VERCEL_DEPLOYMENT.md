@@ -1,6 +1,6 @@
 # Vercel deployment record
 
-## Current V2-gate release — 2026-11-12
+## Current production release and V2 opt-in state — 2026-11-13
 
 - Project: `covra` (linked project id `prj_MEfQ5bR0bq4XEUNg0XzbNtUbfmqi`)
 - Target: Vercel production on the authenticated Hobby team
@@ -10,7 +10,9 @@
 - Status: `READY`
 - Runtime verification: `/api/health` reported `available` / `testnet`; `/api/protocol-status` reported active `V1`; `/demo`, `/case-study/first-pilot`, and `/app/pools` returned captured HTML responses containing the expected COVRA route content.
 
-This is an application release only. V2 remains opt-in and inactive because the Bradbury Phase 2 deployment gate rejected the current full V2 deployment at the observed post-sequencer transaction-gas ceiling. No V2 contract, Base V2 pool, policy, or settlement transaction is claimed by this deployment.
+This production application remains on the verified V1 pair by explicit default. The native staged V2 pair is now independently deployed and verified: Bradbury/bootstrap `0x71B1Fb863F29c29D4C3f6423196b60589538E491` and Base pool `0x208f1b9c5694d9fbde32c81b0489db922e33263c`, currently unfunded. The existing version-aware routing accepts V2 only when `NEXT_PUBLIC_COVRA_DEPLOYMENT_VERSION=V2` and both V2 public addresses are configured; no production V1 behavior or historical case data is silently switched. No V2 policy, claim or settlement is claimed.
+
+The V2 deployment proof is recorded in [`BRADBURY_DEPLOYMENT.md`](BRADBURY_DEPLOYMENT.md) and [`staged-upgrade-proof-0x71538bfe48e0fd6fc5a789caf46ebcbc8c8d86656ab4d51a2c3194d782e37dc1.json`](deployments/staged-upgrade-proof-0x71538bfe48e0fd6fc5a789caf46ebcbc8c8d86656ab4d51a2c3194d782e37dc1.json). Do not add V2 private keys to Vercel; only the public V2 addresses belong in an opt-in deployment configuration.
 
 ## Historical production record — 2026-11-03 (superseded)
 

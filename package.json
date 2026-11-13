@@ -30,7 +30,8 @@
     "attestor:sign": "node --env-file=.env.local scripts/attestor-sign.mjs",
     "attestor:aggregate": "node --experimental-strip-types --env-file=.env.local scripts/aggregate-attestations.mjs",
     "claim:extension": "node --env-file=.env.local scripts/claim-extension.mjs",
-    "genlayer:preflight": "node scripts/bradbury-contract-preflight.mjs"
+    "genlayer:preflight": "node scripts/bradbury-contract-preflight.mjs",
+    "genlayer:staged-resume": "node --env-file=.env.local scripts/resume-covra-staged-install.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",

@@ -33,11 +33,15 @@ This file tells you **exactly what to collect on your PC**. The complete machine
 | `BRADBURY_ADDRESS_MANAGER` | Phase 2 manager: `0x3F71AE080BD6270A91dBcc7960d88797828538E0` | Verify against official networks docs |
 | `BRADBURY_ADJUDICATOR_ADDRESS` | Address of *your own* finalized COVRA GenLayer deployment | Base payout contract constructor |
 | `NEXT_PUBLIC_BRADBURY_ADJUDICATOR_ADDRESS` | Public copy of deployed Bradbury Intelligent Contract address | Claim-screen Bradbury submission |
+| `BRADBURY_ADJUDICATOR_V2_ADDRESS` | Verified staged V2 Bradbury/bootstrap address `0x71B1Fb863F29c29D4C3f6423196b60589538E491` | V2-only server writes/read verification |
+| `NEXT_PUBLIC_BRADBURY_ADJUDICATOR_V2_ADDRESS` | Same verified public V2 address | Explicit V2 browser routing |
+| `COVRA_DEPLOYMENT_VERSION` / `NEXT_PUBLIC_COVRA_DEPLOYMENT_VERSION` | Leave `V1` for current production; set both to `V2` only for deliberate opt-in | Version-aware routing |
 | `BASE_CHAIN_ID` | `84532`, fixed | Base Sepolia |
 | `BASE_RPC_URL` | Base Sepolia HTTPS RPC; can use public endpoint or provider | Server/contract deploy |
 | `NEXT_PUBLIC_BASE_RPC_URL` | Safe public Base Sepolia RPC | Browser |
 | `NEXT_PUBLIC_BASE_USDC_ADDRESS` | Circle's official Base Sepolia testnet USDC `0x036CbD53842c5426634e7929541eC2318f3dCF7e` | USDC transfers |
 | `NEXT_PUBLIC_COVRA_POOLS_ADDRESS` | Address printed by successful **Base testnet** deploy | Purchase, pool reads |
+| `NEXT_PUBLIC_COVRA_POOLS_V2_ADDRESS` | Verified unfunded V2 Base pool `0x208f1b9c5694d9fbde32c81b0489db922e33263c` | Explicit V2 purchase/pool reads |
 | `BASE_DEPLOYMENT_START_BLOCK` | Block printed by deployment script | Policy indexing |
 | `QUOTE_SIGNER_PRIVATE_KEY` | Dedicated disposable private key, **not** deployer wallet | Server EIP-712 quote signing |
 | `NEXT_PUBLIC_QUOTE_SIGNER_ADDRESS` | Address of that signer, informational | Optional UI integration |
@@ -106,7 +110,7 @@ The deploy script verifies Base Sepolia chain ID and that the configured USDC ad
 - This network is a reset testnet; all previous contract addresses and state are invalid.
 - Bradbury Phase 2 uses Consensus v0.6 fees. This source ZIP pins `genlayer-js@2.0.0-rc.2`, not the StudioNet `1.1.8` stable library. The verified CLI is `genlayer 0.40.0-rc.5`; `0.39.1` and older `0.40` RC profiles may contain stale Phase 2 fee-manager addresses.
 - `npm run genlayer:smoke` checks the **EVM** chain ID only; it does not simulate validator/GenVM consensus.
-- Use Praest on Bradbury only, with the verified GenLayer node RPC. The contract pins v0.3.0 / `py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0`. Official `genlayerlabs/genvm-manager` v0.6.0-rc10 contains the matching runner; see `scripts/prepare-genvm-runtime.py` for the checksum gate. The deployed **V1** adjudicator is already Finalized / FinishedWithReturn; the current V2 candidate is schema-verified but not deployed because its Bradbury transaction exceeds the observed post-sequencer gas ceiling. Do not redeploy positive controls or route production traffic to V2. Existing live addresses and source identity are in BRADBURY_DEPLOYMENT.md. A real `submit_case → adjudicate → [optional appeal → adjudicate] → wait three days → finalize_case → get_decision_digest` lifecycle still requires a funded Base policy and genuine evidence. Every write uses a fresh v0.6 fee quote through the patched account-aware SDK.
+- Use Praest on Bradbury only, with the verified GenLayer node RPC. The contract pins v0.3.0 / `py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0`. Official `genlayerlabs/genvm-manager` v0.6.0-rc10 contains the matching runner; see `scripts/prepare-genvm-runtime.py` for the checksum gate. V1 is Finalized / FinishedWithReturn, and V2 is now installed at the verified staged address using the native alternate-code-slot path; the direct oversized deployment gate remains historical. Keep production on V1 unless the matched V2 public addresses are deliberately configured. Existing live addresses and source identity are in BRADBURY_DEPLOYMENT.md. A real `submit_case → adjudicate → [optional appeal → adjudicate] → wait three days → finalize_case → get_decision_digest` lifecycle still requires a funded Base policy and genuine evidence. Every write uses a fresh v0.6 fee quote through the patched account-aware SDK.
 - The browser `submit_case` write estimates fees before sending; the onchain case does not adjudicate itself. If the public GenLayer node is unavailable, keep this action disabled and use independent CLI verification once your own endpoint exists.
 - Run `npm run attestor:preflight -- 0xCASE_ID 0xFINALIZATION_TX_ID` after independently verifying the issuer host/wallet mapping. This helper never signs; each operator must separately run the sign/aggregate tools described in [claim protocol](CLAIM_PROTOCOL.md).
 

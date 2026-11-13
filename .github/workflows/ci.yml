@@ -30,6 +30,8 @@ jobs:
           python scripts/prepare-genvm-runtime.py
           npm run genlayer:validate
           npm run test:genlayer-direct
+      - name: Verify native alternate-code-slot proof
+        run: python -m pytest tests/python/test_staged_code_slot_direct.py tests/python/test_covra_v2_staged_layout_direct.py -q --tb=short
       - uses: foundry-rs/foundry-toolchain@v1
         with:
           version: stable

@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, http, parseAbi, recoverTypedDataAddress } from "viem";
 import { baseSepolia } from "viem/chains";
+import { activeDeployment } from "../src/lib/deployment-config.mjs";
 
 const types={ClaimExtension:[
   {name:"policyId",type:"bytes32"},{name:"claimId",type:"bytes32"},
@@ -19,7 +20,7 @@ const abi=parseAbi([
   "function claimResolutionDeadline(bytes32) view returns(uint256)",
   "function attestorForClaim(bytes32,address) view returns(bool)",
 ]);
-const pool=process.env.NEXT_PUBLIC_COVRA_POOLS_ADDRESS;
+const pool=activeDeployment().poolAddress;
 if (!/^0x[0-9a-fA-F]{40}$/.test(pool||"")) throw new Error("Exact deployed Base pool required");
 const base=createPublicClient({chain:baseSepolia,transport:http(process.env.BASE_RPC_URL||"https://sepolia.base.org")});
 const domain={name:"COVRA",version:"1",chainId:84532,verifyingContract:pool};

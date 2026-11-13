@@ -2,7 +2,7 @@
 
 **Network lock:** GenLayer Bradbury Phase 2 chain **4221** for intelligent adjudication; Base Sepolia chain **84532** for ring-fenced native Circle test USDC. This repository does not use StudioNet or Arc for settlement.
 
-**Status:** Source implementation and independent preflight are provided; audited live attestation/finality infrastructure is not yet deployed. This is not an insurance policy or a trustless bridge.
+**Status:** V1 has a receipt-backed negative pilot and V2 has a separately verified but unfunded staged deployment. Audited independent attestation/finality infrastructure is not yet established, and no commercial insurance is offered. This is not a trustless bridge.
 
 ## 1. Why a two-chain protocol?
 

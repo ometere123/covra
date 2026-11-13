@@ -16,6 +16,7 @@ import { assertIncidentWithinPolicy, settlementCertificateDeadline } from "./cla
 import { encodePreflightOutput } from "./preflight-io.mjs";
 import { assertExactBradburyReceipt } from "./bradbury-receipt.mjs";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "../src/lib/bradbury-final-state.ts";
+import { activeDeployment } from "../src/lib/deployment-config.mjs";
 
 function fail(reason) { throw new Error("ATTESTOR_PREFLIGHT_REJECTED: " + reason); }
 function hex32(value) { return typeof value === "string" && /^0x[0-9a-fA-F]{64}$/.test(value); }
@@ -93,8 +94,9 @@ async function main() {
   const caseId=process.argv[2];
   const finalizationTx=process.argv[3];
   const nodeUrl=process.env.BRADBURY_NODE_RPC_URL;
-  const basePool=process.env.NEXT_PUBLIC_COVRA_POOLS_ADDRESS;
-  const adjudicator=process.env.BRADBURY_ADJUDICATOR_ADDRESS;
+  const deployment=activeDeployment();
+  const basePool=deployment.poolAddress;
+  const adjudicator=deployment.adjudicatorAddress;
   const evidenceIssuer=process.env.EVIDENCE_ISSUER_WALLET;
   if (!hex32(caseId)) fail("argument must be an exact bytes32 case ID");
   if (!hex32(finalizationTx)) fail("provide the actual finalized GenLayer transaction hash as second argument");

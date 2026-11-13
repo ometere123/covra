@@ -20,15 +20,15 @@
   "blockNumber": "53734261",
   "blockHash": "0xe129bf65c1c3dd341b860fdb47c48d60a34d8d2745e626def0a7f9669f637200",
   "gasUsed": "3952135",
-  "verifiedAt": "2026-11-11T01:46:25.192Z",
+  "verifiedAt": "2026-11-13T19:47:15.948Z",
   "runtimeCodeSha256": "24ecd8c547386e108a3c614e1a7d4aa721b9a8e0096f93c3abb9499270ff54d9",
   "pools": [
     {
-      "assets": "0",
-      "reserved": "0",
-      "premiumsWritten": "0",
+      "assets": "100000000",
+      "reserved": "100000000",
+      "premiumsWritten": "1000000",
       "paid": "0",
-      "totalShares": "0"
+      "totalShares": "99000000"
     },
     {
       "assets": "0",

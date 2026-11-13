@@ -1,0 +1,63 @@
+{
+  "chainId": 84532,
+  "transactionHash": "0x6f41570b4c89d332b5f502f80c29faf3255dc7afbb8e0a42406806aab8d88d04",
+  "status": "success",
+  "deploymentVersion": "V2",
+  "sourceSha256": "49b19bfa5eb7162766b5b9c8224b565aed18dfa0362e634981b2dfe5af9cc3d1",
+  "compiler": "0.8.38+commit.1835d247.Emscripten.clang",
+  "owner": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+  "quoteSigner": "0x870d04144Ef72B02B1740D7c6a893036F29fb3A4",
+  "evidenceIssuer": "0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5",
+  "adjudicator": "0x71B1Fb863F29c29D4C3f6423196b60589538E491",
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "attestors": [
+    "0xD1fcB05420B51b2dF3fa3036d491BBA656CB8a1b",
+    "0xA1afCA241Ad6a84acEcb3e7cC43c57df65cF7826",
+    "0x9a69739ebEbfE1d57D71F0a4668a9FcE181C4A99",
+    "0xe37B7fb260aB56C803ce5aCe5f0f2011eaC48720",
+    "0xe59e5423E14bdb46d2EEefd3A39049a168De4591"
+  ],
+  "contractAddress": "0x208f1b9c5694d9fbde32c81b0489db922e33263c",
+  "blockNumber": "58311245",
+  "blockHash": "0x3116ccdacd89fb949f66d4b4578cef312a7cedc1c35885fef6c9db6d18fb0ea0",
+  "gasUsed": "3952135",
+  "verifiedAt": "2026-11-13T19:47:50.515Z",
+  "runtimeCodeSha256": "ead5a6ba92a5cc4075a6ee4bee0bbf34e48681c61b914b1a7a45475927f6b7b6",
+  "pools": [
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    },
+    {
+      "assets": "0",
+      "reserved": "0",
+      "premiumsWritten": "0",
+      "paid": "0",
+      "totalShares": "0"
+    }
+  ]
+}

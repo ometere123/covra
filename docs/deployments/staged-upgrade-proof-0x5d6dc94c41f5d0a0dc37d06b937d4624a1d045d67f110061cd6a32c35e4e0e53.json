@@ -1,0 +1,1075 @@
+{
+  "proof": "native-code-slot-staged-upgrade",
+  "network": "testnet-bradbury",
+  "chainId": 4221,
+  "genesis": "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4",
+  "nodeRpc": "https://rpc-bradbury.genlayer.com",
+  "chainRpc": "https://rpc.testnet-chain.genlayer.com",
+  "runner": "py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0",
+  "managerRuntime": "genvm-manager-v0.6.0-rc10",
+  "bootstrapPath": "testbed/staged-upgrade/StageableBootstrap.py",
+  "bootstrapBytes": 6321,
+  "bootstrapSha256": "e7e6bcfdf4f1fbf137c00b5e629c650280af81ac45526b5694ecad63ba1e6b84",
+  "replacementPath": "testbed/staged-upgrade/StageableReplacement.py",
+  "replacementBytes": 1832,
+  "replacementSha256": "4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+  "replacementDigest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+  "bootstrapSchema": {
+    "ctor": {
+      "kwparams": {},
+      "params": []
+    },
+    "methods": {
+      "activate": {
+        "kwparams": {},
+        "params": [],
+        "payable": false,
+        "readonly": false,
+        "ret": "null"
+      },
+      "get_code_slot": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "int"
+      },
+      "get_counter": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "int"
+      },
+      "get_installation_status": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "string"
+      },
+      "get_installer": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "address"
+      },
+      "get_marker": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "string"
+      },
+      "increment": {
+        "kwparams": {},
+        "params": [
+          [
+            "amount",
+            "int"
+          ]
+        ],
+        "payable": false,
+        "readonly": false,
+        "ret": "null"
+      },
+      "reset_installation": {
+        "kwparams": {},
+        "params": [],
+        "payable": false,
+        "readonly": false,
+        "ret": "null"
+      },
+      "stage_chunk": {
+        "kwparams": {},
+        "params": [
+          [
+            "index",
+            "int"
+          ],
+          [
+            "total_chunks",
+            "int"
+          ],
+          [
+            "chunk",
+            "bytes"
+          ],
+          [
+            "source_digest",
+            "string"
+          ]
+        ],
+        "payable": false,
+        "readonly": false,
+        "ret": "null"
+      }
+    }
+  },
+  "replacementSchema": {
+    "ctor": {
+      "kwparams": {},
+      "params": []
+    },
+    "methods": {
+      "get_code_slot": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "int"
+      },
+      "get_counter": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "int"
+      },
+      "get_installation_status": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "string"
+      },
+      "get_installer": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "address"
+      },
+      "get_marker": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "string"
+      },
+      "get_version": {
+        "kwparams": {},
+        "params": [],
+        "readonly": true,
+        "ret": "string"
+      },
+      "increment": {
+        "kwparams": {},
+        "params": [
+          [
+            "amount",
+            "int"
+          ]
+        ],
+        "payable": false,
+        "readonly": false,
+        "ret": "null"
+      }
+    }
+  },
+  "deployer": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+  "signingMode": "genlayer-cli-keystore:praest-deployer",
+  "feeManager": "0x7678587A847712f2A96082AC07883A88D0fc7245",
+  "gasCap": "16777216",
+  "gasPrice": "10000000",
+  "initialBalance": "49798341159219986739",
+  "stages": [
+    {
+      "label": "bootstrap counter write",
+      "functionName": "increment",
+      "argsSummary": [
+        "2"
+      ],
+      "gasPreflight": {
+        "method": "eth_estimateGas",
+        "floor": "2205424",
+        "gasLimit": "2425967",
+        "cap": "16777216",
+        "estimateError": null
+      },
+      "feeValue": "100000000000010352",
+      "status": "FINALIZED",
+      "transactionId": "0x755342fd22bec1a22b23deff1c0ef37b6be5e2e2adfe71112dd10202eeace4d6",
+      "executionResult": "FINISHEDWITHRETURN",
+      "receipt": {
+        "observedAt": "1794572827",
+        "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+        "recipient": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C",
+        "initialRotations": "3",
+        "txSlot": "1",
+        "createdTimestamp": "1794572736",
+        "lastVoteTimestamp": "1794572762",
+        "randomSeed": "0xa3c5dcd64c5fdb04e456a8f9ea51870633da8bf20a8ff239b52fe15b6e5ab777",
+        "result": 1,
+        "txExecutionHash": "0xd929172f8a6e663b79960cd3e250e74322aa9d4cc4bb080bbac665ae96bd3718",
+        "txCalldata": "0xd59316004c696e6372656d656e7404617267730d1100",
+        "eqBlocksOutputs": "0x0e076e645f6f75747305",
+        "messages": [],
+        "queueType": 0,
+        "queuePosition": "0",
+        "activator": "0xcEc49586D30a7658eA6deBa75Cd64C82F31D9648",
+        "lastLeader": "0x635F90371bA1a9Ad9c3B7BbD68Bb660802719795",
+        "status": 7,
+        "txId": "0x755342fd22bec1a22b23deff1c0ef37b6be5e2e2adfe71112dd10202eeace4d6",
+        "readStateBlockRange": {
+          "activationBlock": "401980",
+          "processingBlock": "401981",
+          "proposalBlock": "401990"
+        },
+        "numOfRounds": "0",
+        "lastRound": {
+          "round": "0",
+          "leaderIndex": "1",
+          "votesCommitted": "5",
+          "votesRevealed": "5",
+          "appealBond": "0",
+          "rotationsLeft": "3",
+          "result": 1,
+          "validatorsCount": "5",
+          "roundValidators": [
+            "0x66e660ba1B9e6076A0bAbED7d9c0508B07d86607",
+            "0x635F90371bA1a9Ad9c3B7BbD68Bb660802719795",
+            "0xb04975F3C8cdcDB1273d1a6C2E2e93662F74554d",
+            "0x2ab2522DB85Ab48ED9f17007369A567Df288a0c9",
+            "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2"
+          ],
+          "validatorVotes": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "validatorVotesHash": [
+            "0xc7c361a118c641254043d37ff89fe1231bca245a86df35fb6c3f58f3aa750151",
+            "0x334d0b28a4e2f95be356c9ca608f55370ffa9fe1ea30f688c27d07b0ccc08ef3",
+            "0x12c35ec619a39887743e071ca562126f09a29dfa7c8d8b9ed7ab95381f90f802",
+            "0x03bacf6c58cba42f8a360561da9d064f5c80099355007a68f26af7fdd2a4d95f",
+            "0x44d009686468ce151f9e04cc3033a986ae75324971cd57cbee0e2865d3308698"
+          ],
+          "validatorResultHash": [
+            "0x4fc7f7f54031047644df0b4424ab16ebcc2a5a8263a4cbf76808136c7d483a61",
+            "0x4fc7f7f54031047644df0b4424ab16ebcc2a5a8263a4cbf76808136c7d483a61",
+            "0x4fc7f7f54031047644df0b4424ab16ebcc2a5a8263a4cbf76808136c7d483a61",
+            "0x4fc7f7f54031047644df0b4424ab16ebcc2a5a8263a4cbf76808136c7d483a61",
+            "0x4fc7f7f54031047644df0b4424ab16ebcc2a5a8263a4cbf76808136c7d483a61"
+          ],
+          "validatorVotesName": [
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN"
+          ]
+        },
+        "consumedValidatorsCount": "5",
+        "numOfInitialValidators": "5",
+        "txExecutionResult": 1,
+        "consumedValidators": [
+          "0x66e660ba1B9e6076A0bAbED7d9c0508B07d86607",
+          "0x635F90371bA1a9Ad9c3B7BbD68Bb660802719795",
+          "0xb04975F3C8cdcDB1273d1a6C2E2e93662F74554d",
+          "0x2ab2522DB85Ab48ED9f17007369A567Df288a0c9",
+          "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2"
+        ],
+        "txData": "0xd59316004c696e6372656d656e7404617267730d1100",
+        "txDataDecoded": {
+          "callData": {},
+          "leaderOnly": false,
+          "type": "call"
+        },
+        "currentTimestamp": "1794572827",
+        "statusName": "FINALIZED",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "resultName": "MAJORITY_AGREE",
+        "txExecutionResultName": "FINISHED_WITH_RETURN"
+      },
+      "settlementReceipts": []
+    },
+    {
+      "label": "stage chunk 1/3",
+      "functionName": "stage_chunk",
+      "argsSummary": {
+        "index": "0",
+        "totalChunks": "3",
+        "bytes": 700,
+        "sourceDigest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5"
+      },
+      "gasPreflight": {
+        "method": "eth_estimateGas",
+        "floor": "2813131",
+        "gasLimit": "3094445",
+        "cap": "16777216",
+        "estimateError": null
+      },
+      "feeValue": "100000000000010352",
+      "status": "FINALIZED",
+      "transactionId": "0xefdefac1cba682c73738372729c13037682d1aeb43074943e52584b88861ab33",
+      "executionResult": "FINISHEDWITHRETURN",
+      "receipt": {
+        "observedAt": "1794573627",
+        "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+        "recipient": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C",
+        "initialRotations": "3",
+        "txSlot": "3",
+        "createdTimestamp": "1794573532",
+        "lastVoteTimestamp": "1794573562",
+        "randomSeed": "0x8eca224ecad8f5b4f9940b7f2d44c1eba2fc9c40f45bc10f037967b232a3916e",
+        "result": 1,
+        "txExecutionHash": "0x60c1ae426f7d9ceadc077db43df90f06ac74c8d50206965ae0c5a18dea4427a4",
+        "txCalldata": "0xf9031cb9031816005c73746167655f6368756e6b0461726773250119e32b232076302e332e300a23207b2022446570656e6473223a202270792d67656e6c617965723a6261627770397433376a773967346a32626363676e31346736783778397331663764736d6837656d767a373335707a347a78613022207d0a0a2222225265706c6163656d656e742068616c66206f662074686520646973706f7361626c65206e617469766520636f64652d736c6f742070726f6f662e2222220a0a696d706f72742067656e6c6179657220617320676c0a66726f6d2067656e6c617965722e747970657320696d706f7274202a0a696d706f7274206a736f6e0a0a0a636c61737320537461676561626c6528676c2e636f6e74726163742e436f6e7472616374293a0a2020202023204d7573742072656d61696e20627974652d666f722d6279746520636f6d70617469626c6520776974682074686520626f6f747374726170206669656c64206f726465722e0a20202020696e7374616c6c65723a20416464726573730a2020202065787065637465645f6469676573743a207374720a20202020746f74616c5f6368756e6b733a20753235360a202020206e6578745f6368756e6b3a20753235360a202020207374616765645f62797465733a20753235360a202020206163746976617465643a20626f6f6c0a2020202061637469766174696f6e5f6469676573743a207374720a20202020636f756e7465723a20753235360a202020206d61726b65723a207374720a0a20202020646566205f5f696e69745f5f2873656c66293a0a2020202020202020232047656e564d20646f6573206e6f7420726572756e205f5f696e69745f5f20647572696e67206120636f646520757067726164652e202054686973206d6574686f642069730a2020202020202020232070726573656e74206f6e6c7920666f7220736368656d612f72756e74696d652076616c69646174696f6e206f66206120646570940430783466323132393861303034613438396333643836313637663134656230643138663436663563393261623539316339306133393937653164633032306534613500",
+        "eqBlocksOutputs": "0x0e076e645f6f75747305",
+        "messages": [],
+        "queueType": 0,
+        "queuePosition": "0",
+        "activator": "0xcEc49586D30a7658eA6deBa75Cd64C82F31D9648",
+        "lastLeader": "0xcEc49586D30a7658eA6deBa75Cd64C82F31D9648",
+        "status": 7,
+        "txId": "0xefdefac1cba682c73738372729c13037682d1aeb43074943e52584b88861ab33",
+        "readStateBlockRange": {
+          "activationBlock": "402238",
+          "processingBlock": "402238",
+          "proposalBlock": "402240"
+        },
+        "numOfRounds": "0",
+        "lastRound": {
+          "round": "0",
+          "leaderIndex": "0",
+          "votesCommitted": "5",
+          "votesRevealed": "5",
+          "appealBond": "0",
+          "rotationsLeft": "3",
+          "result": 1,
+          "validatorsCount": "5",
+          "roundValidators": [
+            "0xcEc49586D30a7658eA6deBa75Cd64C82F31D9648",
+            "0x71bD24d20297e46697AbB936Be5D1240789E3E48",
+            "0x854967Dbe3B5eb71760d4b4C49C6936d89198427",
+            "0x82c492B0e298fCCc4779C7B6DA01EFa671398497",
+            "0x2ab2522DB85Ab48ED9f17007369A567Df288a0c9"
+          ],
+          "validatorVotes": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "validatorVotesHash": [
+            "0x9bf677ca93e9c5a504596343ffd8163239a088eeb600768d4e25bb12fd1c456e",
+            "0x6ac5144917b9fd6c2c36f7851025dd553b0530f54f1b36ba7643b4137dc85d3a",
+            "0x8f43e12fd89692fa7d6cfc3f2d1a41c95ea7bc18686c474529b92cc9aaaba8a7",
+            "0xfc39f44f38f81f6eeb7639f0c0e3976c73d1e357207bb2a5ab6c9eb95f5f253a",
+            "0x84d2c24df519bfd2ceeadd6ea2fb18c4407c328a9f6f61da016c445e4d1bec28"
+          ],
+          "validatorResultHash": [
+            "0x5a87aec3fa4902438cae8bc2f7136b26e51a92edc347844ecc82c078accff767",
+            "0x5a87aec3fa4902438cae8bc2f7136b26e51a92edc347844ecc82c078accff767",
+            "0x5a87aec3fa4902438cae8bc2f7136b26e51a92edc347844ecc82c078accff767",
+            "0x5a87aec3fa4902438cae8bc2f7136b26e51a92edc347844ecc82c078accff767",
+            "0x5a87aec3fa4902438cae8bc2f7136b26e51a92edc347844ecc82c078accff767"
+          ],
+          "validatorVotesName": [
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN"
+          ]
+        },
+        "consumedValidatorsCount": "5",
+        "numOfInitialValidators": "5",
+        "txExecutionResult": 1,
+        "consumedValidators": [
+          "0xcEc49586D30a7658eA6deBa75Cd64C82F31D9648",
+          "0x71bD24d20297e46697AbB936Be5D1240789E3E48",
+          "0x854967Dbe3B5eb71760d4b4C49C6936d89198427",
+          "0x82c492B0e298fCCc4779C7B6DA01EFa671398497",
+          "0x2ab2522DB85Ab48ED9f17007369A567Df288a0c9"
+        ],
+        "txData": "0xf9031cb9031816005c73746167655f6368756e6b0461726773250119e32b232076302e332e300a23207b2022446570656e6473223a202270792d67656e6c617965723a6261627770397433376a773967346a32626363676e31346736783778397331663764736d6837656d767a373335707a347a78613022207d0a0a2222225265706c6163656d656e742068616c66206f662074686520646973706f7361626c65206e617469766520636f64652d736c6f742070726f6f662e2222220a0a696d706f72742067656e6c6179657220617320676c0a66726f6d2067656e6c617965722e747970657320696d706f7274202a0a696d706f7274206a736f6e0a0a0a636c61737320537461676561626c6528676c2e636f6e74726163742e436f6e7472616374293a0a2020202023204d7573742072656d61696e20627974652d666f722d6279746520636f6d70617469626c6520776974682074686520626f6f747374726170206669656c64206f726465722e0a20202020696e7374616c6c65723a20416464726573730a2020202065787065637465645f6469676573743a207374720a20202020746f74616c5f6368756e6b733a20753235360a202020206e6578745f6368756e6b3a20753235360a202020207374616765645f62797465733a20753235360a202020206163746976617465643a20626f6f6c0a2020202061637469766174696f6e5f6469676573743a207374720a20202020636f756e7465723a20753235360a202020206d61726b65723a207374720a0a20202020646566205f5f696e69745f5f2873656c66293a0a2020202020202020232047656e564d20646f6573206e6f7420726572756e205f5f696e69745f5f20647572696e67206120636f646520757067726164652e202054686973206d6574686f642069730a2020202020202020232070726573656e74206f6e6c7920666f7220736368656d612f72756e74696d652076616c69646174696f6e206f66206120646570940430783466323132393861303034613438396333643836313637663134656230643138663436663563393261623539316339306133393937653164633032306534613500",
+        "txDataDecoded": {
+          "callData": {},
+          "leaderOnly": false,
+          "type": "call"
+        },
+        "currentTimestamp": "1794573627",
+        "statusName": "FINALIZED",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "resultName": "MAJORITY_AGREE",
+        "txExecutionResultName": "FINISHED_WITH_RETURN"
+      }
+    },
+    {
+      "label": "stage chunk 2/3",
+      "functionName": "stage_chunk",
+      "argsSummary": {
+        "index": "1",
+        "totalChunks": "3",
+        "bytes": 700,
+        "sourceDigest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5"
+      },
+      "gasPreflight": {
+        "method": "eth_estimateGas",
+        "floor": "2815366",
+        "gasLimit": "3096903",
+        "cap": "16777216",
+        "estimateError": null
+      },
+      "feeValue": "100000000000010352",
+      "status": "FINALIZED",
+      "transactionId": "0x4e74bec27e81c75709f96ce445d0404838f5836efba8618dd59b77b9ce258b31",
+      "executionResult": "FINISHEDWITHRETURN",
+      "receipt": {
+        "observedAt": "1794573730",
+        "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+        "recipient": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C",
+        "initialRotations": "3",
+        "txSlot": "4",
+        "createdTimestamp": "1794573645",
+        "lastVoteTimestamp": "1794573665",
+        "randomSeed": "0x79b05e4e6865b32ae4361fe6b1508ea0e3a91767ac2d6de869c02a6a8ad1d373",
+        "result": 1,
+        "txExecutionHash": "0x4ddd52b033d997a7ac1197625738099fe0039416bfddf361cecc1e3d8d50a63a",
+        "txCalldata": "0xf9031cb9031816005c73746167655f6368756e6b0461726773250919e32b6c6f7961626c6520736f757263652e0a2020202020202020706173730a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c6174696f6e5f7374617475732873656c6629202d3e207374723a0a202020202020202072657475726e206a736f6e2e64756d7073287b0a20202020202020202020202022616374697661746564223a2073656c662e6163746976617465642c0a2020202020202020202020202265787065637465645f646967657374223a2073656c662e65787065637465645f6469676573742c0a20202020202020202020202022746f74616c5f6368756e6b73223a20696e742873656c662e746f74616c5f6368756e6b73292c0a202020202020202020202020226e6578745f6368756e6b223a20696e742873656c662e6e6578745f6368756e6b292c0a202020202020202020202020227374616765645f6279746573223a20696e742873656c662e7374616765645f6279746573292c0a2020202020202020202020202261637469766174696f6e5f646967657374223a2073656c662e61637469766174696f6e5f6469676573742c0a20202020202020207d2c20736f72745f6b6579733d547275652c20736570617261746f72733d28222c222c20223a2229290a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f756e7465722873656c6629202d3e20753235363a0a202020202020202072657475726e2073656c662e636f756e7465720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f6d61726b65722873656c6629202d3e207374723a0a202020202020202072657475726e2073656c662e6d61726b65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c65722873656c6629202d3e20416464726573940430783466323132393861303034613438396333643836313637663134656230643138663436663563393261623539316339306133393937653164633032306534613500",
+        "eqBlocksOutputs": "0x0e076e645f6f75747305",
+        "messages": [],
+        "queueType": 0,
+        "queuePosition": "0",
+        "activator": "0x2495F6290f89A9393e4222752A15C77eEE8e156f",
+        "lastLeader": "0x2f33669F12F93e204ccf01311419fDb80a07903d",
+        "status": 7,
+        "txId": "0x4e74bec27e81c75709f96ce445d0404838f5836efba8618dd59b77b9ce258b31",
+        "readStateBlockRange": {
+          "activationBlock": "402290",
+          "processingBlock": "402290",
+          "proposalBlock": "402291"
+        },
+        "numOfRounds": "0",
+        "lastRound": {
+          "round": "0",
+          "leaderIndex": "1",
+          "votesCommitted": "5",
+          "votesRevealed": "5",
+          "appealBond": "0",
+          "rotationsLeft": "3",
+          "result": 1,
+          "validatorsCount": "5",
+          "roundValidators": [
+            "0x140457FB2EAb027161A6ccDB378544DCe3Ea3A1D",
+            "0x2f33669F12F93e204ccf01311419fDb80a07903d",
+            "0xcF67B0D2194Fefe32FCdB88b473f400bf663a0D4",
+            "0x6359E7e85D6B0783E0199A915e48f3c353fc9785",
+            "0x7d9e5882155a5fb1cb5d4B15135bF5CE7358D9e8"
+          ],
+          "validatorVotes": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "validatorVotesHash": [
+            "0x856f4cb4b81816af7ff88d23f154603647f6baa689f420fb762e9ae50a88af03",
+            "0xc452ec3739a173c447177374aa23443b7f27a88f46787e07d130ec9ce3fc0ecc",
+            "0x4c1710d7fffc3244ec9301d48e4335a452dfa0d6baf6021faba016e881aca7f1",
+            "0x00fb598bbc99287619b277a4e4ae22c97d5c09722ec16d08ce34ff90560b787f",
+            "0x90d1e9a2ed04e6cad8f3720af678c4158de18c4a35f2b8660704f1d2471a1b23"
+          ],
+          "validatorResultHash": [
+            "0x43e8448474d08d4383c5c21444e7d5251fead8e4f8ca757c13e89943748cbbbc",
+            "0x43e8448474d08d4383c5c21444e7d5251fead8e4f8ca757c13e89943748cbbbc",
+            "0x43e8448474d08d4383c5c21444e7d5251fead8e4f8ca757c13e89943748cbbbc",
+            "0x43e8448474d08d4383c5c21444e7d5251fead8e4f8ca757c13e89943748cbbbc",
+            "0x43e8448474d08d4383c5c21444e7d5251fead8e4f8ca757c13e89943748cbbbc"
+          ],
+          "validatorVotesName": [
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN"
+          ]
+        },
+        "consumedValidatorsCount": "5",
+        "numOfInitialValidators": "5",
+        "txExecutionResult": 1,
+        "consumedValidators": [
+          "0x140457FB2EAb027161A6ccDB378544DCe3Ea3A1D",
+          "0x2f33669F12F93e204ccf01311419fDb80a07903d",
+          "0xcF67B0D2194Fefe32FCdB88b473f400bf663a0D4",
+          "0x6359E7e85D6B0783E0199A915e48f3c353fc9785",
+          "0x7d9e5882155a5fb1cb5d4B15135bF5CE7358D9e8"
+        ],
+        "txData": "0xf9031cb9031816005c73746167655f6368756e6b0461726773250919e32b6c6f7961626c6520736f757263652e0a2020202020202020706173730a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c6174696f6e5f7374617475732873656c6629202d3e207374723a0a202020202020202072657475726e206a736f6e2e64756d7073287b0a20202020202020202020202022616374697661746564223a2073656c662e6163746976617465642c0a2020202020202020202020202265787065637465645f646967657374223a2073656c662e65787065637465645f6469676573742c0a20202020202020202020202022746f74616c5f6368756e6b73223a20696e742873656c662e746f74616c5f6368756e6b73292c0a202020202020202020202020226e6578745f6368756e6b223a20696e742873656c662e6e6578745f6368756e6b292c0a202020202020202020202020227374616765645f6279746573223a20696e742873656c662e7374616765645f6279746573292c0a2020202020202020202020202261637469766174696f6e5f646967657374223a2073656c662e61637469766174696f6e5f6469676573742c0a20202020202020207d2c20736f72745f6b6579733d547275652c20736570617261746f72733d28222c222c20223a2229290a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f756e7465722873656c6629202d3e20753235363a0a202020202020202072657475726e2073656c662e636f756e7465720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f6d61726b65722873656c6629202d3e207374723a0a202020202020202072657475726e2073656c662e6d61726b65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c65722873656c6629202d3e20416464726573940430783466323132393861303034613438396333643836313637663134656230643138663436663563393261623539316339306133393937653164633032306534613500",
+        "txDataDecoded": {
+          "callData": {},
+          "leaderOnly": false,
+          "type": "call"
+        },
+        "currentTimestamp": "1794573730",
+        "statusName": "FINALIZED",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "resultName": "MAJORITY_AGREE",
+        "txExecutionResultName": "FINISHED_WITH_RETURN"
+      }
+    },
+    {
+      "label": "stage chunk 3/3",
+      "functionName": "stage_chunk",
+      "argsSummary": {
+        "index": "2",
+        "totalChunks": "3",
+        "bytes": 432,
+        "sourceDigest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5"
+      },
+      "gasPreflight": {
+        "method": "eth_estimateGas",
+        "floor": "2620667",
+        "gasLimit": "2882734",
+        "cap": "16777216",
+        "estimateError": null
+      },
+      "feeValue": "100000000000010352",
+      "status": "FINALIZED",
+      "transactionId": "0x40b238d9fc356a255a184e4524c15ef04c741a677325bab2b971305f09ee0e5a",
+      "executionResult": "FINISHEDWITHRETURN",
+      "receipt": {
+        "observedAt": "1794573835",
+        "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+        "recipient": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C",
+        "initialRotations": "3",
+        "txSlot": "5",
+        "createdTimestamp": "1794573749",
+        "lastVoteTimestamp": "1794573772",
+        "randomSeed": "0x6a7954b8c6b91e0c58c88c762167ea5584937fb0e41b67ae414682f5c3163831",
+        "result": 1,
+        "txExecutionHash": "0xb0a1066164176491a5d9bbd9b05808c45b29df5c85ebb429c93f37afc7f8d6cb",
+        "txCalldata": "0xf90210b9020c16005c73746167655f6368756e6b0461726773251119831b733a0a202020202020202072657475726e2073656c662e696e7374616c6c65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f64655f736c6f742873656c6629202d3e20753235363a0a202020202020202072657475726e20676c2e73746f726167652e526f6f742e67657428292e636f64655f736c6f740a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f76657273696f6e2873656c6629202d3e207374723a0a202020202020202072657475726e20227265706c6163656d656e742d7632220a0a2020202040676c2e7075626c69632e77726974650a2020202064656620696e6372656d656e742873656c662c20616d6f756e743a207532353629202d3e204e6f6e653a0a2020202020202020696620616d6f756e74203c3d2030206f7220616d6f756e74203e20313030303a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20626f756e64656420696e6372656d656e7422290a202020202020202073656c662e636f756e746572202b3d20616d6f756e740a940430783466323132393861303034613438396333643836313637663134656230643138663436663563393261623539316339306133393937653164633032306534613500",
+        "eqBlocksOutputs": "0x0e076e645f6f75747305",
+        "messages": [],
+        "queueType": 0,
+        "queuePosition": "0",
+        "activator": "0xcEc49586D30a7658eA6deBa75Cd64C82F31D9648",
+        "lastLeader": "0x4ABb4b3841c038DA2e46979f41E1548AF71A2524",
+        "status": 7,
+        "txId": "0x40b238d9fc356a255a184e4524c15ef04c741a677325bab2b971305f09ee0e5a",
+        "readStateBlockRange": {
+          "activationBlock": "402325",
+          "processingBlock": "402325",
+          "proposalBlock": "402326"
+        },
+        "numOfRounds": "0",
+        "lastRound": {
+          "round": "0",
+          "leaderIndex": "4",
+          "votesCommitted": "5",
+          "votesRevealed": "5",
+          "appealBond": "0",
+          "rotationsLeft": "3",
+          "result": 1,
+          "validatorsCount": "5",
+          "roundValidators": [
+            "0x036D5A4A8025a7d89aA7B91bFE7C919b7Cd21Ef8",
+            "0x022518B2D8dbe10439927dd081428aCcD7ED8007",
+            "0xb04975F3C8cdcDB1273d1a6C2E2e93662F74554d",
+            "0xe9f16f7Aeb26F4b985F88227793cf391e1826086",
+            "0x4ABb4b3841c038DA2e46979f41E1548AF71A2524"
+          ],
+          "validatorVotes": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "validatorVotesHash": [
+            "0x7600ae5aa26c6ee213f3f1c5ce99842c2304baf53f5d15388731c961b2a3aedb",
+            "0xa55dafeeee814e07f165e4e768fc1e97db5685c17adb6cdae3ec627a636a8d44",
+            "0x85b0433db69cf126a379c5c6d23e589db6891ab49c2a1a750fae014f028f4c89",
+            "0xbd8de2a5054c7d8756d92c1e5ad06f0ff6c4c431e32e6ebcf399b01fa8201eb2",
+            "0x1b04002988e8fda9bd8f27af85b5ff0c1d433e98b6383c8de38449d5829efcaa"
+          ],
+          "validatorResultHash": [
+            "0x953284026bfc23f0ec7fd5aabdc356d41a8d43dd6f3f807d0942ebea356c6694",
+            "0x953284026bfc23f0ec7fd5aabdc356d41a8d43dd6f3f807d0942ebea356c6694",
+            "0x953284026bfc23f0ec7fd5aabdc356d41a8d43dd6f3f807d0942ebea356c6694",
+            "0x953284026bfc23f0ec7fd5aabdc356d41a8d43dd6f3f807d0942ebea356c6694",
+            "0x953284026bfc23f0ec7fd5aabdc356d41a8d43dd6f3f807d0942ebea356c6694"
+          ],
+          "validatorVotesName": [
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN",
+            "FINISHED_WITH_RETURN"
+          ]
+        },
+        "consumedValidatorsCount": "5",
+        "numOfInitialValidators": "5",
+        "txExecutionResult": 1,
+        "consumedValidators": [
+          "0x036D5A4A8025a7d89aA7B91bFE7C919b7Cd21Ef8",
+          "0x022518B2D8dbe10439927dd081428aCcD7ED8007",
+          "0xb04975F3C8cdcDB1273d1a6C2E2e93662F74554d",
+          "0xe9f16f7Aeb26F4b985F88227793cf391e1826086",
+          "0x4ABb4b3841c038DA2e46979f41E1548AF71A2524"
+        ],
+        "txData": "0xf90210b9020c16005c73746167655f6368756e6b0461726773251119831b733a0a202020202020202072657475726e2073656c662e696e7374616c6c65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f64655f736c6f742873656c6629202d3e20753235363a0a202020202020202072657475726e20676c2e73746f726167652e526f6f742e67657428292e636f64655f736c6f740a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f76657273696f6e2873656c6629202d3e207374723a0a202020202020202072657475726e20227265706c6163656d656e742d7632220a0a2020202040676c2e7075626c69632e77726974650a2020202064656620696e6372656d656e742873656c662c20616d6f756e743a207532353629202d3e204e6f6e653a0a2020202020202020696620616d6f756e74203c3d2030206f7220616d6f756e74203e20313030303a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20626f756e64656420696e6372656d656e7422290a202020202020202073656c662e636f756e746572202b3d20616d6f756e740a940430783466323132393861303034613438396333643836313637663134656230643138663436663563393261623539316339306133393937653164633032306534613500",
+        "txDataDecoded": {
+          "callData": {},
+          "leaderOnly": false,
+          "type": "call"
+        },
+        "currentTimestamp": "1794573835",
+        "statusName": "FINALIZED",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "resultName": "MAJORITY_AGREE",
+        "txExecutionResultName": "FINISHED_WITH_RETURN"
+      }
+    },
+    {
+      "label": "atomic code-slot activation",
+      "functionName": "activate",
+      "argsSummary": [],
+      "gasPreflight": {
+        "method": "eth_estimateGas",
+        "floor": "2204824",
+        "gasLimit": "2425307",
+        "cap": "16777216",
+        "estimateError": null
+      },
+      "feeValue": "100000000000010352",
+      "status": "FINALIZED",
+      "transactionId": "0x23967d46dfa73c812b02b062ab8707af95ce5ba87cda4af1cb4ffbbd96421aa1",
+      "executionResult": "FINISHEDWITHRETURN",
+      "receipt": {
+        "id": "0x23967d46dfa73c812b02b062ab8707af95ce5ba87cda4af1cb4ffbbd96421aa1",
+        "txOrigin": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+        "sender": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+        "recipient": "0x1452641f37cd59c797514f997bf6d6d5fe9dfd3c",
+        "activator": "0x140457fb2eab027161a6ccdb378544dce3ea3a1d",
+        "status": 7,
+        "statusName": "Finalized",
+        "previousStatus": null,
+        "txSlot": 6,
+        "initialRotations": 3,
+        "numOfInitialValidators": 5,
+        "randomSeed": "0xd5818354bc95dda4eff1289d9a2ec0659ea02fa8ec0bf18dda7d15199e55903c",
+        "txExecutionHash": "0x2346b85488fe8b588a3ed1c5c67b11db6f190407be3cffdcfcb3bfdb4879f834",
+        "txCallData": "cd8b0e0044616374697661746500",
+        "eqBlocksOutputs": "0e076e645f6f75747305",
+        "timestamps": {
+          "Created": 1794573911,
+          "Pending": 1794573911,
+          "Activated": 1794573911,
+          "Proposed": 1794573920,
+          "Committed": 1794573928,
+          "LastVote": 1794573934,
+          "AppealSubmitted": 0,
+          "LeaderRevealed": 1794573930
+        },
+        "result": 1,
+        "txExecutionResult": 1,
+        "txExecutionResultName": "FinishedWithReturn",
+        "epoch": 23,
+        "resultHash": "0x6106a654153c64da4b7c908e493e7a795efa5997d8cd0da02530b0aa8ab88d55",
+        "validUntil": 1794577507,
+        "readStateBlockRanges": [
+          {
+            "ActivationBlock": 402364,
+            "ProcessingBlock": 402364,
+            "ProposalBlock": 402368
+          }
+        ],
+        "roundData": [
+          {
+            "round": 0,
+            "leaderIndex": 4,
+            "votesCommitted": 5,
+            "votesRevealed": 5,
+            "appealBond": 0,
+            "rotationsLeft": 3,
+            "result": 1,
+            "roundValidators": [
+              "0xcec49586d30a7658ea6deba75cd64c82f31d9648",
+              "0x14ba4ded94109af9dd6387ddd1cc273ec686dccf",
+              "0x61c0ccb0cf8a654ee11836e3fbc1d797d56f9a8d",
+              "0x28b6e26812644b6a924ec568226713fa726a05db",
+              "0xcf67b0d2194fefe32fcdb88b473f400bf663a0d4"
+            ],
+            "validatorVotes": "AQEBAQE=",
+            "validatorVotesHash": [
+              "180fd654d373f3eb0012f2da41d3ac97bdf2824d40a64d894ab8bd83097f86e8",
+              "d735c62d33c2a4d518279b620f360d76201a7a6eb2ede1974560e51de29b98ff",
+              "7db56587be8a69874eb7930815fa4d43fb70caa3943d3614703024fe1b569c33",
+              "79822e6675bbbf457981b998eea6ca0ec2df9d75c7f142bf773d01e26447aab4",
+              "96520e9300caaacc615d6805b8bb0d8383eb51bb6110d70da38834e3a4ad4d2d"
+            ],
+            "validatorResultHash": [
+              "6106a654153c64da4b7c908e493e7a795efa5997d8cd0da02530b0aa8ab88d55",
+              "6106a654153c64da4b7c908e493e7a795efa5997d8cd0da02530b0aa8ab88d55",
+              "6106a654153c64da4b7c908e493e7a795efa5997d8cd0da02530b0aa8ab88d55",
+              "6106a654153c64da4b7c908e493e7a795efa5997d8cd0da02530b0aa8ab88d55",
+              "6106a654153c64da4b7c908e493e7a795efa5997d8cd0da02530b0aa8ab88d55"
+            ]
+          }
+        ],
+        "fees": {
+          "deposit": "100000000000010352",
+          "userValue": "0",
+          "distribution": {
+            "leaderTimeunitsAllocation": "100",
+            "validatorTimeunitsAllocation": "200",
+            "appealRounds": "0",
+            "executionBudgetPerRound": "25000000000000000",
+            "totalMessageFees": "0",
+            "rotations": [
+              "3"
+            ],
+            "maxPriceGenPerTimeUnit": "2",
+            "storageFeeMaxGasPrice": "300000000",
+            "receiptFeeMaxGasPrice": "300000000"
+          },
+          "locked": {
+            "genPerTimeUnit": "1",
+            "storageUnitPrice": "250000000",
+            "receiptGasPrice": "250000000"
+          },
+          "consumed": {
+            "executionConsumed": "61886000000000",
+            "storageFeeUsed": "1750000000",
+            "messageFeesConsumed": "0",
+            "messageFeesBudgetTotal": "0"
+          },
+          "hasAllocations": false,
+          "allocations": null,
+          "allocationPolicy": "open"
+        }
+      }
+    },
+    {
+      "label": "replacement counter write",
+      "functionName": "increment",
+      "argsSummary": [
+        "3"
+      ],
+      "gasPreflight": {
+        "method": "eth_estimateGas",
+        "floor": "2207628",
+        "gasLimit": "2428391",
+        "cap": "16777216",
+        "estimateError": null
+      },
+      "feeValue": "100000000000010352",
+      "status": "FINALIZED",
+      "transactionId": "0x913dcd93de32b5d59c030c4b20fcb91cac77af19361f8dc24f70e1588b11404e",
+      "executionResult": "FINISHEDWITHRETURN",
+      "receipt": {
+        "id": "0x913dcd93de32b5d59c030c4b20fcb91cac77af19361f8dc24f70e1588b11404e",
+        "txOrigin": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+        "sender": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+        "recipient": "0x1452641f37cd59c797514f997bf6d6d5fe9dfd3c",
+        "activator": "0x7d9e5882155a5fb1cb5d4b15135bf5ce7358d9e8",
+        "status": 7,
+        "statusName": "Finalized",
+        "previousStatus": null,
+        "txSlot": 7,
+        "initialRotations": 3,
+        "numOfInitialValidators": 5,
+        "randomSeed": "0xc8cf3c67655a92fb9993e805ce7bfb261d370594b39ece6fb4f62c4f868844b3",
+        "txExecutionHash": "0x55fb0add66ff64dfec38eb6ab73869f62bf254b080784a6829bfdc189c833b06",
+        "txCallData": "d59316004c696e6372656d656e7404617267730d1900",
+        "eqBlocksOutputs": "0e076e645f6f75747305",
+        "timestamps": {
+          "Created": 1794574287,
+          "Pending": 1794574287,
+          "Activated": 1794574290,
+          "Proposed": 1794574298,
+          "Committed": 1794574305,
+          "LastVote": 1794574311,
+          "AppealSubmitted": 0,
+          "LeaderRevealed": 1794574308
+        },
+        "result": 1,
+        "txExecutionResult": 1,
+        "txExecutionResultName": "FinishedWithReturn",
+        "epoch": 23,
+        "resultHash": "0xc0c5327cb19b06ac57718843769144f96b5a94c845146e139f6f950873395144",
+        "validUntil": 1794577884,
+        "readStateBlockRanges": [
+          {
+            "ActivationBlock": 402528,
+            "ProcessingBlock": 402529,
+            "ProposalBlock": 402536
+          }
+        ],
+        "roundData": [
+          {
+            "round": 0,
+            "leaderIndex": 0,
+            "votesCommitted": 5,
+            "votesRevealed": 5,
+            "appealBond": 0,
+            "rotationsLeft": 3,
+            "result": 1,
+            "roundValidators": [
+              "0xb15b3050e8f8a0fe5fa49004c17b59e831d5b818",
+              "0x957761ffc76266c7c04a90b92f76d61cc25c7f29",
+              "0xfac951e3fd9204eb25530f2ef000b9ddb6c2a322",
+              "0xf9e630b65b2cbcd9e84af177245eba4763b5e8d2",
+              "0xcf67b0d2194fefe32fcdb88b473f400bf663a0d4"
+            ],
+            "validatorVotes": "AQEBAQE=",
+            "validatorVotesHash": [
+              "f9255ed1f47bb8b6048b334cd4f05e0855e63eb9c0f03c7b6242c522cfdf2de8",
+              "e9dcfd20d1255e0d65284c4c648bfcfcdad55b2eb5b1efd88e24688d1823e885",
+              "2eda91cb88b59286601294c8118822e7b96c5c607e0b4ca36722436a284b51f0",
+              "dbd04c18f3b01650cf1543a6d4b74a9345c6a4608fe971b451223ff28042e12c",
+              "8519cf232241bb4d5a08155a28408c25a442151dcacb2d96181b6958183d46fc"
+            ],
+            "validatorResultHash": [
+              "c0c5327cb19b06ac57718843769144f96b5a94c845146e139f6f950873395144",
+              "c0c5327cb19b06ac57718843769144f96b5a94c845146e139f6f950873395144",
+              "c0c5327cb19b06ac57718843769144f96b5a94c845146e139f6f950873395144",
+              "c0c5327cb19b06ac57718843769144f96b5a94c845146e139f6f950873395144",
+              "c0c5327cb19b06ac57718843769144f96b5a94c845146e139f6f950873395144"
+            ]
+          }
+        ],
+        "fees": {
+          "deposit": "100000000000010352",
+          "userValue": "0",
+          "distribution": {
+            "leaderTimeunitsAllocation": "100",
+            "validatorTimeunitsAllocation": "200",
+            "appealRounds": "0",
+            "executionBudgetPerRound": "25000000000000000",
+            "totalMessageFees": "0",
+            "rotations": [
+              "3"
+            ],
+            "maxPriceGenPerTimeUnit": "2",
+            "storageFeeMaxGasPrice": "300000000",
+            "receiptFeeMaxGasPrice": "300000000"
+          },
+          "locked": {
+            "genPerTimeUnit": "1",
+            "storageUnitPrice": "250000000",
+            "receiptGasPrice": "250000000"
+          },
+          "consumed": {
+            "executionConsumed": "61886000000000",
+            "storageFeeUsed": "500000000",
+            "messageFeesConsumed": "0",
+            "messageFeesBudgetTotal": "0"
+          },
+          "hasAllocations": false,
+          "allocations": null,
+          "allocationPolicy": "open"
+        }
+      }
+    }
+  ],
+  "status": "staged-upgrade-finalized-and-verified",
+  "verifiedAt": "2026-11-13T12:23:31.434Z",
+  "bootstrapDeployment": {
+    "transactionId": "0x5d6dc94c41f5d0a0dc37d06b937d4624a1d045d67f110061cd6a32c35e4e0e53",
+    "gasPreflight": {
+      "method": "eth_estimateGas",
+      "floor": "7321922",
+      "gasLimit": "8054115",
+      "cap": "16777216",
+      "estimateError": null
+    },
+    "feeValue": "100000000000010352",
+    "contractAddress": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C",
+    "receipt": {
+      "observedAt": "1794572691",
+      "sender": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+      "recipient": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C",
+      "initialRotations": "3",
+      "txSlot": "0",
+      "createdTimestamp": "1794572617",
+      "lastVoteTimestamp": "1794572627",
+      "randomSeed": "0x54817ec2d23aff8dff33dec01bc44012020903abf053c7d54be26a23d62ec31b",
+      "result": 1,
+      "txExecutionHash": "0x457dece6e490fa1dad384a7d4a24934a6180dd0d73c159402ed2641a1a199dff",
+      "txCalldata": "0xf918b6b918b1232076302e332e300a23207b2022446570656e6473223a202270792d67656e6c617965723a6261627770397433376a773967346a32626363676e31346736783778397331663764736d6837656d767a373335707a347a78613022207d0a0a222222446973706f7361626c652070726f6f66206f66207468652052433130206e617469766520616c7465726e6174652d636f64652d736c6f74206d656368616e69736d2e0a0a5468697320636f6e747261637420697320696e74656e74696f6e616c6c7920756e72656c6174656420746f20434f56524120616e64206e6576657220686f6c64732076616c75652e202049740a737461676573206120636f6d706c657465207265706c6163656d656e7420736f7572636520696e207468652072756e74696d65277320646f63756d656e74656420766163616e7420736c6f742c0a7468656e2061746f6d6963616c6c79206368616e67657320526f6f742e636f64655f736c6f7420616674657220636865636b696e672074686520636f6d706c657465205348412d3235360a636f6d6d69746d656e742e202054686520626f6f7473747261707065722072656d6f76657320697473206f776e20757067726164657220617574686f72697a6174696f6e20647572696e670a61637469766174696f6e3b20746865207265706c6163656d656e7420736f7572636520646f6573206e6f74206578706f73652074686520696e7374616c6c6572206d6574686f64732e0a2222220a0a696d706f72742067656e6c6179657220617320676c0a66726f6d2067656e6c617965722e747970657320696d706f7274202a0a696d706f727420686173686c69620a696d706f7274206a736f6e0a0a0a4d41585f4348554e4b5f4259544553203d20313032340a4d41585f534f555243455f4259544553203d2036353533360a4d41585f4348554e4b53203d2036340a5a45524f5f444947455354203d2022220a0a0a646566205f76616c69645f6469676573742876616c75653a2073747229202d3e20626f6f6c3a0a2020202072657475726e20280a20202020202020206973696e7374616e63652876616c75652c20737472290a2020202020202020616e64206c656e2876616c756529203d3d2036360a2020202020202020616e642076616c75652e737461727473776974682822307822290a2020202020202020616e6420616c6c28636820696e2022303132333435363738396162636465664142434445462220666f7220636820696e2076616c75655b323a5d290a20202020290a0a0a636c61737320537461676561626c6528676c2e636f6e74726163742e436f6e7472616374293a0a20202020232054686973206669656c64206f726465722069732070617274206f66207468652070726f6f66277320636f6d7061746962696c69747920636f6e74726163742e20205468650a2020202023207265706c6163656d656e7420736f75726365206465636c61726573207468652073616d65206669656c647320696e207468652073616d65206f726465722e0a20202020696e7374616c6c65723a20416464726573730a2020202065787065637465645f6469676573743a207374720a20202020746f74616c5f6368756e6b733a20753235360a202020206e6578745f6368756e6b3a20753235360a202020207374616765645f62797465733a20753235360a202020206163746976617465643a20626f6f6c0a2020202061637469766174696f6e5f6469676573743a207374720a20202020636f756e7465723a20753235360a202020206d61726b65723a207374720a0a20202020646566205f5f696e69745f5f2873656c66293a0a202020202020202073656c662e696e7374616c6c6572203d20676c2e6d6573736167652e73656e6465725f616464726573730a202020202020202073656c662e65787065637465645f646967657374203d205a45524f5f4449474553540a202020202020202073656c662e746f74616c5f6368756e6b73203d20753235362830290a202020202020202073656c662e6e6578745f6368756e6b203d20753235362830290a202020202020202073656c662e7374616765645f6279746573203d20753235362830290a202020202020202073656c662e616374697661746564203d2046616c73650a202020202020202073656c662e61637469766174696f6e5f646967657374203d205a45524f5f4449474553540a202020202020202073656c662e636f756e746572203d20753235362830290a202020202020202073656c662e6d61726b6572203d2022626f6f747374726170220a20202020202020202320526f6f742e757067726164657273206973207468652072756e74696d6520617574686f72697a6174696f6e20666f722077726974657320746f20746865206c6f636b65640a20202020202020202320726f6f742f636f646520736c6f74732e2020497420697320696e74656e74696f6e616c6c79207265766f6b6564206f6e2061637469766174696f6e2e0a2020202020202020676c2e73746f726167652e526f6f742e67657428292e7570677261646572732e67657428292e617070656e642873656c662e696e7374616c6c6572290a0a20202020646566205f726571756972655f696e7374616c6c65722873656c6629202d3e204e6f6e653a0a2020202020202020696620676c2e6d6573736167652e73656e6465725f6164647265737320213d2073656c662e696e7374616c6c65723a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e7374616c6c6572206f6e6c7922290a202020202020202069662073656c662e6163746976617465643a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e7374616c6c6174696f6e20616c72656164792061637469766174656422290a0a20202020646566205f7374616765645f636f64652873656c66293a0a2020202020202020232052433130277320526f6f742e6765745f766163616e745f736c6f7428292069732074686520646f63756d656e74656420616c7465726e6174652073746f726167650a20202020202020202320736c6f74207573656420666f7220626f6f74737472617070696e672e20205468652072756e74696d65277320636f64655f736c6f7420706f696e747320746f20746869730a20202020202020202320657861637420736c6f742061667465722061637469766174696f6e3b206e6f20736f7572636520636f7079206f636375727320647572696e672061637469766174696f6e2e0a202020202020202072657475726e20676c2e73746f726167652e526f6f742e67657428292e6765745f766163616e745f736c6f7428292e6361737428676c2e73746f726167652e564c415b676c2e75385d2c2030290a0a20202020646566205f7374617475732873656c6629202d3e20646963743a0a202020202020202072657475726e207b0a20202020202020202020202022616374697661746564223a2073656c662e6163746976617465642c0a2020202020202020202020202265787065637465645f646967657374223a2073656c662e65787065637465645f6469676573742c0a20202020202020202020202022746f74616c5f6368756e6b73223a20696e742873656c662e746f74616c5f6368756e6b73292c0a202020202020202020202020226e6578745f6368756e6b223a20696e742873656c662e6e6578745f6368756e6b292c0a202020202020202020202020227374616765645f6279746573223a20696e742873656c662e7374616765645f6279746573292c0a2020202020202020202020202261637469766174696f6e5f646967657374223a2073656c662e61637469766174696f6e5f6469676573742c0a20202020202020207d0a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c6174696f6e5f7374617475732873656c6629202d3e207374723a0a202020202020202072657475726e206a736f6e2e64756d70732873656c662e5f73746174757328292c20736f72745f6b6579733d547275652c20736570617261746f72733d28222c222c20223a2229290a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f756e7465722873656c6629202d3e20753235363a0a202020202020202072657475726e2073656c662e636f756e7465720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f6d61726b65722873656c6629202d3e207374723a0a202020202020202072657475726e2073656c662e6d61726b65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c65722873656c6629202d3e20416464726573733a0a202020202020202072657475726e2073656c662e696e7374616c6c65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f64655f736c6f742873656c6629202d3e20753235363a0a202020202020202072657475726e20676c2e73746f726167652e526f6f742e67657428292e636f64655f736c6f740a0a2020202040676c2e7075626c69632e77726974650a2020202064656620696e6372656d656e742873656c662c20616d6f756e743a207532353629202d3e204e6f6e653a0a2020202020202020696620616d6f756e74203c3d2030206f7220616d6f756e74203e20313030303a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20626f756e64656420696e6372656d656e7422290a202020202020202073656c662e636f756e746572202b3d20616d6f756e740a0a2020202040676c2e7075626c69632e77726974650a202020206465662073746167655f6368756e6b280a202020202020202073656c662c0a2020202020202020696e6465783a20753235362c0a2020202020202020746f74616c5f6368756e6b733a20753235362c0a20202020202020206368756e6b3a2062797465732c0a2020202020202020736f757263655f6469676573743a207374722c0a2020202029202d3e204e6f6e653a0a202020202020202073656c662e5f726571756972655f696e7374616c6c657228290a20202020202020206966206e6f74205f76616c69645f64696765737428736f757263655f646967657374293a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e76616c696420736f757263652064696765737422290a2020202020202020696620696e64657820213d2073656c662e6e6578745f6368756e6b3a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d206368756e6b206973206e6f7420746865206e6578742073657175656e7469616c206368756e6b22290a20202020202020206966206e6f742031203c3d20746f74616c5f6368756e6b73203c3d204d41585f4348554e4b533a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e76616c6964206368756e6b20636f756e7422290a202020202020202069662073656c662e746f74616c5f6368756e6b73203d3d20303a0a202020202020202020202020696620696e64657820213d20303a0a20202020202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d206669727374206368756e6b206d757374206265207a65726f22290a20202020202020202020202073656c662e746f74616c5f6368756e6b73203d20746f74616c5f6368756e6b730a20202020202020202020202073656c662e65787065637465645f646967657374203d20736f757263655f6469676573742e6c6f77657228290a2020202020202020656c696620746f74616c5f6368756e6b7320213d2073656c662e746f74616c5f6368756e6b73206f7220736f757263655f6469676573742e6c6f776572282920213d2073656c662e65787065637465645f6469676573743a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d206368756e6b206d616e6966657374206d69736d6174636822290a20202020202020206966206e6f74206973696e7374616e6365286368756e6b2c20627974657329206f72206e6f742030203c206c656e286368756e6b29203c3d204d41585f4348554e4b5f42595445533a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e76616c696420626f756e646564206368756e6b22290a202020202020202069662073656c662e7374616765645f6279746573202b206c656e286368756e6b29203e204d41585f534f555243455f42595445533a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d2073746167656420736f7572636520746f6f206c6172676522290a202020202020202073656c662e5f7374616765645f636f646528292e657874656e64286368756e6b290a202020202020202073656c662e7374616765645f6279746573202b3d206c656e286368756e6b290a202020202020202073656c662e6e6578745f6368756e6b202b3d20310a0a2020202040676c2e7075626c69632e77726974650a202020206465662072657365745f696e7374616c6c6174696f6e2873656c6629202d3e204e6f6e653a0a202020202020202073656c662e5f726571756972655f696e7374616c6c657228290a202020202020202073656c662e5f7374616765645f636f646528292e7472756e6361746528290a202020202020202073656c662e65787065637465645f646967657374203d205a45524f5f4449474553540a202020202020202073656c662e746f74616c5f6368756e6b73203d20753235362830290a202020202020202073656c662e6e6578745f6368756e6b203d20753235362830290a202020202020202073656c662e7374616765645f6279746573203d20753235362830290a202020202020202073656c662e61637469766174696f6e5f646967657374203d205a45524f5f4449474553540a0a2020202040676c2e7075626c69632e77726974650a202020206465662061637469766174652873656c6629202d3e204e6f6e653a0a202020202020202073656c662e5f726571756972655f696e7374616c6c657228290a202020202020202069662073656c662e746f74616c5f6368756e6b73203d3d2030206f722073656c662e6e6578745f6368756e6b20213d2073656c662e746f74616c5f6368756e6b733a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e636f6d706c6574652073746167656420736f7572636522290a2020202020202020737461676564203d2073656c662e5f7374616765645f636f646528290a20202020202020206966206c656e287374616765642920213d2073656c662e7374616765645f62797465733a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20737461676564206c656e677468206d69736d6174636822290a2020202020202020646967657374203d2022307822202b20686173686c69622e7368613235362862797465732873746167656429292e68657864696765737428290a20202020202020206966206469676573742e6c6f776572282920213d2073656c662e65787065637465645f6469676573743a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d2073746167656420736f7572636520646967657374206d69736d6174636822290a2020202020202020726f6f74203d20676c2e73746f726167652e526f6f742e67657428290a2020202020202020232054686520706f696e74657220777269746520697320636f6e7374616e742d73697a652e2020546865206e6578742047656e564d20696e766f636174696f6e206c6f6164730a20202020202020202320736f757263652066726f6d207468697320736c6f743b2074686973207472616e73616374696f6e206e6576657220636f70696573207468652034324b4220736f757263652e0a2020202020202020726f6f742e636f64655f736c6f74203d20726f6f742e6765745f766163616e745f736c6f7428292e61735f696e7428290a202020202020202073656c662e61637469766174696f6e5f646967657374203d206469676573740a202020202020202073656c662e616374697661746564203d20547275650a202020202020202023205265766f6b696e6720746865206f6e6c79207570677261646572206d616b65732074686520726f6f742f636f64652d736c6f74207472616e736974696f6e2066696e616c2e0a2020202020202020726f6f742e7570677261646572732e67657428292e7472756e6361746528290a0600",
+      "eqBlocksOutputs": "0x0e076e645f6f75747305",
+      "messages": [],
+      "queueType": 0,
+      "queuePosition": "0",
+      "activator": "0xc54496Fa53C88C69A3b35ce0b1Df5E73521bA09a",
+      "lastLeader": "0xc54496Fa53C88C69A3b35ce0b1Df5E73521bA09a",
+      "status": 7,
+      "txId": "0x5d6dc94c41f5d0a0dc37d06b937d4624a1d045d67f110061cd6a32c35e4e0e53",
+      "readStateBlockRange": {
+        "activationBlock": "401929",
+        "processingBlock": "401929",
+        "proposalBlock": "401930"
+      },
+      "numOfRounds": "0",
+      "lastRound": {
+        "round": "0",
+        "leaderIndex": "4",
+        "votesCommitted": "5",
+        "votesRevealed": "5",
+        "appealBond": "0",
+        "rotationsLeft": "3",
+        "result": 1,
+        "validatorsCount": "5",
+        "roundValidators": [
+          "0x6C3F29588abBe6f454A76401c10884E2B23b842c",
+          "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2",
+          "0x4E2aa9efBF40E9f9d4F944407c062e1DBa9c013D",
+          "0x2495F6290f89A9393e4222752A15C77eEE8e156f",
+          "0xc54496Fa53C88C69A3b35ce0b1Df5E73521bA09a"
+        ],
+        "validatorVotes": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "validatorVotesHash": [
+          "0x00e0ddb72e4cdd508f656cc3459cb0be9b84a5acd67b4cbc25e99bc61ac55aac",
+          "0x92bb4b1bc3a4b334213c59350acf7835891cff25f4663fb7a315ff246fda1f6e",
+          "0x7204b06849a18abc3c87145cf4df308eebfd13d2ea9aa60db04d14687511ca11",
+          "0x23fe59a78159e7582cd456ce66645492e2e647920cbc0b370381a32bf971ab2d",
+          "0x67696a299ac902a39f55b36d671edda22c21493934256a947bdd97f035c3adc7"
+        ],
+        "validatorResultHash": [
+          "0x7f0bfe92fadd363471da960120bff07815c465bb95e57dab22c600a0ad7b831f",
+          "0x7f0bfe92fadd363471da960120bff07815c465bb95e57dab22c600a0ad7b831f",
+          "0x7f0bfe92fadd363471da960120bff07815c465bb95e57dab22c600a0ad7b831f",
+          "0x7f0bfe92fadd363471da960120bff07815c465bb95e57dab22c600a0ad7b831f",
+          "0x7f0bfe92fadd363471da960120bff07815c465bb95e57dab22c600a0ad7b831f"
+        ],
+        "validatorVotesName": [
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN",
+          "FINISHED_WITH_RETURN"
+        ]
+      },
+      "consumedValidatorsCount": "5",
+      "numOfInitialValidators": "5",
+      "txExecutionResult": 1,
+      "consumedValidators": [
+        "0x6C3F29588abBe6f454A76401c10884E2B23b842c",
+        "0xf9e630b65b2cbCD9e84Af177245EBa4763B5e8D2",
+        "0x4E2aa9efBF40E9f9d4F944407c062e1DBa9c013D",
+        "0x2495F6290f89A9393e4222752A15C77eEE8e156f",
+        "0xc54496Fa53C88C69A3b35ce0b1Df5E73521bA09a"
+      ],
+      "txData": "0xf918b6b918b1232076302e332e300a23207b2022446570656e6473223a202270792d67656e6c617965723a6261627770397433376a773967346a32626363676e31346736783778397331663764736d6837656d767a373335707a347a78613022207d0a0a222222446973706f7361626c652070726f6f66206f66207468652052433130206e617469766520616c7465726e6174652d636f64652d736c6f74206d656368616e69736d2e0a0a5468697320636f6e747261637420697320696e74656e74696f6e616c6c7920756e72656c6174656420746f20434f56524120616e64206e6576657220686f6c64732076616c75652e202049740a737461676573206120636f6d706c657465207265706c6163656d656e7420736f7572636520696e207468652072756e74696d65277320646f63756d656e74656420766163616e7420736c6f742c0a7468656e2061746f6d6963616c6c79206368616e67657320526f6f742e636f64655f736c6f7420616674657220636865636b696e672074686520636f6d706c657465205348412d3235360a636f6d6d69746d656e742e202054686520626f6f7473747261707065722072656d6f76657320697473206f776e20757067726164657220617574686f72697a6174696f6e20647572696e670a61637469766174696f6e3b20746865207265706c6163656d656e7420736f7572636520646f6573206e6f74206578706f73652074686520696e7374616c6c6572206d6574686f64732e0a2222220a0a696d706f72742067656e6c6179657220617320676c0a66726f6d2067656e6c617965722e747970657320696d706f7274202a0a696d706f727420686173686c69620a696d706f7274206a736f6e0a0a0a4d41585f4348554e4b5f4259544553203d20313032340a4d41585f534f555243455f4259544553203d2036353533360a4d41585f4348554e4b53203d2036340a5a45524f5f444947455354203d2022220a0a0a646566205f76616c69645f6469676573742876616c75653a2073747229202d3e20626f6f6c3a0a2020202072657475726e20280a20202020202020206973696e7374616e63652876616c75652c20737472290a2020202020202020616e64206c656e2876616c756529203d3d2036360a2020202020202020616e642076616c75652e737461727473776974682822307822290a2020202020202020616e6420616c6c28636820696e2022303132333435363738396162636465664142434445462220666f7220636820696e2076616c75655b323a5d290a20202020290a0a0a636c61737320537461676561626c6528676c2e636f6e74726163742e436f6e7472616374293a0a20202020232054686973206669656c64206f726465722069732070617274206f66207468652070726f6f66277320636f6d7061746962696c69747920636f6e74726163742e20205468650a2020202023207265706c6163656d656e7420736f75726365206465636c61726573207468652073616d65206669656c647320696e207468652073616d65206f726465722e0a20202020696e7374616c6c65723a20416464726573730a2020202065787065637465645f6469676573743a207374720a20202020746f74616c5f6368756e6b733a20753235360a202020206e6578745f6368756e6b3a20753235360a202020207374616765645f62797465733a20753235360a202020206163746976617465643a20626f6f6c0a2020202061637469766174696f6e5f6469676573743a207374720a20202020636f756e7465723a20753235360a202020206d61726b65723a207374720a0a20202020646566205f5f696e69745f5f2873656c66293a0a202020202020202073656c662e696e7374616c6c6572203d20676c2e6d6573736167652e73656e6465725f616464726573730a202020202020202073656c662e65787065637465645f646967657374203d205a45524f5f4449474553540a202020202020202073656c662e746f74616c5f6368756e6b73203d20753235362830290a202020202020202073656c662e6e6578745f6368756e6b203d20753235362830290a202020202020202073656c662e7374616765645f6279746573203d20753235362830290a202020202020202073656c662e616374697661746564203d2046616c73650a202020202020202073656c662e61637469766174696f6e5f646967657374203d205a45524f5f4449474553540a202020202020202073656c662e636f756e746572203d20753235362830290a202020202020202073656c662e6d61726b6572203d2022626f6f747374726170220a20202020202020202320526f6f742e757067726164657273206973207468652072756e74696d6520617574686f72697a6174696f6e20666f722077726974657320746f20746865206c6f636b65640a20202020202020202320726f6f742f636f646520736c6f74732e2020497420697320696e74656e74696f6e616c6c79207265766f6b6564206f6e2061637469766174696f6e2e0a2020202020202020676c2e73746f726167652e526f6f742e67657428292e7570677261646572732e67657428292e617070656e642873656c662e696e7374616c6c6572290a0a20202020646566205f726571756972655f696e7374616c6c65722873656c6629202d3e204e6f6e653a0a2020202020202020696620676c2e6d6573736167652e73656e6465725f6164647265737320213d2073656c662e696e7374616c6c65723a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e7374616c6c6572206f6e6c7922290a202020202020202069662073656c662e6163746976617465643a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e7374616c6c6174696f6e20616c72656164792061637469766174656422290a0a20202020646566205f7374616765645f636f64652873656c66293a0a2020202020202020232052433130277320526f6f742e6765745f766163616e745f736c6f7428292069732074686520646f63756d656e74656420616c7465726e6174652073746f726167650a20202020202020202320736c6f74207573656420666f7220626f6f74737472617070696e672e20205468652072756e74696d65277320636f64655f736c6f7420706f696e747320746f20746869730a20202020202020202320657861637420736c6f742061667465722061637469766174696f6e3b206e6f20736f7572636520636f7079206f636375727320647572696e672061637469766174696f6e2e0a202020202020202072657475726e20676c2e73746f726167652e526f6f742e67657428292e6765745f766163616e745f736c6f7428292e6361737428676c2e73746f726167652e564c415b676c2e75385d2c2030290a0a20202020646566205f7374617475732873656c6629202d3e20646963743a0a202020202020202072657475726e207b0a20202020202020202020202022616374697661746564223a2073656c662e6163746976617465642c0a2020202020202020202020202265787065637465645f646967657374223a2073656c662e65787065637465645f6469676573742c0a20202020202020202020202022746f74616c5f6368756e6b73223a20696e742873656c662e746f74616c5f6368756e6b73292c0a202020202020202020202020226e6578745f6368756e6b223a20696e742873656c662e6e6578745f6368756e6b292c0a202020202020202020202020227374616765645f6279746573223a20696e742873656c662e7374616765645f6279746573292c0a2020202020202020202020202261637469766174696f6e5f646967657374223a2073656c662e61637469766174696f6e5f6469676573742c0a20202020202020207d0a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c6174696f6e5f7374617475732873656c6629202d3e207374723a0a202020202020202072657475726e206a736f6e2e64756d70732873656c662e5f73746174757328292c20736f72745f6b6579733d547275652c20736570617261746f72733d28222c222c20223a2229290a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f756e7465722873656c6629202d3e20753235363a0a202020202020202072657475726e2073656c662e636f756e7465720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f6d61726b65722873656c6629202d3e207374723a0a202020202020202072657475726e2073656c662e6d61726b65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f696e7374616c6c65722873656c6629202d3e20416464726573733a0a202020202020202072657475726e2073656c662e696e7374616c6c65720a0a2020202040676c2e7075626c69632e766965770a20202020646566206765745f636f64655f736c6f742873656c6629202d3e20753235363a0a202020202020202072657475726e20676c2e73746f726167652e526f6f742e67657428292e636f64655f736c6f740a0a2020202040676c2e7075626c69632e77726974650a2020202064656620696e6372656d656e742873656c662c20616d6f756e743a207532353629202d3e204e6f6e653a0a2020202020202020696620616d6f756e74203c3d2030206f7220616d6f756e74203e20313030303a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20626f756e64656420696e6372656d656e7422290a202020202020202073656c662e636f756e746572202b3d20616d6f756e740a0a2020202040676c2e7075626c69632e77726974650a202020206465662073746167655f6368756e6b280a202020202020202073656c662c0a2020202020202020696e6465783a20753235362c0a2020202020202020746f74616c5f6368756e6b733a20753235362c0a20202020202020206368756e6b3a2062797465732c0a2020202020202020736f757263655f6469676573743a207374722c0a2020202029202d3e204e6f6e653a0a202020202020202073656c662e5f726571756972655f696e7374616c6c657228290a20202020202020206966206e6f74205f76616c69645f64696765737428736f757263655f646967657374293a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e76616c696420736f757263652064696765737422290a2020202020202020696620696e64657820213d2073656c662e6e6578745f6368756e6b3a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d206368756e6b206973206e6f7420746865206e6578742073657175656e7469616c206368756e6b22290a20202020202020206966206e6f742031203c3d20746f74616c5f6368756e6b73203c3d204d41585f4348554e4b533a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e76616c6964206368756e6b20636f756e7422290a202020202020202069662073656c662e746f74616c5f6368756e6b73203d3d20303a0a202020202020202020202020696620696e64657820213d20303a0a20202020202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d206669727374206368756e6b206d757374206265207a65726f22290a20202020202020202020202073656c662e746f74616c5f6368756e6b73203d20746f74616c5f6368756e6b730a20202020202020202020202073656c662e65787065637465645f646967657374203d20736f757263655f6469676573742e6c6f77657228290a2020202020202020656c696620746f74616c5f6368756e6b7320213d2073656c662e746f74616c5f6368756e6b73206f7220736f757263655f6469676573742e6c6f776572282920213d2073656c662e65787065637465645f6469676573743a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d206368756e6b206d616e6966657374206d69736d6174636822290a20202020202020206966206e6f74206973696e7374616e6365286368756e6b2c20627974657329206f72206e6f742030203c206c656e286368756e6b29203c3d204d41585f4348554e4b5f42595445533a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e76616c696420626f756e646564206368756e6b22290a202020202020202069662073656c662e7374616765645f6279746573202b206c656e286368756e6b29203e204d41585f534f555243455f42595445533a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d2073746167656420736f7572636520746f6f206c6172676522290a202020202020202073656c662e5f7374616765645f636f646528292e657874656e64286368756e6b290a202020202020202073656c662e7374616765645f6279746573202b3d206c656e286368756e6b290a202020202020202073656c662e6e6578745f6368756e6b202b3d20310a0a2020202040676c2e7075626c69632e77726974650a202020206465662072657365745f696e7374616c6c6174696f6e2873656c6629202d3e204e6f6e653a0a202020202020202073656c662e5f726571756972655f696e7374616c6c657228290a202020202020202073656c662e5f7374616765645f636f646528292e7472756e6361746528290a202020202020202073656c662e65787065637465645f646967657374203d205a45524f5f4449474553540a202020202020202073656c662e746f74616c5f6368756e6b73203d20753235362830290a202020202020202073656c662e6e6578745f6368756e6b203d20753235362830290a202020202020202073656c662e7374616765645f6279746573203d20753235362830290a202020202020202073656c662e61637469766174696f6e5f646967657374203d205a45524f5f4449474553540a0a2020202040676c2e7075626c69632e77726974650a202020206465662061637469766174652873656c6629202d3e204e6f6e653a0a202020202020202073656c662e5f726571756972655f696e7374616c6c657228290a202020202020202069662073656c662e746f74616c5f6368756e6b73203d3d2030206f722073656c662e6e6578745f6368756e6b20213d2073656c662e746f74616c5f6368756e6b733a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20696e636f6d706c6574652073746167656420736f7572636522290a2020202020202020737461676564203d2073656c662e5f7374616765645f636f646528290a20202020202020206966206c656e287374616765642920213d2073656c662e7374616765645f62797465733a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d20737461676564206c656e677468206d69736d6174636822290a2020202020202020646967657374203d2022307822202b20686173686c69622e7368613235362862797465732873746167656429292e68657864696765737428290a20202020202020206966206469676573742e6c6f776572282920213d2073656c662e65787065637465645f6469676573743a0a202020202020202020202020726169736520676c2e766d2e557365724572726f7228225b45585045435445445d2073746167656420736f7572636520646967657374206d69736d6174636822290a2020202020202020726f6f74203d20676c2e73746f726167652e526f6f742e67657428290a2020202020202020232054686520706f696e74657220777269746520697320636f6e7374616e742d73697a652e2020546865206e6578742047656e564d20696e766f636174696f6e206c6f6164730a20202020202020202320736f757263652066726f6d207468697320736c6f743b2074686973207472616e73616374696f6e206e6576657220636f70696573207468652034324b4220736f757263652e0a2020202020202020726f6f742e636f64655f736c6f74203d20726f6f742e6765745f766163616e745f736c6f7428292e61735f696e7428290a202020202020202073656c662e61637469766174696f6e5f646967657374203d206469676573740a202020202020202073656c662e616374697661746564203d20547275650a202020202020202023205265766f6b696e6720746865206f6e6c79207570677261646572206d616b65732074686520726f6f742f636f64652d736c6f74207472616e736974696f6e2066696e616c2e0a2020202020202020726f6f742e7570677261646572732e67657428292e7472756e6361746528290a0600",
+      "txDataDecoded": {
+        "code": "# v0.3.0\n# { \"Depends\": \"py-genlayer:babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0\" }\n\n\"\"\"Disposable proof of the RC10 native alternate-code-slot mechanism.\n\nThis contract is intentionally unrelated to COVRA and never holds value.  It\nstages a complete replacement source in the runtime's documented vacant slot,\nthen atomically changes Root.code_slot after checking the complete SHA-256\ncommitment.  The bootstrapper removes its own upgrader authorization during\nactivation; the replacement source does not expose the installer methods.\n\"\"\"\n\nimport genlayer as gl\nfrom genlayer.types import *\nimport hashlib\nimport json\n\n\nMAX_CHUNK_BYTES = 1024\nMAX_SOURCE_BYTES = 65536\nMAX_CHUNKS = 64\nZERO_DIGEST = \"\"\n\n\ndef _valid_digest(value: str) -> bool:\n    return (\n        isinstance(value, str)\n        and len(value) == 66\n        and value.startswith(\"0x\")\n        and all(ch in \"0123456789abcdefABCDEF\" for ch in value[2:])\n    )\n\n\nclass Stageable(gl.contract.Contract):\n    # This field order is part of the proof's compatibility contract.  The\n    # replacement source declares the same fields in the same order.\n    installer: Address\n    expected_digest: str\n    total_chunks: u256\n    next_chunk: u256\n    staged_bytes: u256\n    activated: bool\n    activation_digest: str\n    counter: u256\n    marker: str\n\n    def __init__(self):\n        self.installer = gl.message.sender_address\n        self.expected_digest = ZERO_DIGEST\n        self.total_chunks = u256(0)\n        self.next_chunk = u256(0)\n        self.staged_bytes = u256(0)\n        self.activated = False\n        self.activation_digest = ZERO_DIGEST\n        self.counter = u256(0)\n        self.marker = \"bootstrap\"\n        # Root.upgraders is the runtime authorization for writes to the locked\n        # root/code slots.  It is intentionally revoked on activation.\n        gl.storage.Root.get().upgraders.get().append(self.installer)\n\n    def _require_installer(self) -> None:\n        if gl.message.sender_address != self.installer:\n            raise gl.vm.UserError(\"[EXPECTED] installer only\")\n        if self.activated:\n            raise gl.vm.UserError(\"[EXPECTED] installation already activated\")\n\n    def _staged_code(self):\n        # RC10's Root.get_vacant_slot() is the documented alternate storage\n        # slot used for bootstrapping.  The runtime's code_slot points to this\n        # exact slot after activation; no source copy occurs during activation.\n        return gl.storage.Root.get().get_vacant_slot().cast(gl.storage.VLA[gl.u8], 0)\n\n    def _status(self) -> dict:\n        return {\n            \"activated\": self.activated,\n            \"expected_digest\": self.expected_digest,\n            \"total_chunks\": int(self.total_chunks),\n            \"next_chunk\": int(self.next_chunk),\n            \"staged_bytes\": int(self.staged_bytes),\n            \"activation_digest\": self.activation_digest,\n        }\n\n    @gl.public.view\n    def get_installation_status(self) -> str:\n        return json.dumps(self._status(), sort_keys=True, separators=(\",\", \":\"))\n\n    @gl.public.view\n    def get_counter(self) -> u256:\n        return self.counter\n\n    @gl.public.view\n    def get_marker(self) -> str:\n        return self.marker\n\n    @gl.public.view\n    def get_installer(self) -> Address:\n        return self.installer\n\n    @gl.public.view\n    def get_code_slot(self) -> u256:\n        return gl.storage.Root.get().code_slot\n\n    @gl.public.write\n    def increment(self, amount: u256) -> None:\n        if amount <= 0 or amount > 1000:\n            raise gl.vm.UserError(\"[EXPECTED] bounded increment\")\n        self.counter += amount\n\n    @gl.public.write\n    def stage_chunk(\n        self,\n        index: u256,\n        total_chunks: u256,\n        chunk: bytes,\n        source_digest: str,\n    ) -> None:\n        self._require_installer()\n        if not _valid_digest(source_digest):\n            raise gl.vm.UserError(\"[EXPECTED] invalid source digest\")\n        if index != self.next_chunk:\n            raise gl.vm.UserError(\"[EXPECTED] chunk is not the next sequential chunk\")\n        if not 1 <= total_chunks <= MAX_CHUNKS:\n            raise gl.vm.UserError(\"[EXPECTED] invalid chunk count\")\n        if self.total_chunks == 0:\n            if index != 0:\n                raise gl.vm.UserError(\"[EXPECTED] first chunk must be zero\")\n            self.total_chunks = total_chunks\n            self.expected_digest = source_digest.lower()\n        elif total_chunks != self.total_chunks or source_digest.lower() != self.expected_digest:\n            raise gl.vm.UserError(\"[EXPECTED] chunk manifest mismatch\")\n        if not isinstance(chunk, bytes) or not 0 < len(chunk) <= MAX_CHUNK_BYTES:\n            raise gl.vm.UserError(\"[EXPECTED] invalid bounded chunk\")\n        if self.staged_bytes + len(chunk) > MAX_SOURCE_BYTES:\n            raise gl.vm.UserError(\"[EXPECTED] staged source too large\")\n        self._staged_code().extend(chunk)\n        self.staged_bytes += len(chunk)\n        self.next_chunk += 1\n\n    @gl.public.write\n    def reset_installation(self) -> None:\n        self._require_installer()\n        self._staged_code().truncate()\n        self.expected_digest = ZERO_DIGEST\n        self.total_chunks = u256(0)\n        self.next_chunk = u256(0)\n        self.staged_bytes = u256(0)\n        self.activation_digest = ZERO_DIGEST\n\n    @gl.public.write\n    def activate(self) -> None:\n        self._require_installer()\n        if self.total_chunks == 0 or self.next_chunk != self.total_chunks:\n            raise gl.vm.UserError(\"[EXPECTED] incomplete staged source\")\n        staged = self._staged_code()\n        if len(staged) != self.staged_bytes:\n            raise gl.vm.UserError(\"[EXPECTED] staged length mismatch\")\n        digest = \"0x\" + hashlib.sha256(bytes(staged)).hexdigest()\n        if digest.lower() != self.expected_digest:\n            raise gl.vm.UserError(\"[EXPECTED] staged source digest mismatch\")\n        root = gl.storage.Root.get()\n        # The pointer write is constant-size.  The next GenVM invocation loads\n        # source from this slot; this transaction never copies the 42KB source.\n        root.code_slot = root.get_vacant_slot().as_int()\n        self.activation_digest = digest\n        self.activated = True\n        # Revoking the only upgrader makes the root/code-slot transition final.\n        root.upgraders.get().truncate()\n",
+        "constructorArgs": {},
+        "leaderOnly": false,
+        "type": "deploy",
+        "contractAddress": "0x1452641F37cd59C797514f997bf6d6D5fe9DFD3C"
+      },
+      "currentTimestamp": "1794572691",
+      "statusName": "FINALIZED",
+      "lifecycle": {
+        "state": "finalized",
+        "outcome": "accepted"
+      },
+      "resultName": "MAJORITY_AGREE",
+      "txExecutionResultName": "FINISHED_WITH_RETURN"
+    },
+    "settlementReceipts": []
+  },
+  "initialState": {
+    "status": "{\"activated\":false,\"activation_digest\":\"\",\"expected_digest\":\"\",\"next_chunk\":0,\"staged_bytes\":0,\"total_chunks\":0}",
+    "counter": 0,
+    "marker": "bootstrap",
+    "installer": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+    "codeSlot": 0
+  },
+  "failedAttempts": [
+    {
+      "label": "CLI digest scalar negative control",
+      "transactionId": "0x799b1e55fc40378b973b79fd98809e7e5a5ff447d59e6a80713dd24e85a136bc",
+      "status": "FINALIZED",
+      "executionResult": "FINISHEDWITHERROR",
+      "reason": "GenVM trace returned [EXPECTED] invalid source digest: the CLI scalar parser converted the 0x-prefixed digest into a bigint. No chunk state was committed."
+    }
+  ],
+  "resume": {
+    "startedAt": "2026-11-13T12:50:35.312Z",
+    "account": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+    "signingMode": "genlayer-cli-keychain-in-memory",
+    "initialStatus": {
+      "activated": true,
+      "activation_digest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+      "expected_digest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+      "next_chunk": 3,
+      "staged_bytes": 1832,
+      "total_chunks": 3
+    },
+    "initialCounter": "2"
+  },
+  "afterChunk1": {
+    "activated": false,
+    "activation_digest": "",
+    "expected_digest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+    "next_chunk": 1,
+    "staged_bytes": 700,
+    "total_chunks": 3
+  },
+  "afterChunk2": {
+    "activated": false,
+    "activation_digest": "",
+    "expected_digest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+    "next_chunk": 2,
+    "staged_bytes": 1400,
+    "total_chunks": 3
+  },
+  "afterActivation": {
+    "status": {
+      "activated": true,
+      "activation_digest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+      "expected_digest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+      "next_chunk": 3,
+      "staged_bytes": 1832,
+      "total_chunks": 3
+    },
+    "codeSlot": "34637940894572516012752351849877552082745457177273238154725048070642300542474",
+    "marker": "bootstrap",
+    "counter": 2,
+    "version": "replacement-v2"
+  },
+  "defaultCodeSlotReadbackSha256": "e7e6bcfdf4f1fbf137c00b5e629c650280af81ac45526b5694ecad63ba1e6b84",
+  "resolvedCodeEvidence": {
+    "replacementSha256": "4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+    "activationDigest": "0x4f21298a004a489c3d86167f14eb0d18f46f5c92ab591c90a3997e1dc020e4a5",
+    "codeSlot": "34637940894572516012752351849877552082745457177273238154725048070642300542474",
+    "note": "Bradbury gen_getContractCode returns the root/default code slot; the resolved alternate slot was verified by the finalized activation digest, the replacement-only get_version method, and rejection of the removed stage_chunk method."
+  },
+  "activeMethodChecks": {
+    "getVersion": "replacement-v2",
+    "removedStageChunkRejected": true,
+    "expectedReplacementMethods": [
+      "get_code_slot",
+      "get_counter",
+      "get_installation_status",
+      "get_installer",
+      "get_marker",
+      "get_version",
+      "increment"
+    ]
+  },
+  "afterReplacementWrite": {
+    "counter": 5,
+    "version": "replacement-v2"
+  },
+  "completedAt": "2026-11-13T12:53:07.122Z"
+}

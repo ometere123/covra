@@ -8,6 +8,7 @@ import { createPublicClient,http,recoverTypedDataAddress } from "viem";
 import { baseSepolia } from "viem/chains";
 import { types,messageForSigning } from "./attestor-sign.mjs";
 import { poolsAbi } from "../src/lib/chain.ts";
+import { activeDeployment } from "../src/lib/deployment-config.mjs";
 
 export async function aggregateAttestations(list, pool, base) {
   if (!Array.isArray(list)||list.length<3||list.length>5) throw new Error("Require 3-5 independently signed records");
@@ -38,7 +39,7 @@ export async function aggregateAttestations(list, pool, base) {
 async function main() {
   const list=JSON.parse(readFileSync(0,"utf8"));
   const base=createPublicClient({chain:baseSepolia,transport:http(process.env.BASE_RPC_URL||"https://sepolia.base.org")});
-  const bundle=await aggregateAttestations(list,process.env.NEXT_PUBLIC_COVRA_POOLS_ADDRESS,base);
+  const bundle=await aggregateAttestations(list,activeDeployment().poolAddress,base);
   process.stdout.write(JSON.stringify(bundle)+"\n");
 }
 if (process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)

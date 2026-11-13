@@ -10,6 +10,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient,http,parseAbi } from "viem";
 import { baseSepolia } from "viem/chains";
 import { parsePreflightOutput } from "./preflight-io.mjs";
+import { activeDeployment } from "../src/lib/deployment-config.mjs";
 
 export const types={Decision:[
   {name:"policyId",type:"bytes32"},{name:"claimId",type:"bytes32"},
@@ -44,7 +45,7 @@ async function main() {
   ],{encoding:"utf8",timeout:60000,env:process.env,maxBuffer:1024*1024}));
   if (JSON.stringify(preflight.decision)!==JSON.stringify(input.decision))
     throw new Error("Independent preflight disagrees on the signable statement");
-  const pool=process.env.NEXT_PUBLIC_COVRA_POOLS_ADDRESS;
+  const pool=activeDeployment().poolAddress;
   if (!/^0x[0-9a-fA-F]{40}$/.test(pool||"")) throw new Error("Invalid pool address");
   const account=privateKeyToAccount(secret);
   const base=createPublicClient({chain:baseSepolia,transport:http(process.env.BASE_RPC_URL||"https://sepolia.base.org")});
