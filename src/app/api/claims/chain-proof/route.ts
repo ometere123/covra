@@ -7,9 +7,10 @@ import { z } from "zod";
 import { walletSession } from "@/lib/auth";
 import { authenticateAgent } from "@/lib/agent-auth";
 import { database } from "@/lib/db";
-import { baseClient, configuredPoolAddress, poolsAbi } from "@/lib/chain";
-import { configuredAdjudicator } from "@/lib/bradbury-client";
-import { canonicalJson, claimIdFromUuid, finalizedResultDigest } from "@/lib/claim-protocol";
+import { baseClient, poolsAbi } from "@/lib/chain";
+import { canonicalJson, claimIdFromUuid } from "@/lib/claim-protocol";
+import { deployedDecisionDigest } from "@/lib/deployed-decision-digest";
+import { configuredDeployment } from "@/lib/deployment-config.mjs";
 import { assertExactBradburyReceipt } from "@/lib/bradbury-receipt";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "@/lib/bradbury-final-state";
 import { responseError, testnetGuard } from "@/lib/http";
@@ -30,7 +31,7 @@ export async function POST(request:NextRequest) {
     if (!owner) return NextResponse.json({error:"Authorized owner or agent required"},{status:401});
     const {claimId,txHash,phase,evidenceDigest,evidenceSource}=schema.parse(await request.json());
     const sql=database();
-    const rows=await sql`select c.*,p.risk_spec_hash,p.terms_hash,p.beneficiary_wallet,p.cover_micro_usdc,
+    const rows=await sql`select c.*,p.risk_spec_hash,p.terms_hash,p.beneficiary_wallet,p.cover_micro_usdc,p.base_tx_hash as purchase_tx_hash,
       prs.risk_spec_json
       from claims c join policies p on p.policy_id=c.policy_id
       join policy_risk_specs prs on prs.policy_id=p.policy_id and prs.risk_spec_hash=p.risk_spec_hash
@@ -40,8 +41,28 @@ export async function POST(request:NextRequest) {
     if (claim.status === "CANCELLED")
       return NextResponse.json({error:"This intake was withdrawn; it cannot be used for subsequent chain actions"},{status:409});
     const actualId=claimIdFromUuid(claimId,owner);
-    const pool=configuredPoolAddress();
-    if (!pool) throw new Error("Base pool not configured");
+    if (!/^0x[0-9a-fA-F]{64}$/.test(claim.purchase_tx_hash))
+      throw new Error("Missing original policy purchase receipt");
+    const purchase=await baseClient.getTransactionReceipt({hash:claim.purchase_tx_hash});
+    const deployments=(["V1","V2"] as const).map(configuredDeployment).filter(candidate =>
+      candidate.configured && candidate.poolAddress?.toLowerCase()===purchase.to?.toLowerCase());
+    if (purchase.status!=="success" || deployments.length!==1 ||
+        await baseClient.getBlockNumber()<purchase.blockNumber+11n)
+      throw new Error("Policy purchase does not identify a unique configured deployment");
+    const deployment=deployments[0];
+    const pool=deployment.poolAddress as `0x${string}`;
+    const purchased=purchase.logs.some(log => {
+      if (log.address.toLowerCase()!==pool.toLowerCase()) return false;
+      try {
+        const event=decodeEventLog({abi:poolsAbi,data:log.data,topics:log.topics});
+        return event.eventName==="PolicyPurchased" &&
+          event.args.policyId.toLowerCase()===String(claim.policy_id).toLowerCase();
+      } catch { return false; }
+    });
+    if (!purchased) throw new Error("Original purchase receipt does not contain the policy");
+    const boundAdjudicator=await baseClient.readContract({address:pool,abi:poolsAbi,functionName:"bradburyAdjudicator"});
+    if (boundAdjudicator.toLowerCase()!==deployment.adjudicatorAddress?.toLowerCase())
+      throw new Error("Configured adjudicator differs from the policy pool binding");
     let status="";
     let eventType:string=phase;
     let blockNumber:string|null=null;
@@ -107,7 +128,7 @@ export async function POST(request:NextRequest) {
       }
     } else {
       const endpoint=process.env.BRADBURY_NODE_RPC_URL;
-      const adjudicator=configuredAdjudicator();
+      const adjudicator=deployment.adjudicatorAddress as `0x${string}`;
       if (!endpoint?.startsWith("https://")||!adjudicator) throw new Error("Bradbury execution node not configured");
       await assertBradburyNodeIdentity(endpoint);
       const client=createClient({chain:testnetBradbury,endpoint});
@@ -170,13 +191,7 @@ export async function POST(request:NextRequest) {
         phase==="BRADBURY_APPEALED"?["SUBMITTED","DECIDED","FINALIZED"]:["FINALIZED"];
       if (!acceptable.includes(record.state)) throw new Error("Unexpected GenLayer case state");
       if (phase === "BRADBURY_FINALIZED") {
-        const expectedDecisionDigest=finalizedResultDigest({
-          case_id:String(record.id),policy_id:String(record.policy_id),claim_id:String(record.claim_id),
-          terms_hash:String(record.terms_hash),risk_spec_hash:String(record.risk_spec_hash),
-          verdict:String(record.verdict) as "COVERED"|"NOT_COVERED"|"INSUFFICIENT_EVIDENCE",
-          revision:Number(record.revision),evidence_hash:String(record.evidence_hash),
-          coverage_class:Number(record.risk),finalized_at:Number(record.finalized_at),
-        });
+        const expectedDecisionDigest=deployedDecisionDigest(deployment.version,record);
         const digest=await readFinalizedBradburyView(endpoint,adjudicator,"get_decision_digest",[actualId]);
         if (typeof digest!=="string"||digest.toLowerCase()!==expectedDecisionDigest.toLowerCase())
           throw new Error("Finalized GenLayer decision digest does not match the canonical case state");

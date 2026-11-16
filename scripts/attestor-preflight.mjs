@@ -17,6 +17,7 @@ import { encodePreflightOutput } from "./preflight-io.mjs";
 import { assertExactBradburyReceipt } from "./bradbury-receipt.mjs";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "../src/lib/bradbury-final-state.ts";
 import { activeDeployment } from "../src/lib/deployment-config.mjs";
+import { deployedDecisionDigest } from "../src/lib/deployed-decision-digest.ts";
 
 function fail(reason) { throw new Error("ATTESTOR_PREFLIGHT_REJECTED: " + reason); }
 function hex32(value) { return typeof value === "string" && /^0x[0-9a-fA-F]{64}$/.test(value); }
@@ -122,13 +123,7 @@ async function main() {
   if (![0,1,2,3,4].includes(record.risk) || ![0,1].includes(record.revision)) fail("invalid risk/revision");
   if (!["COVERED","NOT_COVERED"].includes(record.verdict)) fail("non-settleable GenLayer result");
   if (!Number.isSafeInteger(record.finalized_at) || record.finalized_at <= record.decided_at+259200) fail("GenLayer appeal window not satisfied");
-  const digestFields = {
-    case_id:record.id,policy_id:record.policy_id,claim_id:record.claim_id,
-    terms_hash:record.terms_hash,risk_spec_hash:record.risk_spec_hash,
-    verdict:record.verdict,revision:record.revision,
-    evidence_hash:record.evidence_hash,coverage_class:record.risk,finalized_at:record.finalized_at,
-  };
-  const expectedResultDigest=sha256(canonical(digestFields));
+  const expectedResultDigest=deployedDecisionDigest(deployment.version, record);
   const actualResultDigest=await readFinalizedBradburyView(nodeUrl,adjudicator,"get_decision_digest",[caseId]);
   if (!same(expectedResultDigest,actualResultDigest)) fail("GenLayer finalized digest mismatch");
 
