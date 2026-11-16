@@ -32,6 +32,11 @@ jobs:
           npm run test:genlayer-direct
       - name: Verify native alternate-code-slot proof
         run: python -m pytest tests/python/test_staged_code_slot_direct.py tests/python/test_covra_v2_staged_layout_direct.py -q --tb=short
+      - name: Verify V3 staged installation offline
+        run: |
+          python -m unittest discover -s scripts -p 'test_prepare_v3_staged.py'
+          python scripts/prepare-v3-staged.py --verify
+          python -m pytest tests/python/test_adjudicator_v3_direct.py -q --tb=short
       - uses: foundry-rs/foundry-toolchain@v1
         with:
           version: stable

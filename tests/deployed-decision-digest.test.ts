@@ -27,4 +27,16 @@ describe("deployed decision digest", () => {
     expect(() => deployedDecisionDigest("V2", { ...v2, state: "DECIDED" })).toThrow();
     expect(() => deployedDecisionDigest("V2", { ...v2, confidence: "0" })).toThrow();
   });
+
+  it("matches Python's canonical V3 unproven closure vector", () => {
+    const closed = {
+      ...v2, decision_schema: "covra-decision-v3", revision: 2, findings: [],
+      verdict: "UNPROVEN_CLOSED", state: "UNPROVEN_CLOSED",
+      event_time: "2023-10-01T00:00:00Z", cure_deadline: 1699999999,
+      resolution_deadline: 1700001000, decided_at: 0,
+    };
+    expect(deployedDecisionDigest("V3", closed)).toBe("0x4b8dbd81821cd40da4216b9ee23bfd3fce0e2d5fdc71fb286eac1f5efaa142cb");
+    expect(() => deployedDecisionDigest("V3", { ...closed, state: "FINALIZED" })).toThrow();
+    expect(() => deployedDecisionDigest("V2", closed)).toThrow();
+  });
 });

@@ -26,6 +26,17 @@ const structured = z.object({
   contradictions: references,
   uncertainty: references,
 });
+const timestamp = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+const v3Common = common.extend({
+  verdict: z.enum(["COVERED", "NOT_COVERED", "UNPROVEN_CLOSED"]),
+  state: z.enum(["FINALIZED", "UNPROVEN_CLOSED"]),
+  revision: z.number().int().min(0).max(2),
+  event_time: z.iso.datetime(),
+  cure_deadline: timestamp,
+  resolution_deadline: timestamp,
+  decided_at: timestamp,
+});
+const v3Structured = structured.extend({ decision_schema: z.literal("covra-decision-v3") });
 
 function canonical(value: unknown): string {
   if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
@@ -40,6 +51,15 @@ function canonical(value: unknown): string {
 }
 
 export function deployedDecisionDigest(version: string, record: unknown) {
+  if (version === "V3") {
+    const { id, risk, ...fields } = v3Common.parse(record);
+    if ((fields.state === "UNPROVEN_CLOSED") !== (fields.verdict === "UNPROVEN_CLOSED"))
+      throw new Error("Inconsistent V3 terminal state and verdict");
+    return "0x" + createHash("sha256").update(canonical({
+      ...fields, ...v3Structured.parse(record), case_id: id, coverage_class: risk,
+      protocol_version: "COVRA_ADJUDICATOR_V3",
+    }), "utf8").digest("hex");
+  }
   const { id, risk, ...fields } = common.parse(record);
   const payload: Record<string, unknown> = {
     ...fields, case_id: id, coverage_class: risk,

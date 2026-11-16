@@ -10,7 +10,7 @@ import { database } from "@/lib/db";
 import { baseClient, poolsAbi } from "@/lib/chain";
 import { canonicalJson, claimIdFromUuid } from "@/lib/claim-protocol";
 import { deployedDecisionDigest } from "@/lib/deployed-decision-digest";
-import { configuredDeployment } from "@/lib/deployment-config.mjs";
+import { historicalDeploymentForPool } from "@/lib/deployment-config.mjs";
 import { assertExactBradburyReceipt } from "@/lib/bradbury-receipt";
 import { assertBradburyNodeIdentity, readFinalizedBradburyView } from "@/lib/bradbury-final-state";
 import { responseError, testnetGuard } from "@/lib/http";
@@ -44,12 +44,10 @@ export async function POST(request:NextRequest) {
     if (!/^0x[0-9a-fA-F]{64}$/.test(claim.purchase_tx_hash))
       throw new Error("Missing original policy purchase receipt");
     const purchase=await baseClient.getTransactionReceipt({hash:claim.purchase_tx_hash});
-    const deployments=(["V1","V2"] as const).map(configuredDeployment).filter(candidate =>
-      candidate.configured && candidate.poolAddress?.toLowerCase()===purchase.to?.toLowerCase());
-    if (purchase.status!=="success" || deployments.length!==1 ||
-        await baseClient.getBlockNumber()<purchase.blockNumber+11n)
-      throw new Error("Policy purchase does not identify a unique configured deployment");
-    const deployment=deployments[0];
+    if (purchase.status!=="success" || await baseClient.getBlockNumber()<purchase.blockNumber+11n)
+      throw new Error("Policy purchase receipt lacks 12 confirmations or failed");
+    const deployment=historicalDeploymentForPool(purchase.to);
+    if (deployment.version==="V3") throw new Error("V3 claim verification is disabled until its protocol verifier is available");
     const pool=deployment.poolAddress as `0x${string}`;
     const purchased=purchase.logs.some(log => {
       if (log.address.toLowerCase()!==pool.toLowerCase()) return false;

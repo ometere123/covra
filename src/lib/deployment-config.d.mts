@@ -6,5 +6,9 @@ export type ContractDeployment = {
   configured: boolean;
 };
 export function configuredDeployment(version: ContractVersion): ContractDeployment;
+export function configuredDeployment(version: "V3"): Omit<ContractDeployment, "version"> & { version: "V3" };
+export function historicalDeploymentForPool(poolAddress: string | null): Omit<ContractDeployment, "version"> & {
+  version: ContractVersion | "V3";
+};
 export function activeContractVersion(): ContractVersion;
 export function activeDeployment(): ContractDeployment;
