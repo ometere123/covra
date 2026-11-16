@@ -26,7 +26,9 @@ The V3 evidence library commits the frozen method and registry revision. For ind
 
 The GenLayer contract implements evidence pending, one cure, one appeal, and terminal unproven closure. The canonical SHA-256 digest binds the state, incident time, revision, decision timestamps and structured findings. The Base contract and the local TypeScript verifier use separate version-aware domains and encodings.
 
-V3 remains gated until GenLayer can verify a frozen operator registry and signed source records, and until the claim coordinator verifies and applies identical revision and timing rules on both chains. The GenLayer contract fails closed for financial dispositions. V3 transaction routing remains disabled. Independent operator onboarding and a qualifying incident are subsequent operational requirements.
+V3 remains gated until GenLayer can verify a frozen operator registry and signed source records, and until the claim coordinator verifies and applies compatible revision and timing rules on both chains. The current witness format uses EIP-191 signer recovery through viem. The pinned GenVM runner has no verified equivalent integration for that format. GenLayer also needs authenticated Base policy commitments and deterministic fact extraction from each raw record. The GenLayer contract fails closed for financial dispositions. V3 transaction routing remains disabled. Independent operator onboarding and a qualifying incident are subsequent operational requirements.
+
+For the verified offline candidate, the readable GenLayer source SHA-256 is `03736dbd47a875ceaf547c942de5fe9d56a8d088ede79d1c16e80faa4e617030`. The generated artifact is 45,386 bytes and 65 chunks, with SHA-256 `f78f6914a83dc6d5a9d73785d58ef958d4ad5951b5396602bebfa49cba872257`. The staged installer verified exact slot readback in Direct Mode. Live gas and activation remain unverified.
 
 ## Reproduction
 

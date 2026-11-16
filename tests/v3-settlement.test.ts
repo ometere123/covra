@@ -9,9 +9,9 @@ it("matches the Solidity V3 EIP-712 field order and separates versions and pools
   expect(solidity).toContain('"Decision(' + fields.join(",") + ')"');
   const domain = v3SettlementDomain("0x1000000000000000000000000000000000000000");
   const digest = (value: typeof domain) =>
-    hashTypedData({ domain: value, types: {}, primaryType: "EIP712Domain", message: {} });
+    hashTypedData({ domain: value, types: {}, primaryType: "EIP712Domain" });
   expect(digest(domain)).not.toBe(hashTypedData({
-    domain: { ...domain, version: "1" }, types: {}, primaryType: "EIP712Domain", message: {},
+    domain: { ...domain, version: "1" }, types: {}, primaryType: "EIP712Domain",
   }));
   expect(digest(domain)).not.toBe(digest({ ...domain, verifyingContract: "0x2000000000000000000000000000000000000000" }));
 });

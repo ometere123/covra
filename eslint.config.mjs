@@ -1,6 +1,7 @@
 import nextConfig from "eslint-config-next/core-web-vitals";
 
 const config = [
+  { ignores: ["test-results/**", "playwright-report/**", ".runtime/**"] },
   ...nextConfig,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
