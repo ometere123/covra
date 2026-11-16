@@ -1,0 +1,138 @@
+{
+  "network": "testnet-bradbury",
+  "chainId": 4221,
+  "genesis": "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4",
+  "adjudicator": "0x71B1Fb863F29c29D4C3f6423196b60589538E491",
+  "caller": "0x0d5540e0aD4B92Aa0ad4e5F1b8cD645ee1E363E7",
+  "method": "allow_evidence_host",
+  "args": [
+    "covra-lyart.vercel.app",
+    true
+  ],
+  "feeManager": "0x7678587A847712f2A96082AC07883A88D0fc7245",
+  "feeValue": "100000000000010352",
+  "distribution": {
+    "leaderTimeunitsAllocation": "100",
+    "validatorTimeunitsAllocation": "200",
+    "appealRounds": "0",
+    "executionBudgetPerRound": "25000000000000000",
+    "executionConsumed": "0",
+    "totalMessageFees": "0",
+    "rotations": [
+      "3"
+    ],
+    "maxPriceGenPerTimeUnit": "2",
+    "storageFeeMaxGasPrice": "300000000",
+    "receiptFeeMaxGasPrice": "300000000"
+  },
+  "status": "Finalized",
+  "transactionSubmitted": true,
+  "transactionId": "0x93fd6f9967504baf2c0483f47596e410d463e40bee54467a90e0c30de9941e0c",
+  "executionResult": "FinishedWithReturn",
+  "receipt": {
+    "id": "0x93fd6f9967504baf2c0483f47596e410d463e40bee54467a90e0c30de9941e0c",
+    "txOrigin": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+    "sender": "0x0d5540e0ad4b92aa0ad4e5f1b8cd645ee1e363e7",
+    "recipient": "0x71b1fb863f29c29d4c3f6423196b60589538e491",
+    "activator": "0x60c4c1d3f130c85f5643c84a19f6920fcf13d3ba",
+    "status": 7,
+    "statusName": "Finalized",
+    "previousStatus": null,
+    "txSlot": 63,
+    "initialRotations": 3,
+    "numOfInitialValidators": 5,
+    "randomSeed": "0x799d61b344ad59b285ec0ee814a45d10a80ab1a80d216e6961d06588884feedc",
+    "txExecutionHash": "0x9e8465839a51dbcf8aeebafa1dddd3bb852582655743d7ee33735fdfc309d81a",
+    "txCallData": "f838b616009c01616c6c6f775f65766964656e63655f686f7374046172677315b401636f7672612d6c796172742e76657263656c2e6170701000",
+    "eqBlocksOutputs": "0e076e645f6f75747305",
+    "timestamps": {
+      "Created": 1794850379,
+      "Pending": 1794850379,
+      "Activated": 1794850382,
+      "Proposed": 1794850386,
+      "Committed": 1794850397,
+      "LastVote": 1794850402,
+      "AppealSubmitted": 0,
+      "LeaderRevealed": 1794850398
+    },
+    "result": 1,
+    "txExecutionResult": 1,
+    "txExecutionResultName": "FinishedWithReturn",
+    "epoch": 25,
+    "resultHash": "0x34eeca6e1474b734725806e58cc536644d22e1f4c2e67d7f78cd8d4da873370e",
+    "validUntil": 1794853977,
+    "readStateBlockRanges": [
+      {
+        "ActivationBlock": 511955,
+        "ProcessingBlock": 511956,
+        "ProposalBlock": 511957
+      }
+    ],
+    "roundData": [
+      {
+        "round": 0,
+        "leaderIndex": 0,
+        "votesCommitted": 5,
+        "votesRevealed": 5,
+        "appealBond": 0,
+        "rotationsLeft": 3,
+        "result": 1,
+        "roundValidators": [
+          "0xb0dab7fc62e276f5be045b7ec3674f7168623342",
+          "0xe9f16f7aeb26f4b985f88227793cf391e1826086",
+          "0x4abb4b3841c038da2e46979f41e1548af71a2524",
+          "0xa003e629b6156de5a61a67f9e767602442b66a7a",
+          "0x036d5a4a8025a7d89aa7b91bfe7c919b7cd21ef8"
+        ],
+        "validatorVotes": "AQEBAQE=",
+        "validatorVotesHash": [
+          "49c3e6a14d9cbb0bd338d3a8afa095cd6216fe473fbb1cc03b9886ad83738178",
+          "ef6f36d5a16a6b925e508133d5e7a85d2fd120ec44ed575a6e5cb1474b601a83",
+          "3af2a48c7a36274ccf1dc98e8e913dd8ac544b5fd44d6026f3d37e9360aa8091",
+          "3902acd0a58b87a0693cdeec8b3bfe1f245ce621d0f5a05dc3e7f2ec4ba5b4c7",
+          "840e7f7c4dc68158d0fb1ca40e745c6cbc0225ce44fedcd5a3fb1b1fb9dff25d"
+        ],
+        "validatorResultHash": [
+          "34eeca6e1474b734725806e58cc536644d22e1f4c2e67d7f78cd8d4da873370e",
+          "34eeca6e1474b734725806e58cc536644d22e1f4c2e67d7f78cd8d4da873370e",
+          "34eeca6e1474b734725806e58cc536644d22e1f4c2e67d7f78cd8d4da873370e",
+          "34eeca6e1474b734725806e58cc536644d22e1f4c2e67d7f78cd8d4da873370e",
+          "34eeca6e1474b734725806e58cc536644d22e1f4c2e67d7f78cd8d4da873370e"
+        ]
+      }
+    ],
+    "fees": {
+      "deposit": "100000000000010352",
+      "userValue": "0",
+      "distribution": {
+        "leaderTimeunitsAllocation": "100",
+        "validatorTimeunitsAllocation": "200",
+        "appealRounds": "0",
+        "executionBudgetPerRound": "25000000000000000",
+        "totalMessageFees": "0",
+        "rotations": [
+          "3"
+        ],
+        "maxPriceGenPerTimeUnit": "2",
+        "storageFeeMaxGasPrice": "300000000",
+        "receiptFeeMaxGasPrice": "300000000"
+      },
+      "locked": {
+        "genPerTimeUnit": "1",
+        "storageUnitPrice": "250000000",
+        "receiptGasPrice": "250000000"
+      },
+      "consumed": {
+        "executionConsumed": "61886000000000",
+        "storageFeeUsed": "750000000",
+        "messageFeesConsumed": "0",
+        "messageFeesBudgetTotal": "0"
+      },
+      "hasAllocations": false,
+      "allocations": null,
+      "allocationPolicy": "open"
+    }
+  },
+  "completedAt": "2026-11-16T17:34:29.706Z",
+  "verifiedAt": "2026-11-16T17:34:44.748Z"
+}

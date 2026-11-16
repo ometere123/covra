@@ -1,0 +1,218 @@
+{
+  "checkedAt": "2026-11-16T17:43:05.000Z",
+  "base": {
+    "chainId": 84532,
+    "headBlock": "59645583",
+    "headHash": "0x55a3028bc954704aa07e04ad93c48f0cb453fd78e25c9a171a3397266dc37f84",
+    "pool": "0x208f1b9c5694d9fbde32c81b0489db922e33263c",
+    "deploymentTransaction": "0x6f41570b4c89d332b5f502f80c29faf3255dc7afbb8e0a42406806aab8d88d04",
+    "deploymentBlock": "58311245",
+    "deploymentReceiptStatus": "success",
+    "runtimeCodeSha256": "ead5a6ba92a5cc4075a6ee4bee0bbf34e48681c61b914b1a7a45475927f6b7b6",
+    "circleTestUsdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "owner": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+    "ownerUsdcMicro": "5000000",
+    "ownerBaseEthWei": "139926591313029766",
+    "roles": {
+      "owner": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "quoteSigner": "0x870d04144Ef72B02B1740D7c6a893036F29fb3A4",
+      "deploymentAuthority": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "evidenceIssuer": "0x2e45D3270eeB6A89e5cD4A9CB55282DFA51d87C5",
+      "bradburyAdjudicator": "0x71B1Fb863F29c29D4C3f6423196b60589538E491"
+    },
+    "sourceBradburyChainId": "4221",
+    "attestorCount": 5,
+    "attestors": [
+      {
+        "address": "0xD1fcB05420B51b2dF3fa3036d491BBA656CB8a1b",
+        "authorized": true
+      },
+      {
+        "address": "0xA1afCA241Ad6a84acEcb3e7cC43c57df65cF7826",
+        "authorized": true
+      },
+      {
+        "address": "0x9a69739ebEbfE1d57D71F0a4668a9FcE181C4A99",
+        "authorized": true
+      },
+      {
+        "address": "0xe37B7fb260aB56C803ce5aCe5f0f2011eaC48720",
+        "authorized": true
+      },
+      {
+        "address": "0xe59e5423E14bdb46d2EEefd3A39049a168De4591",
+        "authorized": true
+      }
+    ],
+    "pools": [
+      {
+        "classId": 0,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 1,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 2,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 3,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 4,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      }
+    ]
+  },
+  "bradbury": {
+    "chainId": 4221,
+    "genesis": "0x17d89764d4f4f963158fc4c5e8f2cb670c2837740b35f37081c12860c3df97e4",
+    "adjudicator": "0x71B1Fb863F29c29D4C3f6423196b60589538E491",
+    "activationTransaction": "0x671c8f76094166e4e440dd723c1f3f4ca27b6e7d767b9368fd682ac2f3b647bb",
+    "activationDigest": "0x3009c8f48fa380c73879a2c65652931ed0438a2e8e55eda27be59c1df05203ed",
+    "activationStatus": "FINALIZED",
+    "activationExecution": "FINISHEDWITHRETURN",
+    "protocolVersion": "COVRA_ADJUDICATOR_V2",
+    "caseCount": "0",
+    "unknownDecisionDigest": "",
+    "evidenceHost": {
+      "host": "covra-lyart.vercel.app",
+      "transactionId": "0x93fd6f9967504baf2c0483f47596e410d463e40bee54467a90e0c30de9941e0c",
+      "status": "Finalized",
+      "executionResult": "FinishedWithReturn",
+      "slot": 63
+    }
+  },
+  "v1Preservation": {
+    "pool": "0xd8619d3948c08c8364fd3a7a35dc8a65b254a8e4",
+    "adjudicator": "0xaefc8672272392310a2ea102787e28bb1f34e1d3",
+    "policyId": "0x888bc262dc251cda642d6843a3d69e94d403871a88ee8e570c04f6c4be7eafcd",
+    "pools": [
+      {
+        "classId": 0,
+        "pool": {
+          "assets": "100000000",
+          "reserved": "100000000",
+          "premiumsWritten": "1000000",
+          "paid": "0",
+          "totalShares": "99000000"
+        },
+        "available": "0",
+        "ownerShares": "99000000"
+      },
+      {
+        "classId": 1,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 2,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 3,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      },
+      {
+        "classId": 4,
+        "pool": {
+          "assets": "0",
+          "reserved": "0",
+          "premiumsWritten": "0",
+          "paid": "0",
+          "totalShares": "0"
+        },
+        "available": "0",
+        "ownerShares": "0"
+      }
+    ],
+    "policy": {
+      "insured": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "beneficiary": "0xa5840e65a15021d8b1648dB10176c04811f07873",
+      "coverageClass": 0,
+      "state": 1,
+      "limit": "100000000",
+      "startsAt": "1794388591",
+      "endsAt": "1794474991",
+      "claimDeadline": "1795684591",
+      "termsHash": "0xc2c43b0ff585725587e4aa048e824a979adc16708628ca23f35cb3c4cdce6554",
+      "riskSpecHash": "0xb59375ff5246954e65a153cac00f4a071d8d86a05f3776835603ba1fd2dad0ae"
+    },
+    "claimLock": {
+      "claimId": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "evidenceDigest": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "openedAt": "0",
+      "revision": 0,
+      "attestorRosterVersion": "0"
+    },
+    "claimResolutionDeadline": "1799572591"
+  },
+  "verdict": "BLOCKED_BEFORE_SPEND",
+  "blocker": "No independently attributable, policy-compatible OBSERVED_PUBLIC evidence source and qualifying event is currently available for a V2 case. The hosted issuer is explicitly COVRA_CONTROLLED and cannot authorize a COVERED result; public status APIs do not publish the exact covra-independent-source-v1 bytes required by the immutable V2 contract."
+}

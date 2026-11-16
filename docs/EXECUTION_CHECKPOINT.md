@@ -337,3 +337,32 @@ Verified production deployment:
 GitHub Actions run `43226186049` for `5ac76ad7ccf7b80459ae364a50c36f08b218c178` completed successfully (`COVRA quality gate`).
 
 Release boundary: V1 remains the only live adjudicator/pool pair. The V2 source candidate is schema-valid and locally tested but has no live Bradbury deployment or matching Base V2 pool; production traffic was not switched. Functional test quorum remains common-custody (`FUNCTIONAL_QUORUM_VERIFIED / OPERATOR_INDEPENDENCE_NOT_VERIFIED`). No new policy, settlement or V1 finalization transaction was broadcast. No `.env.local` access or modification occurred.
+# 2026-11-16 V2 lifecycle pre-spend gate
+
+The V2 pair was independently re-read without any USDC write. Base Sepolia head
+block `59644404` verified the unfunded pool `0x208f1b9c5694d9fbde32c81b0489db922e33263c`,
+Circle test USDC, owner/quote/evidence/adjudicator bindings, five authorized
+attestors and zero assets/reserves/shares in all classes. The funding wallet
+`0xa5840e65a15021d8b1648dB10176c04811f07873` held `5,000,000` micro-USDC and
+`139926591313029766` wei Base Sepolia ETH.
+
+Bradbury Phase 2 chain `4221` and the expected genesis were reverified. V2
+finalized reads return `COVRA_ADJUDICATOR_V2`, case count `0` and an empty
+unknown-case digest. The nonfinancial owner write enabling
+`covra-lyart.vercel.app` finalized as transaction
+`0x93fd6f9967504baf2c0483f47596e410d463e40bee54467a90e0c30de9941e0c`,
+`FinishedWithReturn`, with a fresh nonzero FeeManager deposit. It did not touch
+Base or V1 funds.
+
+The candidate class-1 Dependency Outage scenario is not yet executable as a
+legitimate positive case. Public status summaries are reachable but do not
+publish the exact `covra-independent-source-v1` records required by the
+immutable V2 contract; the hosted issuer is explicitly `COVRA_CONTROLLED` with
+zero independent observers. No V2 approval, deposit, purchase, claim lock or
+Bradbury case was broadcast. The exact evidence-readiness and spend checkpoint
+is [`docs/V2_LIFECYCLE_READINESS_2026-11-16.md`](V2_LIFECYCLE_READINESS_2026-11-16.md)
+and [`v2-readiness-2026-11-16.json`](deployments/v2-readiness-2026-11-16.json).
+The current verdict is **`BLOCKED_BEFORE_SPEND`**, pending an independent
+policy-compatible source/incident or an explicitly authorized controlled test
+with an external participant, plus the missing 95 USDC if the minimum 100-USDC
+class-1 pilot is later approved.
